@@ -39,6 +39,9 @@ public class OpenSearchSource extends AbstractCDRSource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( OpenSearchSource.class );
 
+    private static final String FACTORY_PID = "ecdr-opensearch-source";
+    private static final String SERVICE_TYPE = "CDR Brokered REST Search";
+
     private Map<String, String> parameterMap = new HashMap<String, String>();
     private Map<String, String> harcodedParamMap = new HashMap<String, String>();
 
@@ -179,5 +182,15 @@ public class OpenSearchSource extends AbstractCDRSource {
         //TODO future work!
         LOGGER.warn("Got some properties but do not know what to do with them.");
 
+    }
+
+    @Override
+    public String getFactoryIdentifier() {
+        return FACTORY_PID;
+    }
+
+    @Override
+    public String getServiceType() {
+        return SERVICE_TYPE;
     }
 }

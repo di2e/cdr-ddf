@@ -27,6 +27,9 @@ public class CDRRestSource extends AbstractCDRSource {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CDRRestSource.class );
 
+    private static final String FACTORY_PID = "ecdr-rest-source";
+    private static final String SERVICE_TYPE = "CDR REST Search Service";
+
     private Map<String, String> parameterMap = new HashMap<String, String>();
     private Map<String, String> harcodedParamMap = new HashMap<String, String>();
 
@@ -68,6 +71,16 @@ public class CDRRestSource extends AbstractCDRSource {
         //TODO future work!
         LOGGER.warn("Got some properties but do not know what to do with them.");
 
+    }
+
+    @Override
+    public String getFactoryIdentifier() {
+        return FACTORY_PID;
+    }
+
+    @Override
+    public String getServiceType() {
+        return SERVICE_TYPE;
     }
 
 }
