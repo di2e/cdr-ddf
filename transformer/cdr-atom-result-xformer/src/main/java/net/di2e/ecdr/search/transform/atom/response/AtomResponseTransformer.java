@@ -36,6 +36,7 @@ import org.apache.abdera.ext.geo.Position;
 import org.apache.abdera.ext.opensearch.OpenSearchConstants;
 import org.apache.abdera.i18n.iri.IRI;
 import org.apache.abdera.model.Category;
+import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
@@ -152,9 +153,23 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
             metacard.setExpirationDate( new Date( DATE_FORMATTER.parseMillis( expirationDate ) ) );
         }
 
-        String metadata = entry.getContent();
-        metacard.setMetadata( metadata );
+        StringBuilder metadata = new StringBuilder( entry.getContent() );
+        Content.Type contentType = entry.getContentType();
 
+        // certain content types may not follow XML structure
+        switch (contentType) {
+        case TEXT:
+        case HTML:
+            // add content element to make sure it has single root
+            metadata.insert( 0, "<content>" );
+            metadata.append( "</content>" );
+            break;
+        default:
+            // other items are xml-based
+            break;
+        }
+
+        metacard.setMetadata( metadata.toString() );
         metacard.setLocation( getWKT( entry ) );
 
         // if ( position != null ){
