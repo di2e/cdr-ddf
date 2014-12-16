@@ -27,6 +27,7 @@ import net.di2e.ecdr.commons.query.rest.parsers.QueryParser;
 import net.di2e.ecdr.search.transform.mapper.TransformIdMapper;
 
 import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
+import org.opengis.filter.sort.SortBy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -122,7 +123,13 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
             throws SourceUnavailableException, UnsupportedQueryException, FederationException {
         QueryRequest queryRequest = new QueryRequestImpl( query, false, query.getSiteNames(), getQueryParser().getQueryProperties( queryParameters,
                 localSourceId ) );
-        QueryResponse queryResponse = getCatalogFramework().query( queryRequest, fifoFedStrategy );
+        SortBy originalSortBy = getQueryParser().getSortBy( queryParameters );
+        QueryResponse queryResponse;
+        if (originalSortBy == null) {
+            queryResponse = getCatalogFramework().query( queryRequest );
+        } else {
+            queryResponse = getCatalogFramework().query( queryRequest, fifoFedStrategy );
+        }
         return queryResponse;
     }
 
