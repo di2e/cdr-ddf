@@ -58,9 +58,9 @@ import ddf.catalog.util.impl.TemporalResultComparator;
  * {@link SortOrder.DESCENDING} and {@link SortOrder.ASCENDING}. For this class to function properly a sort value and
  * sort order must be provided.
  * 
- * @see Metacard
- * @see Query
- * @see SortBy
+ * @see ddf.catalog.data.Metacard
+ * @see ddf.catalog.operation.Query
+ * @see org.opengis.filter.sort.SortBy
  */
 public class NormalizingSortedFederationStrategy extends AbstractFederationStrategy {
 
@@ -107,11 +107,11 @@ public class NormalizingSortedFederationStrategy extends AbstractFederationStrat
 
         private Query query;
 
-        public SortedQueryMonitor( ExecutorService pool, Map<Source, Future<SourceResponse>> futuress, QueryResponseImpl returnResults, Query query ) {
+        public SortedQueryMonitor( ExecutorService pool, Map<Source, Future<SourceResponse>> futures, QueryResponseImpl returnResults, Query query ) {
 
             this.returnResults = returnResults;
             this.query = query;
-            this.futures = futuress;
+            this.futures = futures;
         }
 
         @SuppressWarnings( { "rawtypes", "unchecked" } )
@@ -166,7 +166,7 @@ public class NormalizingSortedFederationStrategy extends AbstractFederationStrat
                     }
                     processingDetails.add( new ProcessingDetailsImpl( site.getId(), e ) );
                 } catch ( TimeoutException e ) {
-                    LOGGER.warn( "search timed out: " + new Date() + " on site " + site.getId() );
+                    LOGGER.warn( "search timed out: {} on site {}", new Date(), site.getId() );
                     processingDetails.add( new ProcessingDetailsImpl( site.getId(), e ) );
                 }
                 if ( sourceResponse != null ) {
@@ -199,12 +199,12 @@ public class NormalizingSortedFederationStrategy extends AbstractFederationStrat
                     } else {
                         siteListObject = new ArrayList<String>();
                         ((List) siteListObject).add( site.getId() );
-                        returnProperties.put( SearchConstants.SITE_LIST, (Serializable) siteListObject );
+                        returnProperties.put( SearchConstants.SITE_LIST, siteListObject );
                     }
 
                 }
             }
-            LOGGER.debug( "all sites finished returning results: " + resultList.size() );
+            LOGGER.debug( "all sites finished returning {} total results.", resultList.size() );
             if ( normalizeResults ) {
                 resultList = relevanceNormalizer.normalize( resultList, query );
             }

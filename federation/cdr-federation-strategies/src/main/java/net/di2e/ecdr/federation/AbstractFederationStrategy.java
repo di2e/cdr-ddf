@@ -70,7 +70,7 @@ public abstract class AbstractFederationStrategy implements NormalizingFederatio
     /**
      * Instantiates an {@code AbstractFederationStrategy} with the provided {@link ExecutorService}.
      * 
-     * @param queryExecutorService
+     * @param executor
      *            the {@link ExecutorService} for queries
      */
     public AbstractFederationStrategy( ExecutorService executor, List<PreFederatedQueryPlugin> preQuery, List<PostFederatedQueryPlugin> postQuery ) {
@@ -83,14 +83,14 @@ public abstract class AbstractFederationStrategy implements NormalizingFederatio
     /**
      * Creates the monitor for federated queries.
      * 
-     * @param queryExecutorService
+     * @param executor
      * @param futures
      * @param returnResults
      *            the query results
      * @param query
      * @return the {@link Runnable}
      */
-    protected abstract Runnable createMonitor( ExecutorService exceutor, Map<Source, Future<SourceResponse>> futures, QueryResponseImpl returnResults, Query query );
+    protected abstract Runnable createMonitor( ExecutorService executor, Map<Source, Future<SourceResponse>> futures, QueryResponseImpl returnResults, Query query );
 
     @Override
     public QueryResponse federate( List<Source> sources, final QueryRequest queryRequest ) {

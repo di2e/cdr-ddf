@@ -62,6 +62,8 @@ public final class SearchConstants {
     public static final String TIMEOUT_PARAMETER = "timeout";
     public static final String STATUS_PARAMETER = "status";
     public static final String OID_PARAMETER = "oid";
+
+    public static final String DEDUPLICATION_PARAMETER = "dedup";
     
     public static final String CDR_KEYWORD_QUERY_LANGUAGE = "cdr-kw-basic-2.0";
     public static final String CDR_CQL_QUERY_LANGUAGE = "cql-1.2";
