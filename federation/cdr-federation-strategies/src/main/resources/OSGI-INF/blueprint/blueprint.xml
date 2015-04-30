@@ -54,4 +54,8 @@
         <argument ref="filterAdapter" />
     </bean>
 
+    <bean id="deduplicationPlugin" class="net.di2e.ecdr.federation.DeduplicationPlugin" />
+
+    <service id="deduplicationService" ref="deduplicationPlugin" interface="ddf.catalog.plugin.PostQueryPlugin" />
+
 </blueprint>

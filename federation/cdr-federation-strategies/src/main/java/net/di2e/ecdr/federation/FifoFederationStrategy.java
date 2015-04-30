@@ -197,13 +197,6 @@ public class FifoFederationStrategy implements FederationStrategy {
         };
     }
 
-    /**
-     * Gets the time remaining before the timeout on a query
-     * 
-     * @param deadline
-     *            - the deadline for the timeout to occur
-     * @return the time remaining prior to the timeout
-     */
     private static final class FifoQueryMonitor implements Runnable {
 
         private QueryResponseImpl returnResults;
@@ -213,11 +206,11 @@ public class FifoFederationStrategy implements FederationStrategy {
         private AtomicInteger sites = new AtomicInteger();
         private AtomicInteger resultsToSkip = null;
 
-        public FifoQueryMonitor( ExecutorService pool, Map<Source, Future<SourceResponse>> futuress, QueryResponseImpl returnResults, Query query, int resultsToSkip ) {
+        public FifoQueryMonitor( ExecutorService pool, Map<Source, Future<SourceResponse>> futures, QueryResponseImpl returnResults, Query query, int resultsToSkip ) {
             this.pool = pool;
             this.returnResults = returnResults;
             this.query = query;
-            this.futures = futuress;
+            this.futures = futures;
             this.resultsToSkip = new AtomicInteger( resultsToSkip );
         }
 
@@ -237,13 +230,20 @@ public class FifoFederationStrategy implements FederationStrategy {
                 } else {
                     siteListObject = new ArrayList<String>();
                     ((List) siteListObject).add( site.getId() );
-                    returnResults.getProperties().put( SearchConstants.SITE_LIST, (Serializable) siteListObject );
+                    returnResults.getProperties().put( SearchConstants.SITE_LIST, siteListObject );
                 }
                 updateSites( 1 );
                 pool.submit( new SourceQueryThread( site, entry.getValue(), returnResults, pageSize ) );
             }
         }
 
+        /**
+         * Gets the time remaining before the timeout on a query
+         *
+         * @param deadline
+         *            - the deadline for the timeout to occur
+         * @return the time remaining prior to the timeout
+         */
         private long getTimeRemaining( long deadline ) {
             long timeleft;
             if ( System.currentTimeMillis() > deadline ) {

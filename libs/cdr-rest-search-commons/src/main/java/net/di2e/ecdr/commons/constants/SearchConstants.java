@@ -64,6 +64,8 @@ public final class SearchConstants {
     public static final String TIMEOUT_PARAMETER = "timeout";
     public static final String STATUS_PARAMETER = "status";
     public static final String OID_PARAMETER = "oid";
+
+    public static final String DEDUPLICATION_PARAMETER = "dedup";
     
     public static final String GEORSS_RESULT_FORMAT_PARAMETER = "georssFormat";
     public static final String GEORSS_SIMPLE_FORMAT = "simple";

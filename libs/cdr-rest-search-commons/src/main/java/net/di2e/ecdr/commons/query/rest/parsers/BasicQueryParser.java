@@ -103,6 +103,7 @@ public class BasicQueryParser implements QueryParser {
     private boolean defaultFuzzySearch = true;
     private Map<String, String> parameterExtensionMap = SearchUtils.convertToMap( "uid=id" );
     private List<String> parameterPropertyList = new ArrayList<>();
+    private boolean defaultDeduplication = true;
 
     private QueryRequestCache queryRequestCache = null;
 
@@ -166,6 +167,10 @@ public class BasicQueryParser implements QueryParser {
         } else {
             LOGGER.warn( "Could not update the default query request cache size due to invalid integer value [{}]", size );
         }
+    }
+
+    public void setDefaultDeduplication( boolean defaultDedup ) {
+        this.defaultDeduplication = defaultDedup;
     }
 
     public void setExtensionMap( List<String> extensionMap ) {
@@ -358,8 +363,9 @@ public class BasicQueryParser implements QueryParser {
     @Override
     public Map<String, Serializable> getQueryProperties( MultivaluedMap<String, String> queryParameters, String sourceId ) {
         Map<String, Serializable> queryProps = new HashMap<String, Serializable>();
-        String format = queryParameters.getFirst( SearchConstants.FORMAT_PARAMETER );
-        queryProps.put( SearchConstants.FORMAT_PARAMETER, StringUtils.isNotBlank( format ) ? format : defaultResponseFormat );
+        // default properties that may not be in the request
+        setDefaultProperty( queryProps, SearchConstants.FORMAT_PARAMETER, queryParameters.getFirst( SearchConstants.FORMAT_PARAMETER ), defaultResponseFormat );
+        setDefaultProperty( queryProps, SearchConstants.DEDUPLICATION_PARAMETER, queryParameters.getFirst( SearchConstants.DEDUPLICATION_PARAMETER ), defaultDeduplication );
         for (String key : queryParameters.keySet() ) {
             String value = queryParameters.getFirst( key );
             if (StringUtils.isNotBlank( value ) && parameterPropertyList.contains( key ) ) {
@@ -367,6 +373,14 @@ public class BasicQueryParser implements QueryParser {
             }
         }
         return queryProps;
+    }
+
+    private void setDefaultProperty(Map<String, Serializable> properties, String parameter, String value, Serializable defaultValue) {
+        if (StringUtils.isNotBlank( value )) {
+            properties.put( parameter, value );
+        } else {
+            properties.put( parameter, defaultValue );
+        }
     }
 
     @Override
