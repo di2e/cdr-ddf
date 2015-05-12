@@ -22,6 +22,8 @@
         description="Atom Metacard and Query Response Transformer">
         <feature>cdr-ddf-registry-core</feature>
         <bundle>mvn:net.di2e.ecdr.transformer/cdr-transformer-mapper/${project.version}</bundle>
+        <bundle>mvn:joda-time/joda-time/${joda.time.version}</bundle>
+        <bundle>mvn:net.di2e.ecdr.api/cdr-api-auditor/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-rest-search-commons/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.transformer/cdr-atom-result-xformer/${project.version}</bundle>
     </feature>
@@ -30,6 +32,8 @@
         <feature>cdr-ddf-registry-core</feature>
         <feature>cxf-rs-security-cors</feature>
         <bundle>mvn:net.di2e.ecdr.transformer/cdr-transformer-mapper/${project.version}</bundle>
+        <bundle>mvn:joda-time/joda-time/${joda.time.version}</bundle>
+        <bundle>mvn:net.di2e.ecdr.api/cdr-api-auditor/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-rest-search-commons/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.endpoint/cdr-endpoint-sortmapper/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-libs-result-relevance-normalizer/${project.version}</bundle>
@@ -47,6 +51,8 @@
         <feature>cdr-atom-result-xformer</feature>
         <feature>cdr-ddf-registry-core</feature>
         <feature>cxf-rs-security-sso-saml</feature>
+        <bundle>mvn:joda-time/joda-time/${joda.time.version}</bundle>
+        <bundle>mvn:net.di2e.ecdr.api/cdr-api-auditor/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-rest-search-commons/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.source/cdr-rest-source/${project.version}</bundle>
     </feature>
@@ -55,6 +61,8 @@
         <feature>cdr-ddf-registry-core</feature>
         <feature>cxf-rs-security-cors</feature>
         <bundle>mvn:net.di2e.ecdr.transformer/cdr-transformer-mapper/${project.version}</bundle>
+        <bundle>mvn:joda-time/joda-time/${joda.time.version}</bundle>
+        <bundle>mvn:net.di2e.ecdr.api/cdr-api-auditor/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-rest-search-commons/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.endpoint/cdr-endpoint-sortmapper/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-libs-result-relevance-normalizer/${project.version}</bundle>

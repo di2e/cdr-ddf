@@ -16,7 +16,8 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>net.di2e.ecdr</groupId>
@@ -98,10 +99,11 @@
         <!--  DDF Dependency Versions -->
         <ddf.catalog.version>2.4.1</ddf.catalog.version>
         <ddf.action.version>2.4.0</ddf.action.version>
-		<ddf.platform.version>2.3.1</ddf.platform.version>
+        <ddf.platform.version>2.3.1</ddf.platform.version>
         <ddf.libs.platform-config-impl.version>1.0.0</ddf.libs.platform-config-impl.version>
         <ddf.compression.version>2.6.0</ddf.compression.version>
         <ddf.registry.version>0.1.0</ddf.registry.version>
+        <joda.time.version>2.2</joda.time.version>
         
        <!--  <checkstyle.config.location>src/main/resources/cdr-checkstyle.xml</checkstyle.config.location>
          <checkstyle.header.location>src/main/resources/header.txt</checkstyle.header.location>-->
@@ -263,7 +265,7 @@
                         <argLine>-Djava.awt.headless=true</argLine>
                         <argLine>-XX:-UseSplitVerifier</argLine>
                     </configuration>
-                    
+
                 </plugin>
 
                 <plugin>
@@ -508,7 +510,7 @@
         </profile>
     </profiles>
 
-		
+
 
     <dependencyManagement>
         <dependencies>
@@ -527,10 +529,15 @@
                 <artifactId>cxf-bundle</artifactId>
                 <version>2.7.8</version>
             </dependency>
-            <dependency> 
+            <dependency>
                 <groupId>com.hazelcast</groupId>
                 <artifactId>hazelcast</artifactId>
                 <version>3.3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>${joda.time.version}</version>
             </dependency>
         </dependencies>
 
@@ -660,7 +667,7 @@
         <module>api</module>
         <module>libs</module>
         <module>security</module>
-		<module>transformer</module>
+        <module>transformer</module>
         <module>federation</module>
         <module>endpoint</module>
         <module>source</module>
