@@ -33,7 +33,7 @@
     <dependencies>
         <dependency>
             <groupId>ddf.catalog.core</groupId>
-            <artifactId>catalog-core-api-impl</artifactId>
+            <artifactId>catalog-core-api</artifactId>
             <version>${ddf.catalog.version}</version>
         </dependency>
         <dependency>
@@ -53,6 +53,7 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>
+                            javax.servlet.http;version="[2.5,4)",
                             *
                         </Import-Package>
                         <Export-Package>

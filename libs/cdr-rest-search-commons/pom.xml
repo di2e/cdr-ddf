@@ -119,7 +119,8 @@
                         </Embed-Dependency>
                         <Import-Package>
                             !org.apache.commons.codec.*,
-                            *,
+                            javax.servlet.http;version="[2.5,4)",
+                            *
                         </Import-Package>
                         <Export-Package>
                             net.di2e.ecdr.commons.*,
