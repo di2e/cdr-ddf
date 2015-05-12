@@ -73,9 +73,9 @@
                             catalog-core-api-impl
                         </Embed-Dependency>
                         <Import-Package>
-                            META-INF.cxf,
-                            META-INF.cxf.osgi,
-                            templates,
+                            META-INF.cxf;version="[2.7.0, 4.0)";resolution:=optional,
+                            META-INF.cxf.osgi;version="[2.7.0, 4.0)";resolution:=optional,
+                            templates;resolution:=optional,
                             *,
                         </Import-Package>
                         <Export-Package />
