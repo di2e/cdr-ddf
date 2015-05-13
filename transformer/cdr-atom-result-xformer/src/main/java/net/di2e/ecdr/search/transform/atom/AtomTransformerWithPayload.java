@@ -46,6 +46,8 @@ import ddf.catalog.transform.MetacardTransformer;
 
 public class AtomTransformerWithPayload extends AtomTransformer {
 
+    private static final String TRANSFORMER_ID = "atom-with-payload";
+
     private static final Logger LOGGER = LoggerFactory.getLogger( AtomTransformerWithPayload.class );
 
     private Map<String, MetacardTransformer> metacardTransformerMap = null;
@@ -133,8 +135,12 @@ public class AtomTransformerWithPayload extends AtomTransformer {
      */
     public void metacardTransformerAdded( MetacardTransformer transformer, Map<String, Object> map ) {
         String id = (String) map.get( Constants.SERVICE_ID );
-        metacardTransformerMap.put( id, transformer );
-        LOGGER.debug( "Adding MetacardTransformer with id [{}] to transformer map.", id );
+        // We need to filter out this transformer from being included in the
+        // Metacard Transformers used to produce metadata records
+        if ( !StringUtils.equalsIgnoreCase( id, TRANSFORMER_ID ) ) {
+            metacardTransformerMap.put( id, transformer );
+            LOGGER.debug( "Adding MetacardTransformer with id [{}] to transformer map.", id );
+        }
     }
 
     /**

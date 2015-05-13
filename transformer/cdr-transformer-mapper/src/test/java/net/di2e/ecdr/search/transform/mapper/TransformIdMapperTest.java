@@ -32,10 +32,10 @@ public class TransformIdMapperTest {
         Assert.assertEquals( "atom-with-payload", mapper.getQueryResponseTransformValue( "atom-ddms-4.1" ) );
         Assert.assertEquals( "atom-with-payload", mapper.getQueryResponseTransformValue( "atom-ddms-5.0" ) );
 
-        Assert.assertEquals( null, mapper.getMetacardTransformValue( "atom" ) );
+        Assert.assertEquals( "cdr-atom", mapper.getMetacardTransformValue( "atom" ) );
         Assert.assertEquals( null, mapper.getMetacardTransformValue( "ddf-atom" ) );
         Assert.assertEquals( null, mapper.getMetacardTransformValue( "cdr-atom" ) );
-        Assert.assertEquals( null, mapper.getMetacardTransformValue( "atom-ddms" ) );
+        Assert.assertEquals( "atom-with-payload", mapper.getMetacardTransformValue( "atom-ddms" ) );
         Assert.assertEquals( "ddms20", mapper.getMetacardTransformValue( "atom-ddms-2.0" ) );
         Assert.assertEquals( "ddms41", mapper.getMetacardTransformValue( "atom-ddms-4.1" ) );
         Assert.assertEquals( "ddms50", mapper.getMetacardTransformValue( "atom-ddms-5.0" ) );

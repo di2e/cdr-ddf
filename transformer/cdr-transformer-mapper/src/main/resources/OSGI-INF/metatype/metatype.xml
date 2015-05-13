@@ -27,7 +27,7 @@
         
         <AD name="Metadata/Metacard Transformer Mappings" id="metacardTransformValues" required="true" type="String" cardinality="50"
             description="Maps the external value to the internal value used to lookup the transform. Use the format extenral-value=internal-value"
-            default="atom-ddms-2.0=ddms20, atom-ddms-4.1=ddms41, atom-ddms-5.0=ddms50" />
+            default="atom=cdr-atom, atom-ddms=atom-with-payload, atom-ddms-2.0=ddms20, atom-ddms-4.1=ddms41, atom-ddms-5.0=ddms50" />
 
     </OCD>
 
