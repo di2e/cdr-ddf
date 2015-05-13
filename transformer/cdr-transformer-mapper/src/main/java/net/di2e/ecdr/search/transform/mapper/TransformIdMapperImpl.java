@@ -52,6 +52,8 @@ public class TransformIdMapperImpl implements TransformIdMapper {
         metacardTransformFormats.put( CDR_ATOM_DDMS20_TRANSFORM_ID, DDMS20_METACARD_TRANSFORM );
         metacardTransformFormats.put( CDR_ATOM_DDMS41_TRANSFORM_ID, DDMS41_METACARD_TRANSFORM );
         metacardTransformFormats.put( CDR_ATOM_DDMS50_TRANSFORM_ID, DDMS50_METACARD_TRANSFORM );
+        metacardTransformFormats.put( CDR_ATOM_DDMS_TRANSFORM_ID, CDR_ATOM_WITH_PAYLOAD_TRANSFORM_ID );
+        metacardTransformFormats.put( DEFAULT_DDF_ATOM_TRANSFORM_ID, CDR_ATOM_TRANSFORM_ID );
     }
 
     /**
