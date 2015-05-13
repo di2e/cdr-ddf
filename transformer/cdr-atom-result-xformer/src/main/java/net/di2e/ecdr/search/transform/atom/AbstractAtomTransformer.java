@@ -501,7 +501,7 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
             if ( action != null && action.getUrl() != null ) {
                 String transformFormat = (String) properties.get( SearchConstants.METACARD_TRANSFORMER_NAME );
                 if ( StringUtils.isBlank( transformFormat ) ) {
-                    transformFormat = format == null ? CDR_ATOM_TRANSFORMER_ID : format;
+                    transformFormat = StringUtils.defaultIfBlank( format, CDR_ATOM_TRANSFORMER_ID );
                 }
                 entry.addLink( action.getUrl().toString() + "?transform=" + transformFormat, Link.REL_SELF, AtomResponseConstants.ATOM_MIME_TYPE, "View Atom Entry", null, -1 );
                 entry.addLink( action.getUrl().toString(), Link.REL_RELATED, "text/xml", action.getTitle(), null, -1 );
