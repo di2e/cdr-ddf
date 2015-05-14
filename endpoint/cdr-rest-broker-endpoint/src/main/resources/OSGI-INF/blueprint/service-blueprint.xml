@@ -17,8 +17,8 @@
 
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
-    xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs" xmlns:cxf="http://cxf.apache.org/blueprint/core"
+    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
     xsi:schemaLocation="
         http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
         http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
@@ -29,11 +29,11 @@
     <type-converters>
         <bean id="listConverter" class="ddf.catalog.util.impl.ListConverter" />
     </type-converters>
-    
+
     <bean id="preFederatedQuerySortedList" class="ddf.catalog.util.impl.SortedServiceList">
         <argument ref="blueprintBundleContext" />
     </bean>
-    
+
     <bean id="postFederatedQuerySortedList" class="ddf.catalog.util.impl.SortedServiceList">
         <argument ref="blueprintBundleContext" />
     </bean>
@@ -47,9 +47,9 @@
     <reference-list id="postFederatedQuery" interface="ddf.catalog.plugin.PostFederatedQueryPlugin" availability="optional">
         <reference-listener bind-method="bindPlugin" unbind-method="unbindPlugin" ref="postFederatedQuerySortedList" />
     </reference-list>
-    
+
     <bean id="pool" class="java.util.concurrent.Executors" factory-method="newCachedThreadPool" />
-   
+
     <reference id="transformIdMapper" interface="net.di2e.ecdr.search.transform.mapper.TransformIdMapper" />
     <reference id="catalogFramework" interface="ddf.catalog.CatalogFramework" />
     <reference id="filterBuilder" interface="ddf.catalog.filter.FilterBuilder" />
@@ -57,11 +57,11 @@
 
     <service id="cdrRestConfigWatcher" ref="configurationWatcher" interface="org.codice.ddf.configuration.ConfigurationWatcher" />
     <bean id="configurationWatcher" class="org.codice.ddf.configuration.impl.ConfigurationWatcherImpl" />
-    
+
     <reference id="corsFilterConfig" availability="mandatory" interface="net.di2e.ecdr.security.cors.config.CORSFilterConfiguration"/> 
     
-    <bean id="cors-filter" class="net.di2e.ecdr.security.cors.CORSFilter" destroy-method="destroy">
-        <argument ref="corsFilterConfig"/>
+    <bean id="cors-filter" class="net.di2e.ecdr.security.cors.CORSFilter" init-method="init">
+        <argument ref="corsFilterConfig"/> 
     </bean>
 
     <jaxrs:server id="cdrRestEndpoint" address="/cdr/broker/rest">
@@ -75,7 +75,7 @@
             <ref component-id="cors-filter" />
         </jaxrs:providers>
     </jaxrs:server>
-    
+
     <reference-list id="auditorList" interface="net.di2e.ecdr.api.auditor.SearchAuditor" availability="optional" />
 
     <bean id="cdrRestSearchService" class="net.di2e.ecdr.broker.endpoint.rest.CDRRestBrokerServiceImpl">
@@ -86,7 +86,7 @@
         <argument ref="transformIdMapper" />
         <argument ref="normalizingFedStrategy" />
         <argument ref="fifoFederationStrategyBean" />
-        <argument ref="auditorList"/>
+        <argument ref="auditorList" />
     </bean>
 
     <service ref="cdrRestSearchService" auto-export="interfaces" />
@@ -97,7 +97,7 @@
         <cm:managed-properties persistent-id="cdr-rest-broker-endpoint-1.0.1" update-strategy="container-managed" />
         <argument ref="sortTypeConfigurations" />
     </bean>
-    
+
     <bean id="fifoFederationStrategyBean" class="net.di2e.ecdr.federation.FifoFederationStrategy">
         <argument ref="pool" />
         <argument ref="preFederatedQuerySortedList" />

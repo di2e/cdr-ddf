@@ -21,7 +21,7 @@
     xsi:schemaLocation="http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
     http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0 http://aries.apache.org/schemas/blueprint-cm/blueprint-cm-1.0.0.xsd">
 
-    <bean id="cdrCORSFilterConfig" class="net.di2e.ecdr.security.cors.config.CORSFilterConfigurationImpl" scope="singleton">
+    <bean id="cdrCORSFilterConfig" class="net.di2e.ecdr.security.cors.config.CORSFilterConfigurationImpl" scope="singleton" destroy-method="destroy">
         <cm:managed-properties persistent-id="cdr-cors-filter-config" update-strategy="container-managed"/>
     </bean>
     

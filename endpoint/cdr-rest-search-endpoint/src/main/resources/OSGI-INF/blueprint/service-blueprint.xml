@@ -17,21 +17,20 @@
 
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
-    xmlns:cxf="http://cxf.apache.org/blueprint/core"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs" xmlns:cxf="http://cxf.apache.org/blueprint/core"
     xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
     xsi:schemaLocation="
         http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
         http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
         http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
         http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0 http://aries.apache.org/schemas/blueprint-ext/blueprint-ext.xsd">
-    
-    <reference id="corsFilterConfig" availability="mandatory" interface="net.di2e.ecdr.security.cors.config.CORSFilterConfiguration"/> 
-    
-    <bean id="cors-filter" class="net.di2e.ecdr.security.cors.CORSFilter" destroy-method="destroy">
-        <argument ref="corsFilterConfig"/>
+
+    <reference id="corsFilterConfig" availability="mandatory" interface="net.di2e.ecdr.security.cors.config.CORSFilterConfiguration" />
+
+    <bean id="cors-filter" class="net.di2e.ecdr.security.cors.CORSFilter" init-method="init">
+        <argument ref="corsFilterConfig" />
     </bean>
-    
+
     <jaxrs:server id="cdrRestEndpoint" address="/cdr/search/rest">
         <jaxrs:serviceBeans>
             <ref component-id="cdrRestSearchService" />
@@ -43,11 +42,11 @@
             <ref component-id="cors-filter" />
         </jaxrs:providers>
     </jaxrs:server>
-    
+
     <bean id="preFederatedQuerySortedList" class="ddf.catalog.util.impl.SortedServiceList">
         <argument ref="blueprintBundleContext" />
     </bean>
-    
+
     <bean id="postFederatedQuerySortedList" class="ddf.catalog.util.impl.SortedServiceList">
         <argument ref="blueprintBundleContext" />
     </bean>
@@ -61,7 +60,7 @@
     <reference-list id="postFederatedQuery" interface="ddf.catalog.plugin.PostFederatedQueryPlugin" availability="optional">
         <reference-listener bind-method="bindPlugin" unbind-method="unbindPlugin" ref="postFederatedQuerySortedList" />
     </reference-list>
-    
+
     <bean id="pool" class="java.util.concurrent.Executors" factory-method="newCachedThreadPool" />
 
     <reference id="transformIdMapper" interface="net.di2e.ecdr.search.transform.mapper.TransformIdMapper" />
@@ -72,12 +71,12 @@
     <bean id="configurationWatcher" class="org.codice.ddf.configuration.impl.ConfigurationWatcherImpl" />
 
     <reference-list id="sortTypeConfigurations" interface="net.di2e.ecdr.commons.sort.SortTypeConfiguration" availability="optional" />
-    
+
     <bean id="queryParser" class="net.di2e.ecdr.commons.query.rest.parsers.LegacyQueryParser">
         <argument ref="sortTypeConfigurations" />
-        <cm:managed-properties persistent-id="cdr-rest-search-endpoint-1.1" update-strategy="container-managed"/>
+        <cm:managed-properties persistent-id="cdr-rest-search-endpoint-1.1" update-strategy="container-managed" />
     </bean>
-    
+
     <reference-list id="auditorList" interface="net.di2e.ecdr.api.auditor.SearchAuditor" availability="optional" />
 
     <bean id="cdrRestSearchService" class="net.di2e.ecdr.search.endpoint.rest.CDRRestSearchServiceImpl">
@@ -86,8 +85,8 @@
         <argument ref="filterBuilder" />
         <argument ref="queryParser" />
         <argument ref="transformIdMapper" />
-        <argument ref="fifoFederationStrategyBean"/>
-        <argument ref="auditorList"/>
+        <argument ref="fifoFederationStrategyBean" />
+        <argument ref="auditorList" />
     </bean>
 
     <service ref="cdrRestSearchService" auto-export="interfaces" />

@@ -29,6 +29,10 @@ public class CORSFilter extends CrossOriginResourceSharingFilter {
 
     public CORSFilter( CORSFilterConfiguration config ) {
         corsConfig = config;
+
+    }
+
+    public void init() {
         corsConfig.addCORSFilterConfiguration( this );
     }
 

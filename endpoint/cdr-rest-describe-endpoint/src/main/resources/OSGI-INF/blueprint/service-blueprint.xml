@@ -26,6 +26,12 @@
         http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
         http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0 http://aries.apache.org/schemas/blueprint-ext/blueprint-ext.xsd">
     
+    <reference id="corsFilterConfig" availability="mandatory" interface="net.di2e.ecdr.security.cors.config.CORSFilterConfiguration" />
+
+    <bean id="cors-filter" class="net.di2e.ecdr.security.cors.CORSFilter" init-method="init">
+        <argument ref="corsFilterConfig" />
+    </bean>
+    
     <jaxrs:server id="cdrRestDescribeEndpoint" address="/cdr/describe/rest">
         <jaxrs:serviceBeans>
             <ref component-id="cdrRestDescribeService" />
@@ -33,6 +39,9 @@
         <jaxrs:features>
             <cxf:logging />
         </jaxrs:features>
+        <jaxrs:providers>
+            <ref component-id="cors-filter" />
+        </jaxrs:providers>
     </jaxrs:server>
 
     <service id="cdrRestConfigWatcher" ref="configurationWatcher" interface="org.codice.ddf.configuration.ConfigurationWatcher" />
