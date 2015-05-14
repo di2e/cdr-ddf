@@ -21,7 +21,7 @@ import java.util.List;
 
 import net.di2e.ecdr.security.cors.CORSFilter;
 
-import org.apache.cxf.rs.security.cors.CrossOriginResourceSharingFilter;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,13 @@ public class CORSFilterConfigurationImpl implements CORSFilterConfiguration {
      * @param filter
      */
     public void removeCORSFilterConfiguration( CORSFilter filter ) {
+        LOGGER.debug( "Removing new CORSFilter and managing the configuration." );
         filters.remove( filter );
+    }
+    
+    public void destroy() {
+        LOGGER.debug( "Revoving all CORSFilters from filter list" );
+        filters.clear();
     }
 
     /**
@@ -54,7 +60,7 @@ public class CORSFilterConfigurationImpl implements CORSFilterConfiguration {
      *            a list of case-sensitive origin strings.
      */
     public void setAllowOrigins( List<String> allowedOrigins ) {
-        for ( CrossOriginResourceSharingFilter filter : filters ) {
+        for ( CORSFilter filter : filters ) {
             if ( filter != null ) {
                 LOGGER.debug( "Setting [allowedOrigins] for CORS filter: " + allowedOrigins );
                 filter.setAllowOrigins( removeEmptyAndNulls( allowedOrigins ) );
@@ -69,7 +75,7 @@ public class CORSFilterConfigurationImpl implements CORSFilterConfiguration {
      * @param allowCredentials
      */
     public void setAllowCredentials( boolean allowCredentials ) {
-        for ( CrossOriginResourceSharingFilter filter : filters ) {
+        for ( CORSFilter filter : filters ) {
             if ( filter != null ) {
                 LOGGER.debug( "Setting [allowCredentials] for CORS filter: " + allowCredentials );
                 filter.setAllowCredentials( allowCredentials );
@@ -85,7 +91,7 @@ public class CORSFilterConfigurationImpl implements CORSFilterConfiguration {
      *            the list of (case-sensitive) header names.
      */
     public void setExposeHeaders( List<String> exposeHeaders ) {
-        for ( CrossOriginResourceSharingFilter filter : filters ) {
+        for ( CORSFilter filter : filters ) {
             if ( filter != null ) {
                 LOGGER.debug( "Setting [exposeHeaders] for CORS filter: " + exposeHeaders );
                 filter.setExposeHeaders( removeEmptyAndNulls( exposeHeaders ) );
@@ -96,7 +102,7 @@ public class CORSFilterConfigurationImpl implements CORSFilterConfiguration {
     private List<String> removeEmptyAndNulls( List<String> list ) {
         for ( Iterator<String> iterator = list.iterator(); iterator.hasNext();) {
             String string = iterator.next();
-            if ( string.isEmpty() ) {
+            if ( StringUtils.isBlank( string ) ) {
                 // Remove the current element from the iterator and the list.
                 iterator.remove();
             }
