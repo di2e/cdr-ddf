@@ -157,7 +157,6 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
             SourceResponse sourceResponse;
             // ECDR-72 Add in default radius
             Map<String, String> filterParameters = filterAdapter.adapt( query, new StrictFilterDelegate( false, 50000.00, getFilterConfig() ) );
-
             String id = filterParameters.get( SearchConstants.UID_PARAMETER );
             // check if this is an id-only query
             if ( StringUtils.isBlank( id ) ) {
@@ -225,7 +224,7 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
                     }
                 } catch ( RuntimeException e ) {
                     LOGGER.warn( "CDR Rest Source named [" + getId() + "] encountered an unexpected error while executing HTTP Head at URL [" + cdrAvailabilityCheckClient.getBaseURI() + "]:"
-                        + e.getMessage() );
+                            + e.getMessage() );
                 }
 
             } else {
@@ -320,7 +319,8 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
                 if ( bytesToSkip != null ) {
                     LOGGER.debug( "Setting Range header on retrieve request from remote CDR Source [{}] with bytes to skip [{}]", getId(), bytesToSkip );
                     // This creates a Range header in the following manner if
-                    // 100 bytes were to be skipped. The end - means its open ended
+                    // 100 bytes were to be skipped. The end - means its open
+                    // ended
                     // Range: bytes=100-
                     retrieveWebClient.header( HEADER_RANGE, BYTES_EQUAL + bytesToSkip + "-" );
                 }
@@ -357,7 +357,8 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
                     fileName = getId() + "-" + System.currentTimeMillis();
                 }
             } else {
-                // ECDR-74 use MIMEType parser to get the file extension in this case
+                // ECDR-74 use MIMEType parser to get the file extension in this
+                // case
                 fileName = getId() + "-" + System.currentTimeMillis();
             }
 
@@ -375,12 +376,13 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
                     if ( rangeHeader == null || !rangeHeader.equals( BYTES ) ) {
                         LOGGER.debug( "Skipping {} bytes in CDR Remote Source because endpoint didn't support Range Headers", bytesToSkip );
                         try {
-                            // the Java inputStream.skip() method is not guaranteed to skip all the bytes so we use a
+                            // the Java inputStream.skip() method is not
+                            // guaranteed to skip all the bytes so we use a
                             // utility method that is
                             IOUtils.skipFully( binaryStream, bytesToSkip );
                         } catch ( EOFException e ) {
                             LOGGER.warn( "Skipping the requested number of bytes [{}] for URI [{}] resulted in an End of File, so re-retrieving the complete file without skipping bytes: {}",
-                                bytesToSkip, uri, e.getMessage() );
+                                    bytesToSkip, uri, e.getMessage() );
                             try {
                                 binaryStream.close();
                             } catch ( IOException e1 ) {
@@ -463,7 +465,10 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
 
         for ( Entry<String, Serializable> entry : queryRequestProps.entrySet() ) {
             if ( parameterMap.containsKey( entry.getKey() ) ) {
-                filterParameters.put( entry.getKey(), String.valueOf( entry.getValue() ) );
+                String value = (String) entry.getValue();
+                if ( StringUtils.isNotBlank( value ) ) {
+                    filterParameters.put( entry.getKey(), String.valueOf( entry.getValue() ) );
+                }
             }
         }
 
@@ -515,7 +520,7 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
     public synchronized void setPingUrl( String url ) {
         if ( StringUtils.isNotBlank( url ) ) {
             LOGGER.debug( "ConfigUpdate: Updating the ping (site availability check) endpoint url value from [{}] to [{}]", cdrAvailabilityCheckClient == null ? null : cdrAvailabilityCheckClient
-                .getCurrentURI().toString(), url );
+                    .getCurrentURI().toString(), url );
 
             cdrAvailabilityCheckClient = WebClient.create( url, true );
 
@@ -529,9 +534,10 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
     }
 
     /*
-     * This method is needed because of a CXF deficiency of not using the keystore values from the java system
-     * properties. So this specifically pulls the values from the system properties then sets them to a KeyManager being
-     * used
+     * This method is needed because of a CXF deficiency of not using the
+     * keystore values from the java system properties. So this specifically
+     * pulls the values from the system properties then sets them to a
+     * KeyManager being used
      */
     protected TLSClientParameters getTlsClientParameters() {
         TLSClientParameters tlsClientParameters = new TLSClientParameters();
@@ -575,14 +581,18 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
     }
 
     /**
-     * Sets the time (in seconds) that availability should be cached (that is, the minimum amount of time between 2
-     * perform availability checks). For example if set to 60 seconds, then if an availability check is called 30
-     * seconds after a previous availability check was called, the second call will just return a cache value and not do
-     * another check.
+     * Sets the time (in seconds) that availability should be cached (that is,
+     * the minimum amount of time between 2 perform availability checks). For
+     * example if set to 60 seconds, then if an availability check is called 30
+     * seconds after a previous availability check was called, the second call
+     * will just return a cache value and not do another check.
      * <p/>
-     * This settings allow admins to ensure that a site is not overloaded with availability checks
+     * This settings allow admins to ensure that a site is not overloaded with
+     * availability checks
      *
-     * @param newCacheTime New time period, in seconds, to check the availability of the federated source.
+     * @param newCacheTime
+     *            New time period, in seconds, to check the availability of the
+     *            federated source.
      */
     public void setAvailableCheckCacheTime( long newCacheTime ) {
         if ( newCacheTime < 1 ) {
@@ -669,9 +679,9 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
 
     private void setSecurityCredentials( WebClient client, Map<String, Serializable> requestProperties ) {
         if ( sendSecurityCookie ) {
-            if (requestProperties.containsKey( SecurityConstants.SECURITY_SUBJECT )) {
+            if ( requestProperties.containsKey( SecurityConstants.SECURITY_SUBJECT ) ) {
                 Serializable property = requestProperties.get( SecurityConstants.SECURITY_SUBJECT );
-                if (property instanceof Subject ) {
+                if ( property instanceof Subject ) {
                     Subject subject = (Subject) property;
                     RestSecurity.setSubjectOnClient( subject, client );
                 }
