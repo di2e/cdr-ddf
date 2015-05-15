@@ -80,6 +80,7 @@ public class OpenSearchSource extends AbstractCDRSource {
         LOGGER.debug( "Checking cache for Result with id [{}].", id );
         Metacard metacard = metacardCache.get( id );
         if ( metacard != null ) {
+            metacard.setSourceId( getId() );
             LOGGER.debug( "Cache hit found for id [{}], returning response", id );
             sourceResponse = new SourceResponseImpl( queryRequest, Arrays.asList( (Result) new ResultImpl( metacard ) ), 1L );
         } else {
