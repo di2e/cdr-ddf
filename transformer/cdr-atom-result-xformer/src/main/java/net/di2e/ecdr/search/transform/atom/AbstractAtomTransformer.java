@@ -52,6 +52,8 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.ExtensibleElement;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
 import org.joda.time.format.DateTimeFormatter;
@@ -131,8 +133,7 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
      * Specifies if GML encoding should be used for location data.
      *
      * @param shouldUseGMLEncoding
-     *            true (default) will return locations as GeoRSS-GML; false will
-     *            return locations as GeoRSS-Simple
+     *            true (default) will return locations as GeoRSS-GML; false will return locations as GeoRSS-Simple
      */
     public void setUseGMLEncoding( boolean shouldUseGMLEncoding ) {
         defaultToUseGMLEncoding = shouldUseGMLEncoding;
@@ -182,21 +183,29 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
 
         Entry entry = null;
         for ( Result result : results ) {
-            entry = getMetacardEntry( new CDRMetacard( result.getMetacard() ), properties );
-            Double relevance = result.getRelevanceScore();
+            String id = null;
+            try {
+                CDRMetacard cdrMetacard = new CDRMetacard( result.getMetacard() );
+                id = cdrMetacard.getId();
+                entry = getMetacardEntry( cdrMetacard, properties );
+                Double relevance = result.getRelevanceScore();
 
-            if ( relevance != null ) {
-                Element relevanceElement = entry.addExtension( new QName( AtomResponseConstants.RELEVANCE_NAMESPACE, AtomResponseConstants.RELEVANCE_ELEMENT,
-                        AtomResponseConstants.RELEVANCE_NAMESPACE_PREFIX ) );
-                relevanceElement.setText( String.valueOf( relevance ) );
+                if ( relevance != null ) {
+                    Element relevanceElement = entry.addExtension( new QName( AtomResponseConstants.RELEVANCE_NAMESPACE, AtomResponseConstants.RELEVANCE_ELEMENT,
+                            AtomResponseConstants.RELEVANCE_NAMESPACE_PREFIX ) );
+                    relevanceElement.setText( String.valueOf( relevance ) );
+                }
+                Double distance = result.getDistanceInMeters();
+                if ( distance != null ) {
+                    Element distanceElement = entry.addExtension( new QName( AtomResponseConstants.CDRS_EXT_NAMESPACE, AtomResponseConstants.DISTANCE_ELEMENT,
+                            AtomResponseConstants.CDRS_EXT_NAMESPACE_PREFIX ) );
+                    distanceElement.setText( String.valueOf( distance ) );
+                }
+                feed.addEntry( entry );
+            } catch ( Exception e ) {
+                LOGGER.warn( "WARNING - Could not properly transform metacard with id {} because ran into error '{}'.  Please turn on DEBUG logging for more details", id, e.getMessage() );
+                LOGGER.debug( e.getMessage(), e );
             }
-            Double distance = result.getDistanceInMeters();
-            if ( distance != null ) {
-                Element distanceElement = entry.addExtension( new QName( AtomResponseConstants.CDRS_EXT_NAMESPACE, AtomResponseConstants.DISTANCE_ELEMENT,
-                        AtomResponseConstants.CDRS_EXT_NAMESPACE_PREFIX ) );
-                distanceElement.setText( String.valueOf( distance ) );
-            }
-            feed.addEntry( entry );
         }
 
         BinaryContent binaryContent = null;
@@ -351,10 +360,10 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
         if ( properties == null ) {
             properties = new HashMap<String, Serializable>();
         }
-        Entry entry = getMetacardEntry( new CDRMetacard( metacard ), properties );
-
         BinaryContent binaryContent = null;
         try {
+            Entry entry = getMetacardEntry( new CDRMetacard( metacard ), properties );
+
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             entry.writeTo( outputStream );
             binaryContent = new BinaryContentImpl( new ByteArrayInputStream( outputStream.toByteArray() ), new MimeType( AtomResponseConstants.ATOM_MIME_TYPE ) );
@@ -398,7 +407,7 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
         return isTransform50;
     }
 
-    protected Entry getMetacardEntry( CDRMetacard metacard, Map<String, Serializable> properties ) {
+    protected Entry getMetacardEntry( CDRMetacard metacard, Map<String, Serializable> properties ) throws URIException {
 
         String format = (String) properties.get( SearchConstants.FORMAT_PARAMETER );
 
@@ -407,7 +416,7 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
         entry.declareNS( AtomResponseConstants.GEORSS_NAMESPACE, AtomResponseConstants.GEORSS_NAMESPACE_PREFIX );
         entry.declareNS( AtomResponseConstants.RELEVANCE_NAMESPACE, AtomResponseConstants.RELEVANCE_NAMESPACE_PREFIX );
 
-        entry.setId( metacard.getAtomId() );
+        entry.setId( URIUtil.encodePathQuery( metacard.getAtomId() ) );
         entry.setTitle( metacard.getTitle() );
         entry.setUpdated( metacard.getModifiedDate() );
         Date effective = metacard.getEffectiveDate();
@@ -448,16 +457,13 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
     }
 
     /**
-     * This method inspects the properties to determine if there is a property
-     * that specifies the GeoRSS format. If that property exists then it will
-     * use the value of that property to determine whether to use simple or gml
-     * format. Otherwise it will return the default global property for using
-     * GML or Simple
+     * This method inspects the properties to determine if there is a property that specifies the GeoRSS format. If that
+     * property exists then it will use the value of that property to determine whether to use simple or gml format.
+     * Otherwise it will return the default global property for using GML or Simple
      *
      * @param properties
      *            that were passed into the transformer
-     * @return true if GML encoding for GeoRSS should be used, false would mean
-     *         to use simple encoding
+     * @return true if GML encoding for GeoRSS should be used, false would mean to use simple encoding
      */
     protected boolean useGmlEncoding( Map<String, Serializable> properties ) {
         String format = (String) properties.get( SearchConstants.GEORSS_RESULT_FORMAT_PARAMETER );
