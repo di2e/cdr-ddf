@@ -105,7 +105,6 @@ public class CDRMetacard implements Metacard, Serializable {
         if ( metacard instanceof CDRMetacard ) {
             map.putAll( ((CDRMetacard) metacard).getMap() );
             setSourceId( metacard.getSourceId() );
-            System.out.println( "CDRMetacard " + getSourceId() );
         } else {
             this.wrappedMetacard = metacard;
             if ( metacard.getMetacardType() != null ) {

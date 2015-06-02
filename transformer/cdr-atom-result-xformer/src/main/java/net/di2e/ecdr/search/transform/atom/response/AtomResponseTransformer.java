@@ -135,7 +135,6 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
         }
         metacard.setId( id );
 
-        System.out.println( "Setting source " + siteName );
         metacard.setSourceId( siteName );
 
         List<Category> categories = entry.getCategories();
@@ -252,6 +251,8 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
                         if ( mimeType.getSubType().contains( "xml" ) ) {
                             metadataLink = link.getHref().toASCIIString();
                             metacard.setMetadataLinkURI( URI.create( metadataLink ) );
+                            metacard.setAttribute( CDRMetacard.WRAP_METADATA, null );
+                            break;
                         } else if ( mimeType.getBaseType().contains( "text" ) ) {
                             metadataLink = link.getHref().toASCIIString();
                             metacard.setMetadataLinkURI( URI.create( metadataLink ) );

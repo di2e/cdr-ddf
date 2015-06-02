@@ -489,7 +489,6 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
                 }
             }
         }
-        System.out.println("Source " + metacard.getSourceId() );
         if ( resourceActionProvider != null && metacard.hasResource() ) {
             Action action = resourceActionProvider.getAction( metacard );
             if ( action != null && action.getUrl() != null ) {

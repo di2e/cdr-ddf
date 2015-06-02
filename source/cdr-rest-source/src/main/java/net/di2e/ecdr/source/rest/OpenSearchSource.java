@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.filter.config.FilterConfig;
 import net.di2e.ecdr.commons.filter.config.FilterConfig.AtomContentXmlWrapOption;
 import net.di2e.ecdr.libs.cache.Cache;
@@ -80,7 +79,6 @@ public class OpenSearchSource extends AbstractCDRSource {
         SourceResponse sourceResponse = null;
         LOGGER.debug( "Checking cache for Result with id [{}].", id );
         Metacard metacard = metacardCache.get( id );
-        CDRMetacard cdrMetacard = (CDRMetacard) metacard;
         if ( metacard != null ) {
             metacard.setSourceId( getId() );
             LOGGER.debug( "Cache hit found for id [{}], returning response", id );
