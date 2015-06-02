@@ -28,6 +28,9 @@ public class FilterConfig {
     private AtomContentXmlWrapOption wrapOption = AtomContentXmlWrapOption.NEVER_WRAP;
 
     public FilterConfig() {
+        thumbnailLinkRelation = "preview";
+        metadataLinkRelation = "related";
+        productLinkRelation = "alternate";
     }
 
     public AtomContentXmlWrapOption getAtomContentXmlWrapOption() {

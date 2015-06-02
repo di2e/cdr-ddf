@@ -185,7 +185,8 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
         for ( Result result : results ) {
             String id = null;
             try {
-                CDRMetacard cdrMetacard = new CDRMetacard( result.getMetacard() );
+                Metacard metacard = result.getMetacard();
+                CDRMetacard cdrMetacard = new CDRMetacard( metacard );
                 id = cdrMetacard.getId();
                 entry = getMetacardEntry( cdrMetacard, properties );
                 Double relevance = result.getRelevanceScore();
@@ -488,7 +489,6 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
                 }
             }
         }
-
         if ( resourceActionProvider != null && metacard.hasResource() ) {
             Action action = resourceActionProvider.getAction( metacard );
             if ( action != null && action.getUrl() != null ) {
@@ -497,6 +497,7 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
             // If there is no explicit resource then the metadata serves as
             // the product/resource so include a link to it here
         } else if ( metadataActionProvider != null ) {
+
             Action action = metadataActionProvider.getAction( metacard );
             if ( action != null && action.getUrl() != null ) {
                 entry.addLink( action.getUrl().toString(), Link.REL_ALTERNATE, "text/xml", "View Product", null, -1 );
@@ -600,25 +601,29 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
 
     protected void setEntrySecurity( Entry entry, Metacard metacard ) {
         for ( SecurityMarkingHandler securityHandler : securityHandlers ) {
-            SecurityData securityData = securityHandler.getSecurityData( metacard );
-            if ( securityData != null ) {
-                String securityNamespace = securityData.getSecurityNamespace();
-                if ( StringUtils.isNotBlank( securityNamespace ) ) {
-                    boolean hasAttribute = false;
-                    for ( java.util.Map.Entry<String, List<String>> securityEntry : securityData.getSecurityMarkings().entrySet() ) {
-                        List<String> securityValues = securityEntry.getValue();
-                        if ( securityValues != null && !securityValues.isEmpty() ) {
-                            if ( !hasAttribute ) {
-                                entry.declareNS( securityNamespace, SecurityConstants.ISM_NAMESPACE_PREFIX );
+            try {
+                SecurityData securityData = securityHandler.getSecurityData( metacard );
+                if ( securityData != null ) {
+                    String securityNamespace = securityData.getSecurityNamespace();
+                    if ( StringUtils.isNotBlank( securityNamespace ) ) {
+                        boolean hasAttribute = false;
+                        for ( java.util.Map.Entry<String, List<String>> securityEntry : securityData.getSecurityMarkings().entrySet() ) {
+                            List<String> securityValues = securityEntry.getValue();
+                            if ( securityValues != null && !securityValues.isEmpty() ) {
+                                if ( !hasAttribute ) {
+                                    entry.declareNS( securityNamespace, SecurityConstants.ISM_NAMESPACE_PREFIX );
+                                }
+                                entry.setAttributeValue( new QName( securityNamespace, securityEntry.getKey() ), StringUtils.join( securityValues, " " ) );
+                                hasAttribute = true;
                             }
-                            entry.setAttributeValue( new QName( securityNamespace, securityEntry.getKey() ), StringUtils.join( securityValues, " " ) );
-                            hasAttribute = true;
+                        }
+                        if ( hasAttribute ) {
+                            break;
                         }
                     }
-                    if ( hasAttribute ) {
-                        break;
-                    }
                 }
+            } catch ( Exception e ) {
+                LOGGER.debug( "Ran into exception when trying to parse security info using SecurityMarkingHander of type {}, skipping and trying next handler", securityHandler.getClass(), e );
             }
         }
     }

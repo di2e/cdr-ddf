@@ -15,7 +15,9 @@
  */
 package net.di2e.ecdr.libs.cache.impl;
 
+import java.net.URI;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import javax.cache.Cache;
@@ -28,6 +30,12 @@ import javax.cache.spi.CachingProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.hazelcast.cache.HazelcastCachingProvider;
+import com.hazelcast.config.Config;
+import com.hazelcast.config.JoinConfig;
+import com.hazelcast.config.NetworkConfig;
+import com.hazelcast.core.Hazelcast;
 
 import ddf.catalog.data.Metacard;
 
@@ -43,19 +51,41 @@ public class MetacardJCacheManager implements net.di2e.ecdr.libs.cache.CacheMana
         LOGGER.debug( "Creating a new JCacheManager for caching Metacards" );
         Caching.setDefaultClassLoader( JCache.class.getClassLoader() );
         cachingProvider = Caching.getCachingProvider();
-        cacheManager = cachingProvider.getCacheManager();
+        cacheManager = cachingProvider.getCacheManager( URI.create( "ecdr-jcache-cache-manager" ), getClass().getClassLoader(), getConfigProperties() );
+        
+    }
+
+    private Properties getConfigProperties() {
+        Config config = new Config();
+        config.setClassLoader( getClass().getClassLoader() );
+        config.setInstanceName( "ecdr-jcache-config-instance" );
+        
+
+        NetworkConfig networkConfig = config.getNetworkConfig();
+        JoinConfig join = networkConfig.getJoin();
+        join.getMulticastConfig().setEnabled( false );
+        join.getTcpIpConfig().setEnabled( false );
+        join.getAwsConfig().setEnabled( false );
+        
+        // This actually creates the config so it will be available to the CacheManager
+        Hazelcast.newHazelcastInstance( config );
+        
+        Properties props = new Properties();
+        props.setProperty( HazelcastCachingProvider.HAZELCAST_INSTANCE_NAME, config.getInstanceName() );
+        return props;
     }
 
     @Override
     public net.di2e.ecdr.libs.cache.Cache<Metacard> createCacheInstance( String cacheId, Map<String, Object> cacheProperties ) {
         if ( cacheId == null ) {
-            throw new IllegalArgumentException( "CacheId cannot be null when calling the LRUCache.createCache method" );
+            throw new IllegalArgumentException( "CacheId cannot be null when calling the MetacardJCacheManager.createCache method" );
         } else if ( cacheManager.getCache( CACHE_ID_PREFIX + cacheId ) != null ) {
             throw new IllegalArgumentException( "CacheId with the name [" + cacheId + "] already exists, each cache instance must have a unique name" );
         }
 
         // configure the cache
         MutableConfiguration<String, Metacard> config = new MutableConfiguration<String, Metacard>();
+
         config.setStoreByValue( true ).setTypes( String.class, Metacard.class ).setExpiryPolicyFactory( AccessedExpiryPolicy.factoryOf( getDuration( cacheProperties ) ) )
                 .setStatisticsEnabled( true );
 

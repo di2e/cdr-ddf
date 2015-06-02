@@ -95,7 +95,6 @@
         <feature>cdr-rest-search-endpoint</feature>
         <feature>cdr-rest-broker-endpoint</feature>
         <feature>cdr-rest-source</feature>
-        <feature>cdr-rest-describe-endpoint</feature>
     </feature>
 
 </features>

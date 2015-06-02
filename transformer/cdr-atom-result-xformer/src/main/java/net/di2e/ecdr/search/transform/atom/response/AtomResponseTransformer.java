@@ -30,6 +30,7 @@ import javax.activation.MimeType;
 import javax.xml.namespace.QName;
 
 import net.di2e.ecdr.commons.CDRMetacard;
+import net.di2e.ecdr.commons.CDRMetacardType;
 import net.di2e.ecdr.commons.filter.config.FilterConfig;
 import net.di2e.ecdr.commons.filter.config.FilterConfig.AtomContentXmlWrapOption;
 import net.di2e.ecdr.commons.response.SearchResponseTransformer;
@@ -57,7 +58,6 @@ import org.slf4j.LoggerFactory;
 
 import ddf.catalog.data.Metacard;
 import ddf.catalog.data.Result;
-import ddf.catalog.data.impl.MetacardImpl;
 import ddf.catalog.data.impl.ResultImpl;
 import ddf.catalog.operation.QueryRequest;
 import ddf.catalog.operation.SourceResponse;
@@ -100,7 +100,7 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
         List<Entry> entries = feed.getEntries();
         int size = entries.size();
         for ( Entry entry : entries ) {
-            if (isValidEntry( entry )) {
+            if ( isValidEntry( entry ) ) {
                 Metacard metacard = entryToMetacard( entry, siteName );
                 resultList.add( metacardToResult( entry, metacard ) );
             } else {
@@ -126,7 +126,7 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
     }
 
     private Metacard entryToMetacard( Entry entry, String siteName ) {
-        MetacardImpl metacard = new MetacardImpl();
+        CDRMetacard metacard = new CDRMetacard( CDRMetacardType.CDR_METACARD );
 
         String id = entry.getIdElement().getText();
         // id may be formatted catalog:id:<id>, so we parse out the <id>
@@ -203,7 +203,7 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
                     MimeType mimeType = link.getMimeType();
                     if ( mimeType == null || "image".equals( mimeType.getPrimaryType() ) ) {
 
-                        metacard.setAttribute( CDRMetacard.THUMBNAIL_LINK, URI.create( link.getHref().toASCIIString() ) );
+                        metacard.setThumbnailLinkURI( URI.create( link.getHref().toASCIIString() ) );
                         long thumbnailSize = link.getLength();
                         if ( thumbnailSize > 0 ) {
                             metacard.setAttribute( CDRMetacard.THUMBNAIL_LENGTH, Long.valueOf( thumbnailSize ) );
@@ -211,6 +211,7 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
                         // ECDR-41 figure out MIMEType
                         metacard.setAttribute( CDRMetacard.THUMBNAIL_MIMETYPE, link.getMimeType() );
                         metacard.setAttribute( CDRMetacard.THUMBNAIL_LINK_TITLE, link.getTitle() );
+                        break;
                     }
                 }
             }
@@ -249,7 +250,13 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
                     if ( mimeType != null ) {
                         if ( mimeType.getSubType().contains( "xml" ) ) {
                             metadataLink = link.getHref().toASCIIString();
-                            metacard.setAttribute( CDRMetacard.METADATA_LINK, URI.create( metadataLink ) );
+                            metacard.setMetadataLinkURI( URI.create( metadataLink ) );
+                            metacard.setAttribute( CDRMetacard.WRAP_METADATA, null );
+                            break;
+                        } else if ( mimeType.getBaseType().contains( "text" ) ) {
+                            metadataLink = link.getHref().toASCIIString();
+                            metacard.setMetadataLinkURI( URI.create( metadataLink ) );
+                            metacard.setAttribute( CDRMetacard.WRAP_METADATA, Boolean.TRUE );
                         }
                     }
                 }
@@ -259,9 +266,9 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
         return new CDRMetacard( returnMetacard );
     }
 
-    protected void populateMetadata( Entry entry, MetacardImpl metacard, AtomContentXmlWrapOption wrap, String metadata ) {
+    protected void populateMetadata( Entry entry, CDRMetacard metacard, AtomContentXmlWrapOption wrap, String metadata ) {
         if ( metadata != null ) {
-            if (wrap != null && !wrap.equals( AtomContentXmlWrapOption.NEVER_WRAP ) ) {
+            if ( wrap != null && !wrap.equals( AtomContentXmlWrapOption.NEVER_WRAP ) ) {
                 if ( wrap.equals( AtomContentXmlWrapOption.WRAP_HTML_AND_TEXT ) ) {
                     Content.Type contentType = entry.getContentType();
                     // certain content types may not follow XML structure
@@ -323,11 +330,12 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
 
     /**
      * Check to see if entry is a valid ATOM Entry conforming to the specification.
+     * 
      * @param entry
      * @return true if incoming entry conforms to the specification, false if it does not.
      */
-    private boolean isValidEntry(Entry entry) {
-        if (entry == null) {
+    private boolean isValidEntry( Entry entry ) {
+        if ( entry == null ) {
             return false;
         }
         // RFC4287 Section 4.1.2
