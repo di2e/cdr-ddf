@@ -451,12 +451,16 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
         if ( timeout > 1000 ) {
             filterParameters.put( SearchConstants.TIMEOUT_PARAMETER, String.valueOf( timeout ) );
         }
+        
+        if ( parameterMap.containsKey( SearchConstants.COUNT_PARAMETER ) ) {
+            int pageSize = query.getPageSize();
+            filterParameters.put( SearchConstants.COUNT_PARAMETER, maxResultsCount > 0 && pageSize > maxResultsCount ? String.valueOf( maxResultsCount ) : String.valueOf( pageSize ) );
+        }
 
-        int pageSize = query.getPageSize();
-        filterParameters.put( SearchConstants.COUNT_PARAMETER, maxResultsCount > 0 && pageSize > maxResultsCount ? String.valueOf( maxResultsCount ) : String.valueOf( pageSize ) );
-
-        int startIndex = query.getStartIndex();
-        filterParameters.put( SearchConstants.STARTINDEX_PARAMETER, String.valueOf( getFilterConfig().isZeroBasedStartIndex() ? startIndex - 1 : startIndex ) );
+        if ( parameterMap.containsKey( SearchConstants.STARTINDEX_PARAMETER ) ) {
+            int startIndex = query.getStartIndex();
+            filterParameters.put( SearchConstants.STARTINDEX_PARAMETER, String.valueOf( getFilterConfig().isZeroBasedStartIndex() ? startIndex - 1 : startIndex ) );
+        }
 
         String sortOrderString = getSortOrderString( query.getSortBy() );
         if ( sortOrderString != null ) {

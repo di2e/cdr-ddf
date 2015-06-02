@@ -23,6 +23,7 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.constants.SecurityConstants;
 import net.di2e.ecdr.search.transform.atom.security.SecurityData;
 
@@ -31,7 +32,6 @@ import org.apache.abdera.model.Feed;
 import org.apache.commons.lang.StringUtils;
 
 import ddf.catalog.data.Metacard;
-import ddf.catalog.data.impl.MetacardImpl;
 
 public final class SecurityMarkingParser {
 
@@ -47,7 +47,7 @@ public final class SecurityMarkingParser {
 
     public static Metacard addSecurityToMetacard( Metacard metacard, Entry entry ) {
         HashMap<String, List<String>> securityProps = new HashMap<String, List<String>>();
-        MetacardImpl metacardImpl = new MetacardImpl( metacard );
+        CDRMetacard metacardImpl = new CDRMetacard( metacard );
         List<QName> attributes = entry.getAttributes();
         if ( attributes != null ) {
             String metacardSecurityNamespace = null;

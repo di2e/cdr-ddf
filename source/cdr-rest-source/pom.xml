@@ -153,6 +153,7 @@
                         <Import-Package>
                             !org.joda.convert,
                             !javax.enterprise.util,
+                            org.apache.logging.log4j.*;resolution:=optional,
                             org.osgi.framework;version="[1.6,2)",
                             net.di2e.ecdr.commons,
                             org.apache.cxf.*;version="[2.7.0, 4.0)",
