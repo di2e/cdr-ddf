@@ -33,8 +33,8 @@ import net.di2e.ecdr.commons.query.util.keywordparser.ASTNode;
 import net.di2e.ecdr.commons.query.util.keywordparser.KeywordTextParser;
 
 import org.apache.commons.lang.StringUtils;
-import org.geotools.filter.text.cql2.CQL;
 import org.geotools.filter.text.cql2.CQLException;
+import org.geotools.filter.text.ecql.ECQL;
 import org.opengis.filter.Filter;
 import org.opengis.filter.FilterVisitor;
 import org.opengis.filter.sort.SortBy;
@@ -222,7 +222,7 @@ public class CDRQueryImpl implements Query {
             LOGGER.debug( "Received CQL-based query." );
             String cqlStr = queryParser.getTextualCriteria( queryParameters ).getKeywords();
             try {
-                Filter filter = CQL.toFilter( cqlStr );
+                Filter filter = ECQL.toFilter( cqlStr );
                 addFilter( filters, filter );
             } catch ( CQLException cqlException ) {
                 throw new UnsupportedQueryException( "Invalid CQL predicate provided.", cqlException );
