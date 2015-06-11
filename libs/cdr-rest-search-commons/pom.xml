@@ -35,7 +35,7 @@
         
          <dependency>
             <groupId>net.di2e.ecdr.api</groupId>
-            <artifactId>cdr-api-auditor</artifactId>
+            <artifactId>cdr-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         
@@ -113,9 +113,6 @@
                         <Embed-Dependency>
                             catalog-core-api-impl,
                             platform-configuration-impl,
-                            parboiled*;scope=compile|runtime,
-                            asm*;scope=compile|runtime,
-                            gt-cql;scope=runtime|compile
                         </Embed-Dependency>
                         <Import-Package>
                             !org.apache.commons.codec.*,
@@ -128,8 +125,7 @@
                             templates,
                         </Export-Package>
                         <Private-Package>
-                            org.objectweb.*,
-                            org.parboiled.*,
+                            
                         </Private-Package>
                     </instructions>
                 </configuration>

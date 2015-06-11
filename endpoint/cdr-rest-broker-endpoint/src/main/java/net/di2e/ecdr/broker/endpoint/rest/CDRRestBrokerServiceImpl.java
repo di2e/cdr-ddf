@@ -28,9 +28,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import net.di2e.ecdr.api.auditor.SearchAuditor;
+import net.di2e.ecdr.api.query.QueryConfiguration;
+import net.di2e.ecdr.api.query.QueryLanguage;
 import net.di2e.ecdr.commons.endpoint.rest.AbstractRestSearchEndpoint;
-import net.di2e.ecdr.commons.query.rest.CDRQueryImpl;
-import net.di2e.ecdr.commons.query.rest.parsers.QueryParser;
+import net.di2e.ecdr.commons.query.CDRQueryImpl;
 import net.di2e.ecdr.federation.api.NormalizingFederationStrategy;
 import net.di2e.ecdr.search.transform.mapper.TransformIdMapper;
 
@@ -43,7 +44,6 @@ import org.slf4j.LoggerFactory;
 import ddf.catalog.CatalogFramework;
 import ddf.catalog.federation.FederationException;
 import ddf.catalog.federation.FederationStrategy;
-import ddf.catalog.filter.FilterBuilder;
 import ddf.catalog.operation.QueryRequest;
 import ddf.catalog.operation.QueryResponse;
 import ddf.catalog.operation.impl.QueryRequestImpl;
@@ -58,7 +58,6 @@ import ddf.catalog.source.UnsupportedQueryException;
  * The key difference between CDR Brokered Search and CDR Search is that
  * Brokered Search can route the search to multiple sources (FederatedSource).
  *
- * @author Jeff Vettraino
  */
 @Path( "/" )
 public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
@@ -74,25 +73,22 @@ public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
     private FederationStrategy defaultFederationStrategy = null;
 
     /**
-     * Constructor for JAX RS CDR Search Service. Values should ideally be
-     * passed into the constructor using a dependency injection framework like
-     * blueprint
+     * Constructor for JAX RS CDR Search Service. Values should ideally be passed into the constructor using a
+     * dependency injection framework like blueprint
      *
      * @param framework
      *            Catalog Framework which will be used for search
      * @param config
-     *            ConfigurationWatcherImpl used to get the platform
-     *            configuration values
+     *            ConfigurationWatcherImpl used to get the platform configuration values
      * @param builder
      *            FilterBuilder implementation
      * @param parser
-     *            The instance of the QueryParser to use which will determine
-     *            how to parse the parameters from the queyr String. Query
-     *            parsers are tied to different versions of a query profile
+     *            The instance of the QueryParser to use which will determine how to parse the parameters from the query
+     *            String. Query parsers are tied to different versions of a query profile
      */
-    public CDRRestBrokerServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, FilterBuilder builder, QueryParser parser,
-            TransformIdMapper mapper, NormalizingFederationStrategy sortedFedStrategy, FederationStrategy defaultFedStrategy, List<SearchAuditor> auditors ) {
-        super( framework, config, builder, parser, mapper, auditors );
+    public CDRRestBrokerServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
+            QueryConfiguration queryConfig, NormalizingFederationStrategy sortedFedStrategy, FederationStrategy defaultFedStrategy ) {
+        super( framework, config, queryLangs, mapper, auditorList, queryConfig );
         this.sortedFedStrategy = sortedFedStrategy;
         this.defaultFederationStrategy = defaultFedStrategy;
     }
@@ -146,19 +142,15 @@ public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
                 + "&count={os:count?}&sortKeys={sru:sortKeys?}&status={cdrb:includeStatus?}&format={cdrs:responseFormat?}&timeout={cdrb:timeout?}&queryLanguage={queryLanguage?}&oid={oid?}";
     }
 
-    @Override
-    public boolean useDefaultSortIfNotSpecified() {
-        return false;
-    }
 
     @Override
     public QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query )
             throws SourceUnavailableException, UnsupportedQueryException, FederationException {
         Collection<String> siteNames = query.getSiteNames();
 
-        QueryRequest queryRequest = new QueryRequestImpl( query, siteNames.isEmpty(), siteNames, getQueryParser().getQueryProperties( queryParameters,
+        QueryRequest queryRequest = new QueryRequestImpl( query, siteNames.isEmpty(), siteNames, getQueryProperties( queryParameters,
                 localSourceId ) );
-        SortBy originalSortBy = getQueryParser().getSortBy( queryParameters );
+        SortBy originalSortBy = query.getSortBy();
         QueryResponse queryResponse = originalSortBy == null ? getCatalogFramework().query( queryRequest, defaultFederationStrategy ) : getCatalogFramework()
                 .query( queryRequest, sortedFedStrategy );
         return queryResponse;

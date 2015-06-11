@@ -30,7 +30,7 @@ public final class GeospatialHelper {
                 wkt.append( "," );
                 coordinatePair = 1;
             }
-            wkt.append( coords[i] );
+            wkt.append( coords[i].trim() );
         }
         wkt.append( "))" );
         return wkt.toString();

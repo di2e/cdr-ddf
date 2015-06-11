@@ -17,13 +17,18 @@
 
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs" xmlns:cxf="http://cxf.apache.org/blueprint/core"
-    xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+    xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0" xmlns:jaxrs="http://cxf.apache.org/blueprint/jaxrs"
+    xmlns:cxf="http://cxf.apache.org/blueprint/core" xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
     xsi:schemaLocation="
         http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
         http://cxf.apache.org/blueprint/jaxrs http://cxf.apache.org/schemas/blueprint/jaxrs.xsd
         http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd
         http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0 http://aries.apache.org/schemas/blueprint-ext/blueprint-ext.xsd">
+    
+    <!-- According to the schema the type-converters element must be above all other elements except 'description' -->
+    <type-converters>
+        <bean id="listConverter" class="ddf.catalog.util.impl.ListConverter" />
+    </type-converters>
 
     <reference id="corsFilterConfig" availability="mandatory" interface="net.di2e.ecdr.security.cors.config.CORSFilterConfiguration" />
 
@@ -43,6 +48,32 @@
         </jaxrs:providers>
     </jaxrs:server>
 
+
+    <reference id="catalogFramework" interface="ddf.catalog.CatalogFramework" />
+    <reference id="transformIdMapper" interface="net.di2e.ecdr.search.transform.mapper.TransformIdMapper" />
+    <reference-list id="queryLanguages" interface="net.di2e.ecdr.api.query.QueryLanguage" availability="mandatory" />
+
+    <service id="cdrRestConfigWatcher" ref="configurationWatcher" interface="org.codice.ddf.configuration.ConfigurationWatcher" />
+    <bean id="configurationWatcher" class="org.codice.ddf.configuration.impl.ConfigurationWatcherImpl" />
+
+    <reference-list id="auditorList" interface="net.di2e.ecdr.api.auditor.SearchAuditor" availability="optional" />
+
+    <bean id="queryConfiguration" class="net.di2e.ecdr.commons.query.QueryConfigurationImpl">
+        <cm:managed-properties persistent-id="cdr-rest-search-endpoint-1.1" update-strategy="container-managed" />
+    </bean>
+
+    <bean id="cdrRestSearchService" class="net.di2e.ecdr.search.endpoint.rest.CDRRestSearchServiceImpl">
+        <argument ref="catalogFramework" />
+        <argument ref="configurationWatcher" />
+        <argument ref="queryLanguages" />
+        <argument ref="transformIdMapper" />
+        <argument ref="auditorList" />
+        <argument ref="queryConfiguration" />
+        <argument ref="fifoFederationStrategyBean" />
+    </bean>
+    <service ref="cdrRestSearchService" auto-export="interfaces" />
+
+
     <bean id="preFederatedQuerySortedList" class="ddf.catalog.util.impl.SortedServiceList">
         <argument ref="blueprintBundleContext" />
     </bean>
@@ -52,44 +83,18 @@
     </bean>
 
     <!-- PRE FEDERATED QUERY REFERENCE -->
-    <reference-list id="preFederatedQuery" interface="ddf.catalog.plugin.PreFederatedQueryPlugin" availability="optional">
+    <reference-list id="preFederatedQuery" interface="ddf.catalog.plugin.PreFederatedQueryPlugin"
+        availability="optional">
         <reference-listener bind-method="bindPlugin" unbind-method="unbindPlugin" ref="preFederatedQuerySortedList" />
     </reference-list>
     
     <!-- POST FEDERATED QUERY REFERENCE -->
-    <reference-list id="postFederatedQuery" interface="ddf.catalog.plugin.PostFederatedQueryPlugin" availability="optional">
+    <reference-list id="postFederatedQuery" interface="ddf.catalog.plugin.PostFederatedQueryPlugin"
+        availability="optional">
         <reference-listener bind-method="bindPlugin" unbind-method="unbindPlugin" ref="postFederatedQuerySortedList" />
     </reference-list>
 
     <bean id="pool" class="java.util.concurrent.Executors" factory-method="newCachedThreadPool" />
-
-    <reference id="transformIdMapper" interface="net.di2e.ecdr.search.transform.mapper.TransformIdMapper" />
-    <reference id="catalogFramework" interface="ddf.catalog.CatalogFramework" />
-    <reference id="filterBuilder" interface="ddf.catalog.filter.FilterBuilder" />
-
-    <service id="cdrRestConfigWatcher" ref="configurationWatcher" interface="org.codice.ddf.configuration.ConfigurationWatcher" />
-    <bean id="configurationWatcher" class="org.codice.ddf.configuration.impl.ConfigurationWatcherImpl" />
-
-    <reference-list id="sortTypeConfigurations" interface="net.di2e.ecdr.commons.sort.SortTypeConfiguration" availability="optional" />
-
-    <bean id="queryParser" class="net.di2e.ecdr.commons.query.rest.parsers.LegacyQueryParser">
-        <argument ref="sortTypeConfigurations" />
-        <cm:managed-properties persistent-id="cdr-rest-search-endpoint-1.1" update-strategy="container-managed" />
-    </bean>
-
-    <reference-list id="auditorList" interface="net.di2e.ecdr.api.auditor.SearchAuditor" availability="optional" />
-
-    <bean id="cdrRestSearchService" class="net.di2e.ecdr.search.endpoint.rest.CDRRestSearchServiceImpl">
-        <argument ref="catalogFramework" />
-        <argument ref="configurationWatcher" />
-        <argument ref="filterBuilder" />
-        <argument ref="queryParser" />
-        <argument ref="transformIdMapper" />
-        <argument ref="fifoFederationStrategyBean" />
-        <argument ref="auditorList" />
-    </bean>
-
-    <service ref="cdrRestSearchService" auto-export="interfaces" />
 
     <bean id="fifoFederationStrategyBean" class="net.di2e.ecdr.federation.FifoFederationStrategy">
         <argument ref="pool" />

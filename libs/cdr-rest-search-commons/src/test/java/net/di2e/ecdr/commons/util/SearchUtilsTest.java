@@ -12,14 +12,14 @@
  **/
 package net.di2e.ecdr.commons.util;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class SearchUtilsTest {
 
@@ -48,6 +48,12 @@ public class SearchUtilsTest {
         assertEquals("2", map.get( "1" ));
         assertEquals("3", map.get( "2" ));
         assertEquals("4", map.get( "3" ));
+    }
+
+    @Test
+    public void testIsBoolean() {
+        assertTrue( SearchUtils.isBoolean( Boolean.TRUE.toString() ) );
+        assertTrue( SearchUtils.isBoolean( "1" ) );
     }
 
 }

@@ -28,6 +28,6 @@
     <name>Enterprise CDR APIs</name>
 
     <modules>
-        <module>cdr-api-auditor</module>
+        <module>cdr-api</module>
     </modules>
 </project>
