@@ -31,4 +31,6 @@ public interface QueryLanguage {
 
     String getName();
 
+    String getLanguageDescription( QueryConfiguration queryConfig );
+
 }

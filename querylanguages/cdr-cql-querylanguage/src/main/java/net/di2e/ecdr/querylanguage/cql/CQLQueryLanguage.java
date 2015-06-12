@@ -56,6 +56,36 @@ public class CQLQueryLanguage implements QueryLanguage {
     }
 
     @Override
+    public String getLanguageDescription( QueryConfiguration queryConfig ) {
+        // @formatter:off
+        return "CQL Query Language\n****************************" + System.lineSeparator()
+             + "Usage: To use the CQL query language specify '" + getName() + "' in the {cdrs:queryLanguage} parameter placeholder."  + System.lineSeparator()
+             + "       The CQL query string should be put the contents of the CQL query in the {os:searchTerms} parameter placeholder."  + System.lineSeparator()
+             + System.lineSeparator()
+             + "Examples:  metadata like 'test'" + System.lineSeparator()
+             + "           created <> '2014-01-03'" + System.lineSeparator()
+             + "           metadata = 'England' and (title = 'London' and created before 2014-05-05T00:00:00) or (title = 'Cambridge' and created between '2014-01-03' and '2014-03-03')"
+             + System.lineSeparator()
+             + System.lineSeparator()
+             + "**** Sort Order ****" + System.lineSeparator()
+             + System.lineSeparator()
+             + "sru:sortKeys - space-separated list of sort keys, with individual sort keys comprised of a comma-separated "
+             + "sequence of sub-parameters in the order listed below." + System.lineSeparator()
+             + "    path - Mandatory. An XPath expression for a tagpath to be used in the sort." + System.lineSeparator()
+             + "    sortSchema - Optional. A short name for a URI identifying an XML schema to which the XPath expression applies" + System.lineSeparator()
+             + "    ascending - Optional. Boolean, default 'true'." + System.lineSeparator()
+             + "    caseSensitive - Optional. Boolean, default 'false'." + System.lineSeparator()
+             + "    missingValue - Optional. Default is 'highValue'." + System.lineSeparator()
+             + "            examples: Sort by relevance - score,relevance" + System.lineSeparator()
+             + "                      Sort by updated time descending - entry/date,,false " + System.lineSeparator()
+             + "                      Sort by distance - distance,cdrsx" + System.lineSeparator();
+                
+
+        
+        // @formatter:on
+    }
+
+    @Override
     public boolean isValidQuery( MultivaluedMap<String, String> queryParameters ) {
         return true;
     }
