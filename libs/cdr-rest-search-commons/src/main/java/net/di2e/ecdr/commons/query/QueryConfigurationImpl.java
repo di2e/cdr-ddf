@@ -21,7 +21,7 @@ public class QueryConfigurationImpl implements QueryConfiguration {
     private String defaultDateType = "effective";
     private String defaultDateTypeCustom = null;
     private double defaultRadius = 10000;
-    private String defaultResponseFormat = SearchConstants.ATOM_RESPONSE_FORMAT;;
+    private String defaultResponseFormat = SearchConstants.ATOM_RESPONSE_FORMAT;
     private boolean defaultFuzzySearch = true;
     private boolean defaultDeduplication = false;
     private Map<String, String> parameterExtensionMap = SearchUtils.convertToMap( "uid=id" );

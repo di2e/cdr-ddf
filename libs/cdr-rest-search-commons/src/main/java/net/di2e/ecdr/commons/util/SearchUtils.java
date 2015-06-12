@@ -12,6 +12,7 @@
  **/
 package net.di2e.ecdr.commons.util;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.sort.SortTypeConfiguration;
@@ -35,6 +38,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ddf.catalog.filter.impl.SortByImpl;
+import ddf.catalog.operation.Query;
+import ddf.catalog.operation.QueryResponse;
 import ddf.catalog.source.UnsupportedQueryException;
 
 /**
@@ -60,6 +65,45 @@ public final class SearchUtils {
     }
 
     private SearchUtils() {
+    }
+
+    public static Map<String, Serializable> getTransformLinkProperties( UriInfo uriInfo, Query query, QueryResponse response, String scheme, String host, Integer port ) {
+        Map<String, Serializable> properties = new HashMap<String, Serializable>();
+        UriBuilder uriBuilder = uriInfo.getRequestUriBuilder();
+
+        uriBuilder = updateURLWithPlatformValues( uriBuilder, scheme, host, port );
+
+        String selfLink = uriBuilder.toTemplate();
+        properties.put( SearchConstants.SELF_LINK_REL, selfLink );
+        LOGGER.debug( "Adding self link parameter[{}] with value [{}] to transform properties to be sent to result transformer", SearchConstants.SELF_LINK_REL, selfLink );
+        int startIndex = query.getStartIndex();
+        int pageSize = query.getPageSize();
+        long totalCount = response.getHits();
+
+        if ( startIndex + pageSize <= totalCount ) {
+            String template = uriBuilder.replaceQueryParam( SearchConstants.STARTINDEX_PARAMETER, String.valueOf( startIndex + pageSize ) ).toTemplate();
+            properties.put( SearchConstants.NEXT_LINK_REL, template );
+            LOGGER.debug( "Adding next link parameter[{}] with value [{}] to transform properties to be sent to result transformer", SearchConstants.NEXT_LINK_REL, template );
+        }
+
+        if ( startIndex > 1 ) {
+            String template = uriBuilder.replaceQueryParam( SearchConstants.STARTINDEX_PARAMETER, String.valueOf( Math.max( 1, startIndex - pageSize ) ) ).toTemplate();
+            properties.put( SearchConstants.PREV_LINK_REL, template );
+            LOGGER.debug( "Adding previous link parameter[{}] with value [{}] to transform properties to be sent to result transformer", SearchConstants.PREV_LINK_REL, template );
+        }
+        return properties;
+    }
+
+    public static UriBuilder updateURLWithPlatformValues( UriBuilder builder, String scheme, String host, Integer port ) {
+        if ( StringUtils.isNotBlank( scheme ) && StringUtils.isNotBlank( host ) ) {
+            LOGGER.debug( "Using values from Platform Configuration for Atom Links host[" + host + "], scheme[" + scheme + "], and port[" + port + "]" );
+            builder.scheme( scheme );
+            builder.host( host );
+            if ( port != null ) {
+                builder.port( port );
+            }
+        }
+        return builder;
     }
 
     public static Boolean getBoolean( String booleanString, Boolean defaultValue ) {

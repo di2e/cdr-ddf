@@ -10,7 +10,9 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  * 
  **/
-package net.di2e.ecdr.commons.query.util;
+package net.di2e.ecdr.commons.util;
+
+import net.di2e.ecdr.commons.util.GeospatialHelper;
 
 import org.junit.Assert;
 import org.junit.Test;

@@ -10,7 +10,9 @@
  * <http://www.gnu.org/licenses/lgpl.html>.
  * 
  **/
-package net.di2e.ecdr.commons.query.util;
+package net.di2e.ecdr.commons.util;
+
+import org.apache.commons.lang.StringUtils;
 
 public final class GeospatialHelper {
 
@@ -30,7 +32,7 @@ public final class GeospatialHelper {
                 wkt.append( "," );
                 coordinatePair = 1;
             }
-            wkt.append( coords[i].trim() );
+            wkt.append( StringUtils.trimToEmpty( coords[i] ) );
         }
         wkt.append( "))" );
         return wkt.toString();
