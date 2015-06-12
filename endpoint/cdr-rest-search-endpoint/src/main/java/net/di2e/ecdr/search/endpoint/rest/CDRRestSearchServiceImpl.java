@@ -15,6 +15,7 @@
  */
 package net.di2e.ecdr.search.endpoint.rest;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +30,10 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import net.di2e.ecdr.api.auditor.SearchAuditor;
+import net.di2e.ecdr.api.query.QueryConfiguration;
+import net.di2e.ecdr.api.query.QueryLanguage;
 import net.di2e.ecdr.commons.endpoint.rest.AbstractRestSearchEndpoint;
-import net.di2e.ecdr.commons.query.rest.CDRQueryImpl;
-import net.di2e.ecdr.commons.query.rest.parsers.QueryParser;
+import net.di2e.ecdr.commons.query.CDRQueryImpl;
 import net.di2e.ecdr.federation.FifoFederationStrategy;
 import net.di2e.ecdr.search.transform.mapper.TransformIdMapper;
 
@@ -42,7 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import ddf.catalog.CatalogFramework;
 import ddf.catalog.federation.FederationException;
-import ddf.catalog.filter.FilterBuilder;
 import ddf.catalog.operation.QueryRequest;
 import ddf.catalog.operation.QueryResponse;
 import ddf.catalog.operation.impl.QueryRequestImpl;
@@ -61,7 +62,7 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
 
     private static final String RELATIVE_URL = "/services/cdr/search/rest";
     private static final String SERVICE_TYPE = "CDR REST Search Service";
-    
+
     private FifoFederationStrategy fifoFederationStratgey = null;
 
     private static final Map<String, String> REGISTRABLE_PROPERTIES = new HashMap<String, String>();
@@ -90,9 +91,9 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
      *            The transformation mapper for handling mapping the external CDR transform name to the internal DDF
      *            transform name
      */
-    public CDRRestSearchServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, FilterBuilder builder, QueryParser parser, TransformIdMapper mapper,
-            FifoFederationStrategy fedStrategy, List<SearchAuditor> auditors ) {
-        super( framework, config, builder, parser, mapper, auditors );
+    public CDRRestSearchServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
+            QueryConfiguration queryConfig, FifoFederationStrategy fedStrategy ) {
+        super( framework, config, queryLangs, mapper, auditorList, queryConfig );
         fifoFederationStratgey = fedStrategy;
     }
 
@@ -113,9 +114,9 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
     @Override
     public String getParameterTemplate() {
         return "?q={os:searchTerms}&caseSensitive={caseSensitive?}&fuzzy={fuzzy?}&timeout={fs:maxTimeout?}&start={os:startIndex?}&uid={uid?}&strictMode={strictMode?}"
-            + "&dtstart={time:start?}&dtend={time:end?}&dtType={time:type?}"
-            + "&collections={ecdr:collections?}&sort={fs:sort?}&box={geo:box?}&lat={geo:lat?}&lon={geo:lon?}&radius={geo:radius?}&geometry={geo:geometry?}&polygon={polygon?}"
-            + "&count={os:count?}&sortKeys={sru:sortKeys?}&status={cdrb:includeStatus?}&format={cdrs:responseFormat?}&timeout={cdrb:timeout?}&queryLanguage={queryLanguage?}&oid={oid?}";
+                + "&dtstart={time:start?}&dtend={time:end?}&dtType={time:type?}"
+                + "&collections={ecdr:collections?}&sort={fs:sort?}&box={geo:box?}&lat={geo:lat?}&lon={geo:lon?}&radius={geo:radius?}&geometry={geo:geometry?}&polygon={polygon?}"
+                + "&count={os:count?}&sortKeys={sru:sortKeys?}&status={cdrb:includeStatus?}&format={cdrs:responseFormat?}&timeout={cdrb:timeout?}&queryLanguage={queryLanguage?}&oid={oid?}";
     }
 
     @Override
@@ -139,14 +140,9 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
     }
 
     @Override
-    public boolean useDefaultSortIfNotSpecified() {
-        return true;
-    }
-
-    @Override
     public QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query ) throws SourceUnavailableException, UnsupportedQueryException,
             FederationException {
-        QueryRequest queryRequest = new QueryRequestImpl( query, false, query.getSiteNames(), getQueryParser().getQueryProperties( queryParameters, localSourceId ) );
+        QueryRequest queryRequest = new QueryRequestImpl( query, false, Arrays.asList( localSourceId ), getQueryProperties( queryParameters, localSourceId ) );
         QueryResponse queryResponse = getCatalogFramework().query( queryRequest, fifoFederationStratgey );
         return queryResponse;
     }

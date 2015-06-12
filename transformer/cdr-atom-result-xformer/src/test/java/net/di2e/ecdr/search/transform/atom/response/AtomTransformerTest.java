@@ -30,7 +30,6 @@ import java.util.Set;
 
 import javax.activation.MimeType;
 
-import net.di2e.ecdr.commons.constants.BrokerConstants;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.filter.config.FilterConfig;
 import net.di2e.ecdr.search.transform.atom.AtomTransformer;
@@ -147,7 +146,7 @@ public class AtomTransformerTest extends net.di2e.ecdr.search.transform.atom.res
         AtomTransformer transformer = createTransformer();
         Map<String, Serializable> properties = new HashMap<>();
         properties.put( SearchConstants.STATUS_PARAMETER, Boolean.TRUE );
-        properties.put( BrokerConstants.PATH_PARAMETER, "/path" );
+        properties.put( SearchConstants.PATH_PARAMETER, "/path" );
         transformer.transform( queryResponse, properties );
     }
 
@@ -165,7 +164,7 @@ public class AtomTransformerTest extends net.di2e.ecdr.search.transform.atom.res
         AtomTransformer transformer = createTransformer();
         Map<String, Serializable> properties = new HashMap<>();
         properties.put( SearchConstants.STATUS_PARAMETER, Boolean.TRUE );
-        properties.put( BrokerConstants.PATH_PARAMETER, "/path" );
+        properties.put( SearchConstants.PATH_PARAMETER, "/path" );
         transformer.transform( queryResponse, properties );
     }
 
@@ -182,7 +181,7 @@ public class AtomTransformerTest extends net.di2e.ecdr.search.transform.atom.res
         AtomTransformer transformer = createTransformer();
         Map<String, Serializable> properties = new HashMap<>();
         properties.put( SearchConstants.STATUS_PARAMETER, Boolean.TRUE );
-        properties.put( BrokerConstants.PATH_PARAMETER, "/path" );
+        properties.put( SearchConstants.PATH_PARAMETER, "/path" );
         transformer.transform( queryResponse, properties );
     }
 

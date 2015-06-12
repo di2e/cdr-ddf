@@ -26,6 +26,10 @@
             <Option label="Atom with Metadata Payload (any format)" value="atom-with-payload" />
         </AD>
         
+        <AD name="Default Response Format Custom Override" id="defaultResponseFormatCustom" required="false" type="String" default=""
+            description="Only populate this field if the default response format you desire is not in the dropdown list above.">
+        </AD>
+        
         <AD name="Default Fuzzy Search" id="defaultFuzzySearch" required="true" type="Boolean" default="true"
             description="The default value for the 'fuzzy' parameter (for textual searches) if it is not supplied in the query.  Checked means true" />
 
@@ -49,12 +53,16 @@
             <Option label="Valid Until" value="validTil" />
         </AD>
         
+        <AD name="Default Date Type Custom Override" id="defaultDateTypeCustom" required="false" type="String" default=""
+            description="Only populate this field if the default response date type you desire is not in the dropdown list above.">
+        </AD>
+        
         <AD name="Query Request Cache Size" id="queryRequestCacheSize" required="true" type="Integer" default="1000"
             description="The number of query IDs (OID) to keep in cache to check against when  checking for unique queries." />
-        
+        <!-- 
         <AD name="Default to deduplicate results" id="defaultDeduplication" type="Boolean" default="true"
             description="Check the box if you want to deduplicate results from multiple sources" />
-
+        -->
         <AD name="Parameter Extensions" id="extensionMap" required="false" type="String" default="uid=id" cardinality="100"
             description="List of non-standard parameters that should be added to the query if present in the query request. The mapping should be done by using &lt;parameter name&gt;=&lt;criteria
             field&gt; where the criteria field is what the value of the incoming parameter will be compared to in metacards.">

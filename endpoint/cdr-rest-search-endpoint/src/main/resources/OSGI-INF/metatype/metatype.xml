@@ -25,6 +25,10 @@
             <Option label="Atom" value="cdr-atom" />
             <Option label="Atom with Metadata Payload (any format)" value="atom-with-payload" />
         </AD>
+        
+        <AD name="Default Response Format Custom Override" id="defaultResponseFormatCustom" required="false" type="String" default=""
+            description="Only populate this field if the default response format you desire is not in the dropdown list above.">
+        </AD>
 
         <AD name="Default Fuzzy Search" id="defaultFuzzySearch" required="true" type="Boolean" default="true"
             description="The default value for the 'fuzzy' parameter (for textual searches) if it is not supplied in the query.  Checked means true" />
@@ -47,6 +51,10 @@
             <Option label="Temporal Coverage" value="temporalCoverage" />
             <Option label="Updated" value="updated" />
             <Option label="Valid Until" value="validTil" />
+        </AD>
+        
+        <AD name="Default Date Type Custom Override" id="defaultDateTypeCustom" required="false" type="String" default=""
+            description="Only populate this field if the default response date type you desire is not in the dropdown list above.">
         </AD>
         
         <AD name="Query Request Cache Size" id="queryRequestCacheSize" required="true" type="Integer" default="1000"

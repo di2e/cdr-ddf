@@ -31,7 +31,6 @@ import javax.activation.MimeTypeParseException;
 import javax.xml.namespace.QName;
 
 import net.di2e.ecdr.commons.CDRMetacard;
-import net.di2e.ecdr.commons.constants.BrokerConstants;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.constants.SecurityConstants;
 import net.di2e.ecdr.search.transform.atom.constants.AtomResponseConstants;
@@ -249,7 +248,7 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
                 sourceStatus.setAttributeValue( new QName( AtomResponseConstants.CDRB_NAMESPACE, "sourceId", AtomResponseConstants.CDRB_NAMESPACE_PREFIX ), sourceId );
                 sourceStatus.addSimpleExtension( AtomResponseConstants.CDRB_NAMESPACE, "shortName", AtomResponseConstants.CDRB_NAMESPACE_PREFIX, sourceId );
 
-                String feedPath = (String) properties.get( BrokerConstants.PATH_PARAMETER );
+                String feedPath = (String) properties.get( SearchConstants.PATH_PARAMETER );
                 if ( detail.hasException() ) {
                     sourceStatus.addSimpleExtension( AtomResponseConstants.CDRB_NAMESPACE, "status", AtomResponseConstants.CDRB_NAMESPACE_PREFIX, "error" );
                     sourceStatus.addSimpleExtension( AtomResponseConstants.CDRB_NAMESPACE, "resultsRetrieved", AtomResponseConstants.CDRB_NAMESPACE_PREFIX, "0" );
@@ -313,7 +312,7 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
                     sourceStatus.setAttributeValue( new QName( AtomResponseConstants.CDRB_NAMESPACE, "sourceId", AtomResponseConstants.CDRB_NAMESPACE_PREFIX ), site );
                     sourceStatus.addSimpleExtension( AtomResponseConstants.CDRB_NAMESPACE, "shortName", AtomResponseConstants.CDRB_NAMESPACE_PREFIX, site );
 
-                    String feedPath = (String) properties.get( BrokerConstants.PATH_PARAMETER );
+                    String feedPath = (String) properties.get( SearchConstants.PATH_PARAMETER );
                     Serializable object = queryResponse.getPropertyValue( site );
                     if ( object != null && object instanceof Map ) {
                         Map<String, Serializable> sourceProperties = (Map<String, Serializable>) object;

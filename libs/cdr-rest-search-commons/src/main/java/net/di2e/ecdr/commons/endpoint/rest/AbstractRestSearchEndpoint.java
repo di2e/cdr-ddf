@@ -21,8 +21,10 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -37,10 +39,14 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import net.di2e.ecdr.api.auditor.SearchAuditor;
+import net.di2e.ecdr.api.query.QueryConfiguration;
+import net.di2e.ecdr.api.query.QueryCriteria;
+import net.di2e.ecdr.api.query.QueryLanguage;
 import net.di2e.ecdr.commons.constants.SearchConstants;
-import net.di2e.ecdr.commons.query.rest.CDRQueryImpl;
-import net.di2e.ecdr.commons.query.rest.parsers.QueryParser;
+import net.di2e.ecdr.commons.query.CDRQueryImpl;
+import net.di2e.ecdr.commons.query.cache.QueryRequestCache;
 import net.di2e.ecdr.commons.query.util.QueryHelper;
+import net.di2e.ecdr.commons.util.SearchUtils;
 import net.di2e.ecdr.commons.xml.fs.SourceDescription;
 import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
 import net.di2e.ecdr.commons.xml.osd.Query;
@@ -49,6 +55,8 @@ import net.di2e.ecdr.commons.xml.osd.Url;
 import net.di2e.ecdr.search.transform.mapper.TransformIdMapper;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
 import org.slf4j.Logger;
@@ -57,7 +65,6 @@ import org.slf4j.LoggerFactory;
 import ddf.catalog.CatalogFramework;
 import ddf.catalog.data.BinaryContent;
 import ddf.catalog.federation.FederationException;
-import ddf.catalog.filter.FilterBuilder;
 import ddf.catalog.operation.QueryResponse;
 import ddf.catalog.source.SourceUnavailableException;
 import ddf.catalog.source.UnsupportedQueryException;
@@ -68,50 +75,72 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AbstractRestSearchEndpoint.class );
 
+    private static final int DEFAULT_QUERYID_CACHE_SIZE = 1000;
+
+    private QueryRequestCache queryRequestCache = null;
+
     private CatalogFramework catalogFramework = null;
     private ConfigurationWatcherImpl platformConfig = null;
-    private FilterBuilder filterBuilder = null;
-    private QueryParser queryParser = null;
     private List<SearchAuditor> auditors = null;
+    // private Map<String, QueryLanguage> queryLanguageMap = null;
+    private List<QueryLanguage> queryLanguageList = null;
+    private QueryConfiguration queryConfiguration = null;
 
     private TransformIdMapper transformMapper = null;
 
     /**
-     * Constructor for JAX RS CDR Search Service. Values should ideally be
-     * passed into the constructor using a dependency injection framework like
-     * blueprint
+     * Constructor for JAX RS CDR Search Service. Values should ideally be passed into the constructor using a
+     * dependency injection framework like blueprint
      *
      * @param framework
      *            Catalog Framework which will be used for search
      * @param config
-     *            ConfigurationWatcherImpl used to get the platform
-     *            configuration values
+     *            ConfigurationWatcherImpl used to get the platform configuration values
      * @param builder
      *            FilterBuilder implementation
      * @param parser
-     *            The instance of the QueryParser to use which will determine
-     *            how to parse the parameters from the query String. Query
-     *            parsers are tied to different versions of a query profile
+     *            The instance of the QueryParser to use which will determine how to parse the parameters from the query
+     *            String. Query parsers are tied to different versions of a query profile
      */
-    public AbstractRestSearchEndpoint( CatalogFramework framework, ConfigurationWatcherImpl config, FilterBuilder builder, QueryParser parser,
-            TransformIdMapper mapper, List<SearchAuditor> auditorList ) {
+    public AbstractRestSearchEndpoint( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
+            QueryConfiguration queryConfig ) {
         this.catalogFramework = framework;
         this.platformConfig = config;
-        this.filterBuilder = builder;
-        this.queryParser = parser;
+        // this.queryLanguageMap = queryLangs;
+        this.queryLanguageList = queryLangs;
         this.transformMapper = mapper;
         this.auditors = auditorList;
+        this.queryConfiguration = queryConfig;
+        queryRequestCache = new QueryRequestCache( DEFAULT_QUERYID_CACHE_SIZE );
     }
 
     public Response executePing( UriInfo uriInfo, String encodingHeader, String authHeader ) {
-        boolean isValid = queryParser.isValidQuery( uriInfo.getQueryParameters(), platformConfig.getSiteName() );
+        MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
+        boolean isValid = isValidQuery( queryParams, platformConfig.getSiteName() );
         return isValid ? Response.ok().build() : Response.status( Response.Status.BAD_REQUEST ).build();
     }
 
+    /*
+     * protected QueryLanguage getQueryLanguage( MultivaluedMap<String, String> queryParams ) { String lang =
+     * StringUtils.defaultIfBlank( queryParams.getFirst( SearchConstants.QUERYLANGUAGE_PARAMETER ),
+     * queryConfiguration.getDefaultQueryLanguage() ); LOGGER.debug(
+     * "Using query language that is associated with the name [{}]", lang ); return queryLanguageMap.get( lang ); }
+     */
+
+    protected QueryLanguage getQueryLanguage( MultivaluedMap<String, String> queryParams ) {
+        String lang = StringUtils.defaultIfBlank( queryParams.getFirst( SearchConstants.QUERYLANGUAGE_PARAMETER ), queryConfiguration.getDefaultQueryLanguage() );
+        LOGGER.debug( "Using query language that is associated with the name [{}]", lang );
+        for ( QueryLanguage queryLang : queryLanguageList ) {
+            if ( StringUtils.equalsIgnoreCase( queryLang.getName(), lang ) ) {
+                return queryLang;
+            }
+        }
+        return null;
+    }
+
     /**
-     * Search method that gets called when issuing an HTTP GET to the
-     * corresponding URL. HTTP GET URL query parameters contain the query
-     * criteria values
+     * Search method that gets called when issuing an HTTP GET to the corresponding URL. HTTP GET URL query parameters
+     * contain the query criteria values
      *
      * @param uriInfo
      *            Query parameters obtained by e
@@ -124,23 +153,31 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
     public Response executeSearch( HttpServletRequest servletRequest, UriInfo uriInfo, String encoding, String auth ) {
         Response response;
         QueryResponse queryResponse = null;
-        boolean success = false;
         try {
             String localSourceId = platformConfig.getSiteName();
             MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
-            CDRQueryImpl query = new CDRQueryImpl( filterBuilder, queryParameters, queryParser, useDefaultSortIfNotSpecified(), localSourceId );
+            if ( !isValidQuery( queryParameters, localSourceId ) ) {
+                throw new UnsupportedQueryException( "Invalid query parameters passed in" );
+            }
+
+            QueryLanguage queryLanguage = getQueryLanguage( queryParameters );
+            if ( queryLanguage == null ) {
+                throw new UnsupportedQueryException(
+                        "A Query language could not be determined, please check the default query langauge in the Admin Console ECDR Applicaiton Search Endpoint settings" );
+            }
+            QueryCriteria queryCriteria = queryLanguage.getQueryCriteria( queryParameters, queryConfiguration );
+            CDRQueryImpl query = new CDRQueryImpl( queryCriteria, localSourceId );
 
             queryResponse = executeQuery( localSourceId, queryParameters, query );
 
             // Move the specific links into Atom Transformer if possible
-            Map<String, Serializable> transformProperties = QueryHelper.getTransformLinkProperties( uriInfo, query, queryResponse,
-                    platformConfig.getSchemeFromProtocol(), platformConfig.getHostname(), platformConfig.getPort() );
-            transformProperties.put( SearchConstants.FEED_TITLE, "Atom Search Results from '" + localSourceId + "' for Query: "
-                    + query.getHumanReadableQuery().trim() );
+            Map<String, Serializable> transformProperties = QueryHelper.getTransformLinkProperties( uriInfo, query, queryResponse, platformConfig.getSchemeFromProtocol(),
+                    platformConfig.getHostname(), platformConfig.getPort() );
+            transformProperties.put( SearchConstants.FEED_TITLE, "Atom Search Results from '" + localSourceId + "' for Query: " + query.getHumanReadableQuery().trim() );
             transformProperties.put( SearchConstants.FORMAT_PARAMETER, query.getResponseFormat() );
-            transformProperties.put( SearchConstants.STATUS_PARAMETER, queryParser.isIncludeStatus( queryParameters ) );
+            transformProperties.put( SearchConstants.STATUS_PARAMETER, isIncludeStatus( queryParameters ) );
             transformProperties.put( SearchConstants.LOCAL_SOURCE_ID, catalogFramework.getId() );
-            transformProperties.put( SearchConstants.GEORSS_RESULT_FORMAT_PARAMETER, queryParser.getGeoRSSFormat( queryParameters ) );
+            transformProperties.put( SearchConstants.GEORSS_RESULT_FORMAT_PARAMETER, getGeoRSSFormat( queryParameters ) );
 
             String format = query.getResponseFormat();
 
@@ -150,7 +187,6 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
 
             try ( InputStream is = content.getInputStream() ) {
                 response = Response.ok( is, content.getMimeTypeValue() ).build();
-                success = true;
             } catch ( IOException e ) {
                 LOGGER.error( "Error reading response [" + e.getMessage() + "]", e );
                 response = Response.status( Response.Status.INTERNAL_SERVER_ERROR ).build();
@@ -243,23 +279,10 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         }
     }
 
-    private String generateTemplateUrl() {
-        StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append( platformConfig.getProtocol() );
-        urlBuilder.append( platformConfig.getHostname() );
-        urlBuilder.append( ":" );
-        urlBuilder.append( platformConfig.getPort() );
-        urlBuilder.append( getServiceRelativeUrl() );
-        urlBuilder.append( getParameterTemplate() );
-        return urlBuilder.toString();
-    }
-
     public abstract String getParameterTemplate();
 
-    public abstract boolean useDefaultSortIfNotSpecified();
-
-    public abstract QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query )
-            throws SourceUnavailableException, UnsupportedQueryException, FederationException;
+    public abstract QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query ) throws SourceUnavailableException,
+            UnsupportedQueryException, FederationException;
 
     @Override
     public Map<String, String> getProperties() {
@@ -270,8 +293,95 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         return catalogFramework;
     }
 
-    protected QueryParser getQueryParser() {
-        return queryParser;
+    protected boolean isIncludeStatus( MultivaluedMap<String, String> queryParameters ) {
+        // Include status is true unless explicitly set to false
+        return BooleanUtils.toBooleanDefaultIfNull( SearchUtils.getBoolean( queryParameters.getFirst( SearchConstants.STATUS_PARAMETER ) ), true );
+    }
+
+    protected String getGeoRSSFormat( MultivaluedMap<String, String> queryParameters ) {
+        return StringUtils.defaultIfBlank( queryParameters.getFirst( SearchConstants.GEORSS_RESULT_FORMAT_PARAMETER ), null );
+    }
+
+    public Map<String, Serializable> getQueryProperties( MultivaluedMap<String, String> queryParameters, String sourceId ) {
+        Map<String, Serializable> queryProperties = new HashMap<String, Serializable>();
+
+        queryProperties.put( SearchConstants.FORMAT_PARAMETER,
+                StringUtils.defaultIfBlank( queryParameters.getFirst( SearchConstants.FORMAT_PARAMETER ), queryConfiguration.getDefaultResponseFormat() ) );
+        queryProperties.put( SearchConstants.STATUS_PARAMETER, SearchUtils.getBoolean( queryParameters.getFirst( SearchConstants.STATUS_PARAMETER ), true ) );
+        queryProperties.put( SearchConstants.DEDUP_PARAMETER, SearchUtils.getBoolean( queryParameters.getFirst( SearchConstants.DEDUP_PARAMETER ), queryConfiguration.isDefaultDeduplication() ) );
+
+        for ( String key : queryParameters.keySet() ) {
+            String value = queryParameters.getFirst( key );
+            if ( StringUtils.isNotBlank( value ) && queryConfiguration.getParameterPropertyList().contains( key ) ) {
+                queryProperties.put( key, value );
+            }
+        }
+
+        return queryProperties;
+    }
+
+    protected String generateTemplateUrl() {
+        StringBuilder urlBuilder = new StringBuilder();
+        urlBuilder.append( platformConfig.getProtocol() );
+        urlBuilder.append( platformConfig.getHostname() );
+        urlBuilder.append( ":" );
+        urlBuilder.append( platformConfig.getPort() );
+        urlBuilder.append( getServiceRelativeUrl() );
+        urlBuilder.append( getParameterTemplate() );
+        return urlBuilder.toString();
+    }
+
+    protected boolean isValidQuery( MultivaluedMap<String, String> queryParameters, String sourceId ) {
+        boolean isValidQuery = true;
+        String queryLang = queryParameters.getFirst( SearchConstants.QUERYLANGUAGE_PARAMETER );
+        // if ( StringUtils.isNotBlank( queryLang ) && !queryLanguageMap.containsKey( queryLang ) ) {
+        if ( getQueryLanguage( queryParameters ) == null ) {
+            isValidQuery = false;
+            LOGGER.debug( "The query is not valid because the {} parameter with value {} is not in the allowed values {}", SearchConstants.QUERYLANGUAGE_PARAMETER, queryLang, queryLanguageList );
+        } else if ( !SearchUtils.isBooleanNullOrBlank( queryParameters.getFirst( SearchConstants.CASESENSITIVE_PARAMETER ) ) ) {
+            isValidQuery = false;
+            LOGGER.debug( "The query is not valid because the {} parameter with value {} is not valid", SearchConstants.CASESENSITIVE_PARAMETER,
+                    queryParameters.getFirst( SearchConstants.CASESENSITIVE_PARAMETER ) );
+        } else if ( !SearchUtils.isBooleanNullOrBlank( queryParameters.getFirst( SearchConstants.STRICTMODE_PARAMETER ) ) ) {
+            isValidQuery = false;
+            LOGGER.debug( "The query is not valid because the {} parameter with value {} is not valid", SearchConstants.STRICTMODE_PARAMETER,
+                    queryParameters.getFirst( SearchConstants.STRICTMODE_PARAMETER ) );
+        } else if ( !SearchUtils.isBooleanNullOrBlank( queryParameters.getFirst( SearchConstants.STATUS_PARAMETER ) ) ) {
+            isValidQuery = false;
+            LOGGER.debug( "The query is not valid because the {} parameter with value {} is not valid", SearchConstants.STATUS_PARAMETER,
+                    queryParameters.getFirst( SearchConstants.STATUS_PARAMETER ) );
+        } else if ( !SearchUtils.isBooleanNullOrBlank( queryParameters.getFirst( SearchConstants.FUZZY_PARAMETER ) ) ) {
+            isValidQuery = false;
+            LOGGER.debug( "The query is not valid because the {} parameter with value {} is not valid", SearchConstants.FUZZY_PARAMETER, queryParameters.getFirst( SearchConstants.FUZZY_PARAMETER ) );
+        } else {
+            isValidQuery = isUniqueQuery( queryParameters, sourceId );
+            LOGGER.debug( "Checking if the query is valid: {}", isValidQuery );
+        }
+
+        return isValidQuery;
+    }
+
+    protected boolean isUniqueQuery( MultivaluedMap<String, String> queryParameters, String sourceId ) {
+        boolean isUniqueQuery = true;
+        String oid = queryParameters.getFirst( SearchConstants.OID_PARAMETER );
+
+        if ( StringUtils.isNotBlank( oid ) ) {
+            isUniqueQuery = queryRequestCache.isQueryIdUnique( oid );
+        } else {
+            String uuid = UUID.randomUUID().toString();
+            queryParameters.putSingle( SearchConstants.OID_PARAMETER, uuid );
+            queryRequestCache.add( uuid );
+        }
+
+        String path = queryParameters.getFirst( SearchConstants.PATH_PARAMETER );
+        if ( StringUtils.isNotBlank( path ) ) {
+            String[] pathValues = path.split( "," );
+            if ( ArrayUtils.contains( pathValues, sourceId ) ) {
+                isUniqueQuery = false;
+                LOGGER.debug( "The '{}' with value '{}' contains the local source id {}", SearchConstants.PATH_PARAMETER, path, sourceId );
+            }
+        }
+        return isUniqueQuery;
     }
 
 }

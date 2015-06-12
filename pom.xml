@@ -665,6 +665,7 @@
     <modules>
         <module>api</module>
         <module>libs</module>
+        <module>querylanguages</module>
         <module>security</module>
         <module>transformer</module>
         <module>federation</module>
