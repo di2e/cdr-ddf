@@ -51,6 +51,11 @@ public class CQLQueryLanguage implements QueryLanguage {
     }
 
     @Override
+    public String getUrlTemplateParameters() {
+        return "&sortKeys={sru:sortKeys?}";
+    }
+
+    @Override
     public String getName() {
         return SearchConstants.CDR_CQL_QUERY_LANGUAGE;
     }

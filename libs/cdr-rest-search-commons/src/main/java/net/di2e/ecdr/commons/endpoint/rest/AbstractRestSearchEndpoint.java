@@ -241,18 +241,14 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         osd.getOutputEncoding().add( StandardCharsets.UTF_8.name() );
 
         // url example
-        Url url = new Url();
-        url.setType( MediaType.APPLICATION_ATOM_XML );
-        url.setTemplate( generateTemplateUrl() );
-        osd.getUrl().add( url );
-
-        // federated sites
-        for ( String curSource : catalogFramework.getSourceIds() ) {
-            SourceDescription description = new SourceDescription();
-            description.setSourceId( curSource );
-            description.setShortName( curSource );
-            osd.getAny().add( description );
+        for ( QueryLanguage lang : queryLanguageList ) {
+            Url url = new Url();
+            url.setType( MediaType.APPLICATION_ATOM_XML );
+            url.setTemplate( generateTemplateUrl( lang ) );
+            osd.getUrl().add( url );
         }
+
+        addSourceDescriptions( osd );
 
         StringWriter writer = new StringWriter();
         InputStream is = null;
@@ -277,6 +273,16 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
             return Response.serverError().build();
         } finally {
             IOUtils.closeQuietly( is );
+        }
+    }
+
+    protected void addSourceDescriptions( OpenSearchDescription osd ) {
+        // federated sites
+        for ( String curSource : catalogFramework.getSourceIds() ) {
+            SourceDescription description = new SourceDescription();
+            description.setSourceId( curSource );
+            description.setShortName( curSource );
+            osd.getAny().add( description );
         }
     }
 
@@ -313,7 +319,20 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         return builder.toString().trim();
     }
 
-    public abstract String getParameterTemplate();
+    public String getParameterTemplate( String languageName ) {
+        // @formatter:off
+        return "?q={os:searchTerms?}"
+                + "&count={os:count?}"
+                + "&startIndex={os:startIndex?}"
+                + "&queryLanguage=" + languageName
+                + "&format={cdrs:responseFormat?}"
+                + "&timeout={cdrs:timeout?}"
+                + "&status={cdrb:includeStatus?}"
+                + "&oid={cdrsx:originQueryID?}"
+                + "&strictMode={cdrsx:strictMode?}"
+                + "&path={cdrb:path?}";
+        // @formatter:on
+    }
 
     public abstract QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query ) throws SourceUnavailableException,
             UnsupportedQueryException, FederationException;
@@ -354,14 +373,15 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         return queryProperties;
     }
 
-    protected String generateTemplateUrl() {
+    protected String generateTemplateUrl( QueryLanguage lang ) {
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append( platformConfig.getProtocol() );
         urlBuilder.append( platformConfig.getHostname() );
         urlBuilder.append( ":" );
         urlBuilder.append( platformConfig.getPort() );
         urlBuilder.append( getServiceRelativeUrl() );
-        urlBuilder.append( getParameterTemplate() );
+        urlBuilder.append( getParameterTemplate( lang.getName() ) );
+        urlBuilder.append( lang.getUrlTemplateParameters() );
         return urlBuilder.toString();
     }
 

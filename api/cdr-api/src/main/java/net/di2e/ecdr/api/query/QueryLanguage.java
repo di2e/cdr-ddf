@@ -33,4 +33,6 @@ public interface QueryLanguage {
 
     String getLanguageDescription( QueryConfiguration queryConfig );
 
+    String getUrlTemplateParameters();
+
 }

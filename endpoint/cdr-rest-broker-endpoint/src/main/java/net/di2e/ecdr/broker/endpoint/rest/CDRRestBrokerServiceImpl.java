@@ -134,11 +134,8 @@ public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
     }
 
     @Override
-    public String getParameterTemplate() {
-        return "?q={os:searchTerms}&src={fs:routeTo?}&caseSensitive={caseSensitive?}&fuzzy={fuzzy?}&timeout={fs:maxTimeout?}&start={os:startIndex?}&strictMode={strictMode?}"
-                + "&dtstart={time:start?}&dtend={time:end?}&dtType={time:type?}" + "&collections={ecdr:collections?}&sort={fs:sort?}"
-                + "&box={geo:box?}&lat={geo:lat?}&lon={geo:lon?}&radius={geo:radius?}&geometry={geo:geometry?}&polygon={polygon?}&uid={geo:uid?}"
-                + "&count={os:count?}&sortKeys={sru:sortKeys?}&status={cdrb:includeStatus?}&format={cdrs:responseFormat?}&timeout={cdrb:timeout?}&queryLanguage={queryLanguage?}&oid={oid?}";
+    public String getParameterTemplate( String queryLanguageName ) {
+        return super.getParameterTemplate( queryLanguageName ) + "&source={cdrb:routeTo?}";
     }
 
     @Override

@@ -97,7 +97,7 @@
                 <configuration>
                     <excludes>
                         <!-- Contains LGPL licensed files and must stay LGPL -->
-                        <exclude>**</exclude>
+                        <exclude>**/net/di2e/ecdr/querylanguage/basic/keywordparser/*</exclude>
                     </excludes>
                 </configuration>
                 <executions>

@@ -92,6 +92,31 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
     }
 
     @Override
+    public String getUrlTemplateParameters() {
+        // @formatter:off
+        return "&id={geo:uid?}"
+                + "&resource-uri={ddf:resource-uri?}"
+                + "&caseSensitive={cdrsx:caseSensitive?}"
+                + "&fuzzy={ecdr:fuzzy?}"
+                + "&box={geo:box?}"
+                + "&lat={geo:lat?}"
+                + "&lon={geo:lon?}"
+                + "&radius={geo:radius?}"
+                + "&geometry={geo:geometry?}"
+                + "&polygon={polygon?}"
+                + "&spatialOp={geo:relation?}"
+                + "&dtStart={time:start?}"
+                + "&dtEnd={time:end?}"
+                + "&dtType={cdrsx:dateType?}"
+                + "&dtRelation={time:relation?}"
+                + "&georssFormat={ecdr:georssFormat?}"
+                + "&metadata-content-type={ddf:metadata-content-type?}"
+                + "&textPath={ecdr:textPath?}"
+                + "&sortKeys={sru:sortKeys?}";       
+     // @formatter:on
+    }
+
+    @Override
     public String getLanguageDescription( QueryConfiguration queryConfig ) {
         // @formatter:off
         String description =  "CDR Keyword Basic Query Language" + System.lineSeparator()
@@ -176,7 +201,7 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
                + System.lineSeparator()
                + "ddf:metadata-content-type - comma separate list that maps to the Metacard.CONTENT_TYPE attribute" + System.lineSeparator()
                + System.lineSeparator()
-               + "ddf:textPath - comma separated list of text paths (XPath-like) values to be searched over" + System.lineSeparator()
+               + "ecdr:textPath - comma separated list of text paths (XPath-like) values to be searched over" + System.lineSeparator()
                + "            example: /ddms:Resource/subtitle  (this would return all records that contain an element of subtitle under the ddms:Resource root element" + System.lineSeparator()
                + System.lineSeparator()
                + System.lineSeparator()

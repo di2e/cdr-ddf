@@ -34,6 +34,8 @@ import net.di2e.ecdr.api.query.QueryConfiguration;
 import net.di2e.ecdr.api.query.QueryLanguage;
 import net.di2e.ecdr.commons.endpoint.rest.AbstractRestSearchEndpoint;
 import net.di2e.ecdr.commons.query.CDRQueryImpl;
+import net.di2e.ecdr.commons.xml.fs.SourceDescription;
+import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
 import net.di2e.ecdr.federation.FifoFederationStrategy;
 import net.di2e.ecdr.search.transform.mapper.TransformIdMapper;
 
@@ -112,14 +114,6 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
     }
 
     @Override
-    public String getParameterTemplate() {
-        return "?q={os:searchTerms}&caseSensitive={caseSensitive?}&fuzzy={fuzzy?}&timeout={fs:maxTimeout?}&start={os:startIndex?}&uid={uid?}&strictMode={strictMode?}"
-                + "&dtstart={time:start?}&dtend={time:end?}&dtType={time:type?}"
-                + "&collections={ecdr:collections?}&sort={fs:sort?}&box={geo:box?}&lat={geo:lat?}&lon={geo:lon?}&radius={geo:radius?}&geometry={geo:geometry?}&polygon={polygon?}"
-                + "&count={os:count?}&sortKeys={sru:sortKeys?}&status={cdrb:includeStatus?}&format={cdrs:responseFormat?}&timeout={cdrb:timeout?}&queryLanguage={queryLanguage?}&oid={oid?}";
-    }
-
-    @Override
     public String getServiceType() {
         return SERVICE_TYPE;
     }
@@ -137,6 +131,16 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
     @Override
     public Map<String, String> getProperties() {
         return REGISTRABLE_PROPERTIES;
+    }
+
+    @Override
+    protected void addSourceDescriptions( OpenSearchDescription osd ) {
+        // federated sites
+        String curSource = getCatalogFramework().getId();
+        SourceDescription description = new SourceDescription();
+        description.setSourceId( curSource );
+        description.setShortName( curSource );
+        osd.getAny().add( description );
     }
 
     @Override
