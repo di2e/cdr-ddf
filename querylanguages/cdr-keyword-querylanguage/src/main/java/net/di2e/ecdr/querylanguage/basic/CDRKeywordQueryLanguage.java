@@ -32,8 +32,8 @@ import net.di2e.ecdr.api.query.QueryLanguage;
 import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.query.CDRQueryCriteriaImpl;
-import net.di2e.ecdr.commons.query.util.GeospatialHelper;
 import net.di2e.ecdr.commons.sort.SortTypeConfiguration;
+import net.di2e.ecdr.commons.util.GeospatialHelper;
 import net.di2e.ecdr.commons.util.SearchUtils;
 import net.di2e.ecdr.querylanguage.basic.GeospatialCriteria.SpatialOperator;
 import net.di2e.ecdr.querylanguage.basic.PropertyCriteria.Operator;
@@ -86,8 +86,145 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
         sortTypeConfigurationList = sortTypeConfigurations;
     }
 
+    @Override
     public String getName() {
         return SearchConstants.CDR_KEYWORD_QUERY_LANGUAGE;
+    }
+
+    @Override
+    public String getUrlTemplateParameters() {
+        // @formatter:off
+        return "&id={geo:uid?}"
+                + "&resource-uri={ddf:resource-uri?}"
+                + "&caseSensitive={cdrsx:caseSensitive?}"
+                + "&fuzzy={ecdr:fuzzy?}"
+                + "&box={geo:box?}"
+                + "&lat={geo:lat?}"
+                + "&lon={geo:lon?}"
+                + "&radius={geo:radius?}"
+                + "&geometry={geo:geometry?}"
+                + "&polygon={polygon?}"
+                + "&spatialOp={geo:relation?}"
+                + "&dtStart={time:start?}"
+                + "&dtEnd={time:end?}"
+                + "&dtType={cdrsx:dateType?}"
+                + "&dtRelation={time:relation?}"
+                + "&georssFormat={ecdr:georssFormat?}"
+                + "&metadata-content-type={ddf:metadata-content-type?}"
+                + "&textPath={ecdr:textPath?}"
+                + "&sortKeys={sru:sortKeys?}";       
+     // @formatter:on
+    }
+
+    @Override
+    public String getLanguageDescription( QueryConfiguration queryConfig ) {
+        // @formatter:off
+        String description =  "CDR Keyword Basic Query Language" + System.lineSeparator()
+               + "****************************" + System.lineSeparator()
+               + "Usage: To use the CQL query language specify the '" + getName() + "' in the {cdrs:queryLanguage} parameter placeholder." + System.lineSeparator()
+               + "       The CDR Keyword Basic query language supports booleans (AND, OR, NOT) and parenthesis in the {os:searchTerms} parameter value" + System.lineSeparator()
+               + "       Additionally the parameters below can be used for temporal, geospatial, property, or enhanced keyword searches" + System.lineSeparator()
+               + System.lineSeparator()
+               + "The examples below are only for the keywords that can be used in the {os:searchTerms}.  They can be combined with any of the "
+               + "additional parameters defined in the sections that follow.       " + System.lineSeparator()
+               + "Examples:  ballpark" + System.lineSeparator()
+               + "           ballpark AND goodyear" + System.lineSeparator()
+               + "           bacllpark AND (goodyear or peoria)" + System.lineSeparator()
+               + "           " + System.lineSeparator()
+               + "           " + System.lineSeparator()
+               + "**** ID/URI Search Parameters ****" + System.lineSeparator()
+               + System.lineSeparator()
+               + "geo:uid - unique identifier of the record, matches the Metacard.ID field" + System.lineSeparator()
+               + System.lineSeparator()
+               + "ddf:resource-uri - URL encoded resource URI value that will be directly matched on, matches the Metacard.RESOURCE_URI field" + System.lineSeparator()
+               + System.lineSeparator()
+               + System.lineSeparator()
+               + "**** Contextual Search Parameters ****" + System.lineSeparator()
+               + System.lineSeparator()
+               + "cdrsx:caseSensitive - boolean (1 or 0) specifying whether or not the keyword search should be case sensitive" + System.lineSeparator()
+               + "            default: 0 (false - case insensitive) " + System.lineSeparator()
+               + System.lineSeparator()
+               + "ecdr:fuzzy - boolean (1 or 0) specifying whether or not the keyword search should be fuzzy (fuzzy allows for slight misspellings or derivations to be found)" + System.lineSeparator()
+               + "            default: ${defaultFuzzyCustom} (${defaultFuzzy}) " + System.lineSeparator()
+               + System.lineSeparator()
+               + System.lineSeparator()
+               + "**** Geospatial Search Parameters ****" + System.lineSeparator()
+               + System.lineSeparator()
+               + "geo:box - comma delimited list of lat/lon (deg) bounding box coordinates (geo format: geo:bbox ~ west,south,east,north). "
+               + "This is also commonly referred to by minX, minY, maxX, maxY (where longitude is the X-axis, and latitude is the Y-axis)." + System.lineSeparator()
+               + System.lineSeparator()
+               + "geo:lat/lon - latitude and longitude, respectively, in decimal degrees (typical GPS receiver WGS84 coordinates). Should include a 'radius' parameter "
+               + "that specifies the search radius in meters." + System.lineSeparator()
+               + System.lineSeparator()
+               + "geo:radius - the radius (in meters) parameter, used with the lat and lon parameters, specifies the search distance from this point." + System.lineSeparator()
+               + "            default: ${defaultRadius}" + System.lineSeparator()
+               + System.lineSeparator()
+               + "geo:geometry - The geometry is defined using the Well Known Text and supports the following 2D geographic shapes: POINT, LINESTRING, POLYGON, MULTIPOINT, "
+               + "MULTILINESTRING, MULTIPOLYGON (the Geometry shall be expressed using the EPSG:4326e)" + System.lineSeparator()
+               + "            examples: POINT(1 5)" + System.lineSeparator()
+               + "                      POLYGON((1 1,5 1,5 5,1 5,1 1),(2 2,2 3,3 3,3 2,2 2))" + System.lineSeparator()
+               + System.lineSeparator()
+               + "geo:polygon - (deprecated) polygon defined as comma separated latitude, longitude pairs, in clockwise order, with the last point being the same as the first "
+               + "in order to close the polygon." + System.lineSeparator()
+               + "            example: 45.256,-110.45,46.46,-109.48,43.84,-109.86,45.256,-110.45" + System.lineSeparator()
+               + System.lineSeparator()
+               + "geo:relation - spatial operator for the relation to the result set " + System.lineSeparator()
+               + "            default: intersects" + System.lineSeparator()
+               + "            allowedValues: 'intersects', 'contains', 'disjoint'" + System.lineSeparator()
+               + System.lineSeparator()
+               + "**** Temporal Search Parameters ****" + System.lineSeparator()
+               + System.lineSeparator()
+               + "time:start - replaced with a string of the beginning of the time slice of the search (RFC-3339 - Date and Time format, i.e. YYYY-MM-DDTHH:mm:ssZ). "
+               + "Default value of \"1970-01-01T00:00:00Z\" is used when {time:end} is indicated but {time:start} is not specified." + System.lineSeparator()
+               + System.lineSeparator()
+               + "time:end - replaced with a string of the ending of the time slice of the search (RFC-3339 - Date and Time format, i.e. YYYY-MM-DDTHH:mm:ssZ). "
+               + "Current GMT date/time is used when {time:start} is specified but not {time:end}." + System.lineSeparator()
+               + System.lineSeparator()
+               + "time:relation - temporal operation for the relation to the result set" + System.lineSeparator()
+               + "            default: intersects" + System.lineSeparator()
+               + "            allowedValues: 'intersects', 'contains', 'during', 'disjoint', 'equals'" + System.lineSeparator()
+               + System.lineSeparator()
+               + "cdrsx:dateType - the date type to compare against" + System.lineSeparator()
+               + "            default: ${defaultDateType}" + System.lineSeparator()
+               + "            allowedValues: ${dateTypeValues}" + System.lineSeparator()
+               + System.lineSeparator()
+               + System.lineSeparator()
+               + "**** Content Collections Search Parameters ****" + System.lineSeparator()
+               + System.lineSeparator()
+               + "ecdr:collections - a comma separated list of content collections to search over.  list of content collections can be retrieved by using the Describe spec" + System.lineSeparator()
+               + System.lineSeparator()
+               + System.lineSeparator()
+               + "**** Other Parameters ****" + System.lineSeparator()
+               + System.lineSeparator()
+               + "ecdr:georssFormat - specifies how to return the results that include geospatial data, can be as GML or as Simple GeoRSS" + System.lineSeparator()
+               + "            allowedValues: 'simple', 'gml'" + System.lineSeparator()
+               + System.lineSeparator()
+               + "ddf:metadata-content-type - comma separate list that maps to the Metacard.CONTENT_TYPE attribute" + System.lineSeparator()
+               + System.lineSeparator()
+               + "ecdr:textPath - comma separated list of text paths (XPath-like) values to be searched over" + System.lineSeparator()
+               + "            example: /ddms:Resource/subtitle  (this would return all records that contain an element of subtitle under the ddms:Resource root element" + System.lineSeparator()
+               + System.lineSeparator()
+               + System.lineSeparator()
+               + "**** Sort Order ****" + System.lineSeparator()
+               + System.lineSeparator()
+               + "sru:sortKeys - space-separated list of sort keys, with individual sort keys comprised of a comma-separated sequence of "
+               + "sub-parameters in the order listed below." + System.lineSeparator()
+               + "    path - Mandatory. An XPath expression for a tagpath to be used in the sort." + System.lineSeparator()
+               + "    sortSchema - Optional. A short name for a URI identifying an XML schema to which the XPath expression applies" + System.lineSeparator()
+               + "    ascending - Optional. Boolean, default 'true'." + System.lineSeparator()
+               + "    caseSensitive - Optional. Boolean, default 'false'." + System.lineSeparator()
+               + "    missingValue - Optional. Default is 'highValue'." + System.lineSeparator()
+               + "            examples: Sort by relevance - score,relevance" + System.lineSeparator()
+               + "                      Sort by updated time descending - entry/date,,false " + System.lineSeparator()
+               + "                      Sort by distance - distance,cdrsx" + System.lineSeparator();
+        // @formatter:on
+        boolean fuzzy = queryConfig.isDefaultFuzzySearch();
+        description = StringUtils.replace( description, "${defaultFuzzy}", String.valueOf( fuzzy ), 1 );
+        description = StringUtils.replace( description, "${defaultFuzzyCustom}", fuzzy ? SearchConstants.TRUE_STRING : SearchConstants.FALSE_STRING, 1 );
+        description = StringUtils.replace( description, "${defaultRadius}", String.valueOf( queryConfig.getDefaultRadius() ), 1 );
+        description = StringUtils.replace( description, "${defaultDateType}", queryConfig.getDefaultDateType(), 1 );
+        description = StringUtils.replace( description, "${dateTypeValues}", DATETYPE_MAP.keySet().toString(), 1 );
+        return description;
     }
 
     @Override

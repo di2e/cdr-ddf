@@ -22,6 +22,7 @@ import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,7 +46,6 @@ import net.di2e.ecdr.api.query.QueryLanguage;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.query.CDRQueryImpl;
 import net.di2e.ecdr.commons.query.cache.QueryRequestCache;
-import net.di2e.ecdr.commons.query.util.QueryHelper;
 import net.di2e.ecdr.commons.util.SearchUtils;
 import net.di2e.ecdr.commons.xml.fs.SourceDescription;
 import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
@@ -171,7 +171,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
             queryResponse = executeQuery( localSourceId, queryParameters, query );
 
             // Move the specific links into Atom Transformer if possible
-            Map<String, Serializable> transformProperties = QueryHelper.getTransformLinkProperties( uriInfo, query, queryResponse, platformConfig.getSchemeFromProtocol(),
+            Map<String, Serializable> transformProperties = SearchUtils.getTransformLinkProperties( uriInfo, query, queryResponse, platformConfig.getSchemeFromProtocol(),
                     platformConfig.getHostname(), platformConfig.getPort() );
             transformProperties.put( SearchConstants.FEED_TITLE, "Atom Search Results from '" + localSourceId + "' for Query: " + query.getHumanReadableQuery().trim() );
             transformProperties.put( SearchConstants.FORMAT_PARAMETER, query.getResponseFormat() );
@@ -241,18 +241,14 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         osd.getOutputEncoding().add( StandardCharsets.UTF_8.name() );
 
         // url example
-        Url url = new Url();
-        url.setType( MediaType.APPLICATION_ATOM_XML );
-        url.setTemplate( generateTemplateUrl() );
-        osd.getUrl().add( url );
-
-        // federated sites
-        for ( String curSource : catalogFramework.getSourceIds() ) {
-            SourceDescription description = new SourceDescription();
-            description.setSourceId( curSource );
-            description.setShortName( curSource );
-            osd.getAny().add( description );
+        for ( QueryLanguage lang : queryLanguageList ) {
+            Url url = new Url();
+            url.setType( MediaType.APPLICATION_ATOM_XML );
+            url.setTemplate( generateTemplateUrl( lang ) );
+            osd.getUrl().add( url );
         }
+
+        addSourceDescriptions( osd );
 
         StringWriter writer = new StringWriter();
         InputStream is = null;
@@ -265,6 +261,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
             is = getClass().getResourceAsStream( "/templates/osd_info.template" );
             if ( is != null ) {
                 String osdTemplate = IOUtils.toString( is );
+                osdTemplate = replaceTemplateValues( osdTemplate );
 
                 String responseStr = osdTemplate + writer.toString();
                 return Response.ok( responseStr, MediaType.APPLICATION_XML_TYPE ).build();
@@ -279,7 +276,63 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         }
     }
 
-    public abstract String getParameterTemplate();
+    protected void addSourceDescriptions( OpenSearchDescription osd ) {
+        // federated sites
+        for ( String curSource : catalogFramework.getSourceIds() ) {
+            SourceDescription description = new SourceDescription();
+            description.setSourceId( curSource );
+            description.setShortName( curSource );
+            osd.getAny().add( description );
+        }
+    }
+
+    protected String replaceTemplateValues( String osdTemplate ) {
+        osdTemplate = StringUtils.replace( osdTemplate, "${defaultCount}", String.valueOf( queryConfiguration.getDefaultCount() ), 1 );
+        osdTemplate = StringUtils.replace( osdTemplate, "${defaultQueryLanguage}", queryConfiguration.getDefaultQueryLanguage(), 1 );
+        osdTemplate = StringUtils.replace( osdTemplate, "${queryLanguages}", getQueryLanguagesString(), 1 );
+        osdTemplate = StringUtils.replace( osdTemplate, "${defaultResponseFormat}", queryConfiguration.getDefaultResponseFormat(), 1 );
+        osdTemplate = StringUtils.replace( osdTemplate, "${defaultTimeout}", String.valueOf( queryConfiguration.getDefaultTimeoutMillis() ), 1 );
+        osdTemplate = StringUtils.replace( osdTemplate, "${additionalBasicParameters}", "", 1 );
+        osdTemplate = StringUtils.replace( osdTemplate, "${queryLanguageDocumentation}", getQueryLanguageDescriptions(), 1 );
+        return osdTemplate;
+    }
+
+    protected String getQueryLanguageDescriptions() {
+        StringBuilder sb = new StringBuilder();
+        Iterator<QueryLanguage> langIter = queryLanguageList.iterator();
+        while ( langIter.hasNext() ) {
+            sb.append( langIter.next().getLanguageDescription( queryConfiguration ) );
+            if ( langIter.hasNext() ) {
+                sb.append( System.lineSeparator() );
+                sb.append( System.lineSeparator() );
+                sb.append( System.lineSeparator() );
+            }
+        }
+        return sb.toString();
+    }
+
+    private String getQueryLanguagesString() {
+        StringBuilder builder = new StringBuilder();
+        for ( QueryLanguage lang : queryLanguageList ) {
+            builder.append( "'" + lang.getName() + "' " );
+        }
+        return builder.toString().trim();
+    }
+
+    public String getParameterTemplate( String languageName ) {
+        // @formatter:off
+        return "?q={os:searchTerms?}"
+                + "&count={os:count?}"
+                + "&startIndex={os:startIndex?}"
+                + "&queryLanguage=" + languageName
+                + "&format={cdrs:responseFormat?}"
+                + "&timeout={cdrs:timeout?}"
+                + "&status={cdrb:includeStatus?}"
+                + "&oid={cdrsx:originQueryID?}"
+                + "&strictMode={cdrsx:strictMode?}"
+                + "&path={cdrb:path?}";
+        // @formatter:on
+    }
 
     public abstract QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query ) throws SourceUnavailableException,
             UnsupportedQueryException, FederationException;
@@ -320,14 +373,15 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         return queryProperties;
     }
 
-    protected String generateTemplateUrl() {
+    protected String generateTemplateUrl( QueryLanguage lang ) {
         StringBuilder urlBuilder = new StringBuilder();
         urlBuilder.append( platformConfig.getProtocol() );
         urlBuilder.append( platformConfig.getHostname() );
         urlBuilder.append( ":" );
         urlBuilder.append( platformConfig.getPort() );
         urlBuilder.append( getServiceRelativeUrl() );
-        urlBuilder.append( getParameterTemplate() );
+        urlBuilder.append( getParameterTemplate( lang.getName() ) );
+        urlBuilder.append( lang.getUrlTemplateParameters() );
         return urlBuilder.toString();
     }
 

@@ -17,6 +17,7 @@ package net.di2e.ecdr.broker.endpoint.rest;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
@@ -35,6 +36,7 @@ import net.di2e.ecdr.commons.query.CDRQueryImpl;
 import net.di2e.ecdr.federation.api.NormalizingFederationStrategy;
 import net.di2e.ecdr.search.transform.mapper.TransformIdMapper;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
 import org.opengis.filter.sort.SortBy;
@@ -51,12 +53,11 @@ import ddf.catalog.source.SourceUnavailableException;
 import ddf.catalog.source.UnsupportedQueryException;
 
 /**
- * JAX-RS Web Service which implements the CDR REST Brokered Search
- * Specification which is based on the CDR Search Spec which is in turn based on
- * Open Search
+ * JAX-RS Web Service which implements the CDR REST Brokered Search Specification which is based on the CDR Search Spec
+ * which is in turn based on Open Search
  * 
- * The key difference between CDR Brokered Search and CDR Search is that
- * Brokered Search can route the search to multiple sources (FederatedSource).
+ * The key difference between CDR Brokered Search and CDR Search is that Brokered Search can route the search to
+ * multiple sources (FederatedSource).
  *
  */
 @Path( "/" )
@@ -101,9 +102,8 @@ public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
     }
 
     /**
-     * Search method that gets called when issuing an HTTP GET to the
-     * corresponding URL. HTTP GET URL query parameters contain the query
-     * criteria values
+     * Search method that gets called when issuing an HTTP GET to the corresponding URL. HTTP GET URL query parameters
+     * contain the query criteria values
      *
      * @param uriInfo
      *            Query parameters obtained by e
@@ -134,26 +134,42 @@ public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
     }
 
     @Override
-    public String getParameterTemplate() {
-        return "?q={os:searchTerms}&src={fs:routeTo?}&caseSensitive={caseSensitive?}&fuzzy={fuzzy?}&timeout={fs:maxTimeout?}&start={os:startIndex?}&strictMode={strictMode?}"
-                + "&dtstart={time:start?}&dtend={time:end?}&dtType={time:type?}"
-                + "&collections={ecdr:collections?}&sort={fs:sort?}"
-                + "&box={geo:box?}&lat={geo:lat?}&lon={geo:lon?}&radius={geo:radius?}&geometry={geo:geometry?}&polygon={polygon?}&uid={geo:uid?}"
-                + "&count={os:count?}&sortKeys={sru:sortKeys?}&status={cdrb:includeStatus?}&format={cdrs:responseFormat?}&timeout={cdrb:timeout?}&queryLanguage={queryLanguage?}&oid={oid?}";
+    public String getParameterTemplate( String queryLanguageName ) {
+        return super.getParameterTemplate( queryLanguageName ) + "&source={cdrb:routeTo?}";
     }
 
-
     @Override
-    public QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query )
-            throws SourceUnavailableException, UnsupportedQueryException, FederationException {
+    public QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query ) throws SourceUnavailableException, UnsupportedQueryException,
+            FederationException {
         Collection<String> siteNames = query.getSiteNames();
 
-        QueryRequest queryRequest = new QueryRequestImpl( query, siteNames.isEmpty(), siteNames, getQueryProperties( queryParameters,
-                localSourceId ) );
+        QueryRequest queryRequest = new QueryRequestImpl( query, siteNames.isEmpty(), siteNames, getQueryProperties( queryParameters, localSourceId ) );
         SortBy originalSortBy = query.getSortBy();
-        QueryResponse queryResponse = originalSortBy == null ? getCatalogFramework().query( queryRequest, defaultFederationStrategy ) : getCatalogFramework()
-                .query( queryRequest, sortedFedStrategy );
+        QueryResponse queryResponse = originalSortBy == null ? getCatalogFramework().query( queryRequest, defaultFederationStrategy ) : getCatalogFramework().query( queryRequest,
+                sortedFedStrategy );
         return queryResponse;
+    }
+
+    @Override
+    protected String replaceTemplateValues( String osdTemplate ) {
+        // @formatter:off
+        String additionalParams = "cdrb:routeTo - a comma separated lists of siteNames (sources) that the query should be federated to " + System.lineSeparator()
+                                + "            default: [sent to all sites]" + System.lineSeparator()
+                                + "            allowedValues: " + getAllSites() + System.lineSeparator()
+                                + "            localSourceId: " + getCatalogFramework().getId() + System.lineSeparator()
+                                + "            example: site1,site2";
+        // @formatter:on 
+        osdTemplate = StringUtils.replace( osdTemplate, "${additionalBasicParameters}", additionalParams, 1 );
+        return super.replaceTemplateValues( osdTemplate );
+    }
+
+    private String getAllSites() {
+        StringBuilder builder = new StringBuilder();
+        Set<String> ids = getCatalogFramework().getSourceIds();
+        for ( String id : ids ) {
+            builder.append( "'" + id + "' " );
+        }
+        return builder.toString().trim();
     }
 
 }

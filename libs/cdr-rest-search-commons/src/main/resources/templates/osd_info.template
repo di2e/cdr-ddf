@@ -1,33 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-Request Properties
-******************
-os:count - number of items to return per request (default: count=20)
-os:startIndex - number of result to start response with. (Example: startIndex of 5 would return the 5th ranked result. default: startIndex=1)
+Basic Request Properties 
+*********************************************************************************
+  All of the values in this section are optional (with the exception of some queryLanguages
+  may require the os:searchTerms to be present). These parameters apply to all query languages 
+  (Please see the Query Language sections for more details)
 
-fs:routeTo - comma delimited list of data sources to query (default: all sources)
-fs:sort - specifies which field should be sorted on and what order the sorting should be.
-fs:format - format to return the response in (default: atom-ddms).
 
-****Criteria Types****
+os:searchTerms - the values to search over.  The format of this is governed by the cdrs:queryLanguage parameter
 
-Contextual
-******************"
-os:searchTerms - search terms
+os:count - number of items to return per request 
+            default: ${defaultCount}
 
-Spatial
-******************
-geo:box - comma delimited list of lat/lon (deg) bounding box coordinates (geo format: geo:bbox ~ west,south,east,north). This is also commonly referred to by minX, minY, maxX, maxY (where longitude is the X-axis, and latitude is the Y-axis).
-geo:lat/lon - latitude and longitude, respectively, in decimal degrees (typical GPS receiver WGS84 coordinates). Should include a 'radius' parameter that specifies the search radius in meters.
-geo:radius - the radius (m) parameter, used with the lat and lon parameters, specifies the search distance from this point (default: radius=5000)."
+os:startIndex - number of result to start response with. (Example: startIndex of 5 would return the 5th ranked result) 
+            default: 1
 
-Temporal
-******************
-time:start - replaced with a string of the beginning of the time slice of the search (RFC-3339 - Date and Time format, i.e. YYYY-MM-DDTHH:mm:ssZ). Default value of "1970-01-01T00:00:00Z" is used when dtend is indicated but dtstart is not specified.
-time:end - replaced with a string of the ending of the time slice of the search (RFC-3339 - Date and Time format, i.e. YYYY-MM-DDTHH:mm:ssZ). Current GMT date/time is used when dtstart is specified but not dtend.
+cdrs:queryLanguage - the format/syntax of the text that is used in the {os:searchTerms} parameter.  See the section on "Query Languages" below for more details 
+            default: ${defaultQueryLanguage}
+            allowedValues: ${queryLanguages}
+            
+cdrs:responseFormat - the format for the response
+            default: ${defaultResponseFormat}
 
-Sample Response:
-******************
+cdrs:timeout - the value (in milliseconds) before a search will time out
+            default: ${defaultTimeout}
+            
+cdrb:includeStatus - boolean (1 or 0) on whether or not to include the source status elements which give a summary of what was returned
+            default: 1 (true)
+            
+cdrsx:originQueryID - the unique id for the query, queries that get sent in with ID that have already been used will be rejected
+            default: [System generated UUID]  
+
+cdrsx:strictMode - boolean (1 or 0) for enforcing strict validation on query request and parameters
+            default: 0 (false) 
+
+cdrb:path - a comma separated list of siteNames (sources/brokers) that have already processed this query.  This is used to prevent looping when searches are federated
+            default: No default value
+            example: site1,site2
+            
+${additionalBasicParameters}
+
+cdrb:maxResults - Not supported (please use os:count instead)
+cdrbx:deduplication - Not supported (results will not be processed for deduplication)
+
+
+Query Languages
+*********************************************************************************
+
+${queryLanguageDocumentation}
 
 -->
 

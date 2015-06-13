@@ -642,7 +642,7 @@ public class CDRMetacard implements Metacard, Serializable {
             return returnType.cast( data );
         } else {
             if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug( data.getClass().toString() + " can not be assigned to " + returnType.toString() );
+                LOGGER.trace( data.getClass().toString() + " can not be assigned to " + returnType.toString() );
             }
         }
 

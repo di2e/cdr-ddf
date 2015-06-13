@@ -103,9 +103,6 @@
         <ddf.compression.version>2.6.0</ddf.compression.version>
         <ddf.registry.version>0.1.0</ddf.registry.version>
         <joda.time.version>2.2</joda.time.version>
-        
-       <!--  <checkstyle.config.location>src/main/resources/cdr-checkstyle.xml</checkstyle.config.location>
-         <checkstyle.header.location>src/main/resources/header.txt</checkstyle.header.location>-->
     </properties>
 
     <scm>
