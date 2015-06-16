@@ -15,14 +15,17 @@
  */
 package net.di2e.ecdr.libs.result.relevance;
 
-import ddf.catalog.data.Result;
-import ddf.catalog.data.impl.ResultImpl;
-import ddf.catalog.filter.FilterAdapter;
-import ddf.catalog.operation.Query;
-import ddf.catalog.source.UnsupportedQueryException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -49,12 +52,11 @@ import org.opengis.filter.sort.SortBy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import ddf.catalog.data.Result;
+import ddf.catalog.data.impl.ResultImpl;
+import ddf.catalog.filter.FilterAdapter;
+import ddf.catalog.operation.Query;
+import ddf.catalog.source.UnsupportedQueryException;
 
 /**
  * Normalizes the Relevance of a result set by looking at the contextual criteria, then doing a local calculation of
@@ -214,7 +216,7 @@ public class RelevanceNormalizer {
     protected Map<String, String> getFilterParameters(Query originalQuery) {
         HashMap<String, String> map = new HashMap<>();
         try {
-            map.putAll( filterAdapter.adapt( originalQuery, new StrictFilterDelegate( false, 50000.00, new FilterConfig() ) ) );
+            map.putAll( filterAdapter.adapt( originalQuery, new StrictFilterDelegate( false, 50000.00, new AtomSearchResponseTransformerConfig() ) ) );
         } catch (UnsupportedQueryException uqe) {
             LOGGER.debug( "Query did not contain any contextual criteria (search phrases), cannot perform re-relevance on this query." );
         }

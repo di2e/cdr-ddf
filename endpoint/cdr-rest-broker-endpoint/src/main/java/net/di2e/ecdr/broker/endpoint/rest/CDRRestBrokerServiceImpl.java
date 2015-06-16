@@ -29,12 +29,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import net.di2e.ecdr.api.auditor.SearchAuditor;
+import net.di2e.ecdr.api.federation.NormalizingFederationStrategy;
 import net.di2e.ecdr.api.query.QueryConfiguration;
 import net.di2e.ecdr.api.query.QueryLanguage;
+import net.di2e.ecdr.api.transform.TransformIdMapper;
 import net.di2e.ecdr.commons.endpoint.rest.AbstractRestSearchEndpoint;
 import net.di2e.ecdr.commons.query.CDRQueryImpl;
-import net.di2e.ecdr.federation.api.NormalizingFederationStrategy;
-import net.di2e.ecdr.search.transform.mapper.TransformIdMapper;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;

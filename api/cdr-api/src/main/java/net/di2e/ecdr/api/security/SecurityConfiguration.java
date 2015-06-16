@@ -13,14 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.libs.cache;
+package net.di2e.ecdr.api.security;
 
+import java.util.Map;
+import java.util.Set;
 
-public interface Cache<T> {
-    
-    void put( String id, T metacard );
-    
-    T get( String id );
+/**
+ * Interface that details a simple security configurations. Can be used to populate entries with pre-set information.
+ */
+public interface SecurityConfiguration {
 
-    void destroy();
+    /**
+     * Used for fallback configurations, only one configuration should use this format
+     */
+    String DEFAULT_FORMAT_CONFIGURATION = "default";
+
+    Set<String> getFormats();
+
+    String getNamespace();
+
+    Map<String, String> getAttributes();
+
 }

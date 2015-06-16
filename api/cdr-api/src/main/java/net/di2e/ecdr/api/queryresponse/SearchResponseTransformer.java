@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.search.transform.atom.security;
+package net.di2e.ecdr.api.queryresponse;
 
-import ddf.catalog.data.Metacard;
+import java.io.InputStream;
 
-public interface SecurityMarkingHandler {
+import ddf.catalog.operation.QueryRequest;
+import ddf.catalog.operation.SourceResponse;
 
-    SecurityData getSecurityData( Metacard metacard );
+public interface SearchResponseTransformer {
 
+    SourceResponse processSearchResponse( InputStream inputStream, QueryRequest request, String siteName );
 }

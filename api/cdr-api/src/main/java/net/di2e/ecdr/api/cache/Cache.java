@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.commons.sort;
+package net.di2e.ecdr.api.cache;
 
-public interface SortTypeConfiguration {
 
-    String getSortKey();
+public interface Cache<T> {
+    
+    void put( String id, T metacard );
+    
+    T get( String id );
 
-    String getSortAttribute();
-
-    String getSortOrder();
-
+    void destroy();
 }

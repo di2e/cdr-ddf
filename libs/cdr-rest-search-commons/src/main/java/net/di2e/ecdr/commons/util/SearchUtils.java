@@ -26,8 +26,8 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
+import net.di2e.ecdr.api.sort.SortTypeConfiguration;
 import net.di2e.ecdr.commons.constants.SearchConstants;
-import net.di2e.ecdr.commons.sort.SortTypeConfiguration;
 
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.format.DateTimeFormatter;

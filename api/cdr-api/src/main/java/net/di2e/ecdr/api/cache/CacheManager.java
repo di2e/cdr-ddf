@@ -13,12 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.federation.api;
+package net.di2e.ecdr.api.cache;
 
-import ddf.catalog.federation.FederationStrategy;
+import java.util.Map;
 
-public interface NormalizingFederationStrategy extends FederationStrategy {
+public interface CacheManager<T> {
 
-    void setNormalizeResults( boolean normalize );
+    String CACHE_EXPIRE_AFTER_MINUTES = "cache-expire-after-minutes";
+    String CACHE_SIZE = "cache-size";
+
+    Cache<T> createCacheInstance( String cacheId, Map<String, Object> cacheProperties );
+
+    void removeCacheInstance( String cacheId );
+
+    void destroy();
 
 }

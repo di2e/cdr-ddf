@@ -32,6 +32,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>net.di2e.ecdr.api</groupId>
+            <artifactId>cdr-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    
+        <dependency>
             <groupId>ddf.catalog.core</groupId>
             <artifactId>catalog-core-api-impl</artifactId>
             <version>${ddf.catalog.version}</version>

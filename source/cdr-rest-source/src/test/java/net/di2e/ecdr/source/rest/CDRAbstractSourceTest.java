@@ -36,6 +36,7 @@ import javax.ws.rs.core.Response;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.geotools.filter.text.cql2.CQL;
 import org.junit.Before;
@@ -182,6 +183,11 @@ public abstract class CDRAbstractSourceTest {
         performQuery( "created before 2014-05-05T00:00:00" );
     }
 
+    @Test( expected = UnsupportedQueryException.class )
+    public void testInvalidResponseTransformer() throws Exception {
+        performQuery( "created before 2014-05-05T00:00:00", "blah" );
+    }
+
     @Test
     public void testdoRetrieval() throws Exception {
         AbstractCDRSource source = configureSource();
@@ -214,7 +220,14 @@ public abstract class CDRAbstractSourceTest {
     }
 
     private void performQuery( String CQLStr ) throws Exception {
+        this.performQuery( CQLStr, null );
+    }
+
+    private void performQuery( String CQLStr, String responseTransformer ) throws Exception {
         AbstractCDRSource source = configureSource();
+        if ( StringUtils.isNotBlank( responseTransformer ) ) {
+            source.setResponseTransformer( responseTransformer );
+        }
         SortBy sort = new SortByImpl( Result.RELEVANCE, SortOrder.DESCENDING );
         QueryRequestImpl request = new QueryRequestImpl( new QueryImpl( CQL.toFilter( CQLStr ), 0, 20, sort, true, 10000 ) );
         Map<String, Serializable> properties = new HashMap<String, Serializable>();
@@ -232,7 +245,6 @@ public abstract class CDRAbstractSourceTest {
     }
 
     private AbstractCDRSource configureSource() {
-
         AbstractCDRSource source = createSource();
         source.setId( "example_site" );
         source.setPingUrl( PING_URL );

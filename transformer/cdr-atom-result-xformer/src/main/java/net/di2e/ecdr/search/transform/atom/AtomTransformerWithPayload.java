@@ -25,9 +25,9 @@ import java.util.Map;
 
 import javax.activation.MimeType;
 
+import net.di2e.ecdr.api.security.SecurityConfiguration;
 import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.constants.SearchConstants;
-import net.di2e.ecdr.search.transform.atom.security.SecurityConfiguration;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Entry;

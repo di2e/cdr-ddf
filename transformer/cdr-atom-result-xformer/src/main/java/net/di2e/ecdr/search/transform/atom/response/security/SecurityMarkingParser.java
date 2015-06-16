@@ -25,7 +25,7 @@ import javax.xml.namespace.QName;
 
 import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.constants.SecurityConstants;
-import net.di2e.ecdr.search.transform.atom.security.SecurityData;
+import net.di2e.ecdr.search.transform.atom.security.SecurityDataImpl;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
@@ -71,7 +71,7 @@ public final class SecurityMarkingParser {
         return metacardImpl;
     }
 
-    public static SecurityData getFeedSecurityMarkings( Feed feed ) {
+    public static SecurityDataImpl getFeedSecurityMarkings( Feed feed ) {
 
         List<QName> attributes = feed.getAttributes();
         if ( attributes != null ) {
@@ -90,7 +90,7 @@ public final class SecurityMarkingParser {
                 }
             }
             if ( !securityProps.isEmpty() ) {
-                return new SecurityData( securityProps, feedNamespace );
+                return new SecurityDataImpl( securityProps, feedNamespace );
             }
         }
         return null;

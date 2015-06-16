@@ -18,7 +18,7 @@ package net.di2e.ecdr.source.rest;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,11 +33,11 @@ public class CDRRestSource extends AbstractCDRSource {
 
     private Map<String, String> harcodedParamMap = new HashMap<String, String>();
 
-    private FilterConfig filterConfig = null;
+    private AtomSearchResponseTransformerConfig filterConfig = null;
 
     public CDRRestSource( FilterAdapter filterAdapter ) {
         super( filterAdapter );
-        filterConfig = new FilterConfig();
+        filterConfig = new AtomSearchResponseTransformerConfig();
         LOGGER.info( "Creating a new CDRRestSource." );
         setPingMethod(PingMethod.HEAD);
         setSendSecurityCookie( true );
@@ -49,7 +49,7 @@ public class CDRRestSource extends AbstractCDRSource {
     }
 
     @Override
-    public FilterConfig getFilterConfig() {
+    public AtomSearchResponseTransformerConfig getFilterConfig() {
         return filterConfig;
     }
 

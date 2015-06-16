@@ -15,8 +15,8 @@
  */
 package net.di2e.ecdr.source.rest;
 
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
-import net.di2e.ecdr.libs.cache.CacheManager;
+import net.di2e.ecdr.api.cache.CacheManager;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 import net.di2e.ecdr.libs.cache.impl.MetacardMemoryCacheManager;
 
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class CDROpenSearchSourceTest extends CDRAbstractSourceTest {
         source.setProductLinkRelation( "enclosure" );
         source.setThumbnailLinkRelation( "preview" );
         source.setProxyProductUrls( true );
-        source.setWrapContentWithXmlOption( FilterConfig.AtomContentXmlWrapOption.NEVER_WRAP.toString() );
+        source.setWrapContentWithXmlOption( AtomSearchResponseTransformerConfig.AtomContentXmlWrapOption.NEVER_WRAP.toString() );
         source.setHardCodedParameters( "test=example" );
         return source;
     }

@@ -21,9 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.di2e.ecdr.search.transform.atom.security.SecurityConfiguration;
-import net.di2e.ecdr.search.transform.atom.security.SecurityData;
-import net.di2e.ecdr.search.transform.atom.security.SecurityMarkingHandler;
+import net.di2e.ecdr.api.security.SecurityConfiguration;
+import net.di2e.ecdr.api.security.SecurityData;
+import net.di2e.ecdr.api.security.SecurityMarkingHandler;
+import net.di2e.ecdr.search.transform.atom.security.SecurityDataImpl;
 import ddf.catalog.data.Metacard;
 
 public class ConfigurationSecurityMarkingHandler implements SecurityMarkingHandler {
@@ -42,7 +43,7 @@ public class ConfigurationSecurityMarkingHandler implements SecurityMarkingHandl
             values.add( marking.getValue() );
             securityDataMarkings.put( marking.getKey(), values );
         }
-        SecurityData securityData = new SecurityData( securityDataMarkings, securityConfiguration.getNamespace() );
+        SecurityDataImpl securityData = new SecurityDataImpl( securityDataMarkings, securityConfiguration.getNamespace() );
         return securityData;
     }
 

@@ -42,7 +42,7 @@
     
     <reference id="filterAdapter" interface="ddf.catalog.filter.FilterAdapter" />
 
-    <service id="normalizingFederationStrategy" ref="normalizingFederationStrategyBean" interface="net.di2e.ecdr.federation.api.NormalizingFederationStrategy" />
+    <service id="normalizingFederationStrategy" ref="normalizingFederationStrategyBean" interface="net.di2e.ecdr.api.federation.NormalizingFederationStrategy" />
     
     <bean id="normalizingFederationStrategyBean" class="net.di2e.ecdr.federation.NormalizingSortedFederationStrategy">
         <cm:managed-properties persistent-id="cdr-result-normalization" update-strategy="container-managed"/>

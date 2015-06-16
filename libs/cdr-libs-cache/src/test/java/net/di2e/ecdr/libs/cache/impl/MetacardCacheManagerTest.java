@@ -17,8 +17,8 @@ package net.di2e.ecdr.libs.cache.impl;
 
 import ddf.catalog.data.Metacard;
 import ddf.catalog.data.impl.MetacardImpl;
-import net.di2e.ecdr.libs.cache.Cache;
-import net.di2e.ecdr.libs.cache.CacheManager;
+import net.di2e.ecdr.api.cache.Cache;
+import net.di2e.ecdr.api.cache.CacheManager;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

@@ -30,14 +30,14 @@ import javax.activation.MimeType;
 import javax.activation.MimeTypeParseException;
 import javax.xml.namespace.QName;
 
+import net.di2e.ecdr.api.security.SecurityConfiguration;
+import net.di2e.ecdr.api.security.SecurityData;
+import net.di2e.ecdr.api.security.SecurityMarkingHandler;
 import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.constants.SecurityConstants;
 import net.di2e.ecdr.search.transform.atom.constants.AtomResponseConstants;
 import net.di2e.ecdr.search.transform.atom.geo.GeoHelper;
-import net.di2e.ecdr.search.transform.atom.security.SecurityConfiguration;
-import net.di2e.ecdr.search.transform.atom.security.SecurityData;
-import net.di2e.ecdr.search.transform.atom.security.SecurityMarkingHandler;
 import net.di2e.ecdr.search.transform.atom.security.impl.ConfigurationSecurityMarkingHandler;
 import net.di2e.ecdr.search.transform.atom.security.impl.MetacardSecurityMarkingHandler;
 import net.di2e.ecdr.search.transform.atom.security.impl.XmlMetadataSecurityMarkingHandler;

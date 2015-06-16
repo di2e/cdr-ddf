@@ -50,14 +50,14 @@
     </jaxrs:server>
 
     <reference id="catalogFramework" interface="ddf.catalog.CatalogFramework" />
-    <reference id="transformIdMapper" interface="net.di2e.ecdr.search.transform.mapper.TransformIdMapper" />
+    <reference id="transformIdMapper" interface="net.di2e.ecdr.api.transform.TransformIdMapper" />
     <reference-list id="queryLanguages" interface="net.di2e.ecdr.api.query.QueryLanguage" availability="mandatory" />
 
     <service id="cdrRestConfigWatcher" ref="configurationWatcher" interface="org.codice.ddf.configuration.ConfigurationWatcher" />
     <bean id="configurationWatcher" class="org.codice.ddf.configuration.impl.ConfigurationWatcherImpl" />
 
     <reference-list id="auditorList" interface="net.di2e.ecdr.api.auditor.SearchAuditor" availability="optional" />
-    <reference id="normalizingFedStrategy" interface="net.di2e.ecdr.federation.api.NormalizingFederationStrategy" />
+    <reference id="normalizingFedStrategy" interface="net.di2e.ecdr.api.federation.NormalizingFederationStrategy" />
     
     <bean id="fifoFederationStrategyBean" class="net.di2e.ecdr.federation.FifoFederationStrategy">
         <argument ref="pool" />

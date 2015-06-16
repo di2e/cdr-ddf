@@ -57,8 +57,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            net.di2e.ecdr.api.auditor,
-                            net.di2e.ecdr.api.query,
+                            net.di2e.ecdr.api.*,
                         </Export-Package>
                     </instructions>
                 </configuration>

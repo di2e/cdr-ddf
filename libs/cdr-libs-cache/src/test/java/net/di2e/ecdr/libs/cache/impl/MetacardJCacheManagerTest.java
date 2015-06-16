@@ -16,7 +16,7 @@
 package net.di2e.ecdr.libs.cache.impl;
 
 import ddf.catalog.data.Metacard;
-import net.di2e.ecdr.libs.cache.CacheManager;
+import net.di2e.ecdr.api.cache.CacheManager;
 
 public class MetacardJCacheManagerTest extends MetacardCacheManagerTest {
 

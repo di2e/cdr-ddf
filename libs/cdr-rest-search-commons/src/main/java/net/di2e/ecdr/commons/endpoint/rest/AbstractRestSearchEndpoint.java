@@ -43,6 +43,7 @@ import net.di2e.ecdr.api.auditor.SearchAuditor;
 import net.di2e.ecdr.api.query.QueryConfiguration;
 import net.di2e.ecdr.api.query.QueryCriteria;
 import net.di2e.ecdr.api.query.QueryLanguage;
+import net.di2e.ecdr.api.transform.TransformIdMapper;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.query.CDRQueryImpl;
 import net.di2e.ecdr.commons.query.cache.QueryRequestCache;
@@ -52,7 +53,6 @@ import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
 import net.di2e.ecdr.commons.xml.osd.Query;
 import net.di2e.ecdr.commons.xml.osd.SyndicationRight;
 import net.di2e.ecdr.commons.xml.osd.Url;
-import net.di2e.ecdr.search.transform.mapper.TransformIdMapper;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -407,6 +407,9 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         } else if ( !SearchUtils.isBooleanNullOrBlank( queryParameters.getFirst( SearchConstants.FUZZY_PARAMETER ) ) ) {
             isValidQuery = false;
             LOGGER.debug( "The query is not valid because the {} parameter with value {} is not valid", SearchConstants.FUZZY_PARAMETER, queryParameters.getFirst( SearchConstants.FUZZY_PARAMETER ) );
+        } else if ( !SearchUtils.isBooleanNullOrBlank( queryParameters.getFirst( SearchConstants.DEDUP_PARAMETER ) ) ) {
+            isValidQuery = false;
+            LOGGER.debug( "The query is not valid because the {} parameter with value {} is not valid", SearchConstants.DEDUP_PARAMETER, queryParameters.getFirst( SearchConstants.DEDUP_PARAMETER ) );
         } else {
             isValidQuery = isUniqueQuery( queryParameters, sourceId );
             LOGGER.debug( "Checking if the query is valid: {}", isValidQuery );

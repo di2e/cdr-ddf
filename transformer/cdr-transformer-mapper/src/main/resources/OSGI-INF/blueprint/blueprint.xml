@@ -18,7 +18,7 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0" xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0">
 
-    <service id="transformIdMapper" ref="transformIdMapperBean" interface="net.di2e.ecdr.search.transform.mapper.TransformIdMapper" />
+    <service id="transformIdMapper" ref="transformIdMapperBean" interface="net.di2e.ecdr.api.transform.TransformIdMapper" />
     <bean id="transformIdMapperBean" class="net.di2e.ecdr.search.transform.mapper.TransformIdMapperImpl">
         <cm:managed-properties persistent-id="cdr-transformer-mapper" update-strategy="container-managed"/>
     </bean>

@@ -18,7 +18,7 @@ package net.di2e.ecdr.libs.cache.impl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import net.di2e.ecdr.libs.cache.Cache;
+import net.di2e.ecdr.api.cache.Cache;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

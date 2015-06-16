@@ -20,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.Map;
 
 import net.di2e.ecdr.commons.constants.SearchConstants;
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 
 import org.geotools.filter.text.cql2.CQL;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class StrictFilterDelegateTest {
     public void testFilterDelegate() throws Exception {
         GeotoolsFilterAdapterImpl filterAdapter = new GeotoolsFilterAdapterImpl();
         QueryImpl query = new QueryImpl( CQL.toFilter("q like 'test' AND (created before 2014-05-05T00:00:00 AND created after 2014-06-05T00:00:00) OR created after 2014-07-05T00:00:00") );
-        Map<String, String> filterParameters = filterAdapter.adapt( query, new StrictFilterDelegate( false, 50000.00, new FilterConfig() ) );
+        Map<String, String> filterParameters = filterAdapter.adapt( query, new StrictFilterDelegate( false, 50000.00, new AtomSearchResponseTransformerConfig() ) );
         assertEquals("test", filterParameters.get( SearchConstants.KEYWORD_PARAMETER ));
     }
 

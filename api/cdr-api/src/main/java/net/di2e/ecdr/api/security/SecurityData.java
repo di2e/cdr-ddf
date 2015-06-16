@@ -13,30 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.search.transform.atom.security;
+package net.di2e.ecdr.api.security;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-public class SecurityData {
+public interface SecurityData {
 
-    private HashMap<String, List<String>> securityMarkings = null;
-    private String securityNamespace = null;
-    
-    public SecurityData( Map<String, List<String>> markings, String namespace ) {
-        if ( markings != null ) {
-            this.securityMarkings = new HashMap<String, List<String>>( markings );
-        }
-        this.securityNamespace = namespace;
-    }
-    
-    public HashMap<String, List<String>> getSecurityMarkings() {
-        return securityMarkings;
-    }
-    
-    public String getSecurityNamespace() {
-        return securityNamespace;
-    }
+    HashMap<String, List<String>> getSecurityMarkings();
 
+    String getSecurityNamespace();
 }

@@ -21,9 +21,9 @@ import java.util.Collections;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import net.di2e.ecdr.api.sort.SortTypeConfiguration;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.query.QueryConfigurationImpl;
-import net.di2e.ecdr.commons.sort.SortTypeConfiguration;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.junit.Test;
