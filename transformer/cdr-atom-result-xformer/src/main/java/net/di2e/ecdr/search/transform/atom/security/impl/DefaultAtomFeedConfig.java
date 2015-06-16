@@ -21,8 +21,8 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 
+import net.di2e.ecdr.api.security.SecurityConfiguration;
 import net.di2e.ecdr.commons.util.ConfigAdminUtils;
-import net.di2e.ecdr.search.transform.atom.security.SecurityConfiguration;
 
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.service.cm.Configuration;

@@ -20,10 +20,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
-import net.di2e.ecdr.commons.filter.config.FilterConfig.AtomContentXmlWrapOption;
-import net.di2e.ecdr.libs.cache.Cache;
-import net.di2e.ecdr.libs.cache.CacheManager;
+import net.di2e.ecdr.api.cache.Cache;
+import net.di2e.ecdr.api.cache.CacheManager;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig.AtomContentXmlWrapOption;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -53,14 +53,14 @@ public class OpenSearchSource extends AbstractCDRSource {
 
     private Map<String, String> harcodedParamMap = new HashMap<String, String>();
 
-    private FilterConfig filterConfig = null;
+    private AtomSearchResponseTransformerConfig filterConfig = null;
     private CacheManager<Metacard> cacheManager = null;
     private Cache<Metacard> metacardCache = null;
     private String cacheId = null;
 
     public OpenSearchSource( FilterAdapter adapter, CacheManager<Metacard> manager ) {
         super( adapter );
-        filterConfig = new FilterConfig();
+        filterConfig = new AtomSearchResponseTransformerConfig();
         cacheManager = manager;
         setSendSecurityCookie( false );
     }
@@ -96,7 +96,7 @@ public class OpenSearchSource extends AbstractCDRSource {
     }
 
     @Override
-    public FilterConfig getFilterConfig() {
+    public AtomSearchResponseTransformerConfig getFilterConfig() {
         return filterConfig;
     }
 

@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.commons.response;
+package net.di2e.ecdr.api.federation;
 
-import java.io.InputStream;
+import ddf.catalog.federation.FederationStrategy;
 
-import ddf.catalog.operation.QueryRequest;
-import ddf.catalog.operation.SourceResponse;
+public interface NormalizingFederationStrategy extends FederationStrategy {
 
-public interface SearchResponseTransformer {
+    void setNormalizeResults( boolean normalize );
 
-    SourceResponse processSearchResponse( InputStream inputStream, QueryRequest request, String siteName );
 }

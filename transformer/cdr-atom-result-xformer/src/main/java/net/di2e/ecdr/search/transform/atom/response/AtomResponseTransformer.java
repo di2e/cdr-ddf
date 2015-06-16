@@ -29,11 +29,11 @@ import java.util.Map;
 import javax.activation.MimeType;
 import javax.xml.namespace.QName;
 
+import net.di2e.ecdr.api.queryresponse.SearchResponseTransformer;
 import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.CDRMetacardType;
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
-import net.di2e.ecdr.commons.filter.config.FilterConfig.AtomContentXmlWrapOption;
-import net.di2e.ecdr.commons.response.SearchResponseTransformer;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig.AtomContentXmlWrapOption;
 import net.di2e.ecdr.search.transform.atom.constants.AtomResponseConstants;
 import net.di2e.ecdr.search.transform.atom.geo.AbderaConverter;
 import net.di2e.ecdr.search.transform.atom.response.security.SecurityMarkingParser;
@@ -72,9 +72,9 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
 
     private static final Abdera ABDERA = Abdera.getInstance();
 
-    private FilterConfig filterConfig = null;
+    private AtomSearchResponseTransformerConfig filterConfig = null;
 
-    public AtomResponseTransformer( FilterConfig config ) {
+    public AtomResponseTransformer( AtomSearchResponseTransformerConfig config ) {
         this.filterConfig = config;
     }
 

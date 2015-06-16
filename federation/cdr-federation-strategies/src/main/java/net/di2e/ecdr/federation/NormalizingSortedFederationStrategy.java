@@ -71,7 +71,7 @@ public class NormalizingSortedFederationStrategy extends AbstractFederationStrat
 
     private static final Logger LOGGER = LoggerFactory.getLogger( NormalizingSortedFederationStrategy.class );
 
-    private boolean normalizeResults = true;
+    private boolean normalizeResults = false;
 
     private RelevanceNormalizer relevanceNormalizer = null;
 

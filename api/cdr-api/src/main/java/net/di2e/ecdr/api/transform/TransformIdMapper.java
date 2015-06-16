@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.search.transform.mapper;
+package net.di2e.ecdr.api.transform;
 
 /**
  * Interface to be used to help map the external 'format' values that are used on external interfaces like web services

@@ -15,7 +15,8 @@
  */
 package net.di2e.ecdr.search.transform.atom.security.impl;
 
-import net.di2e.ecdr.search.transform.atom.security.SecurityConfiguration;
+import net.di2e.ecdr.api.security.SecurityConfiguration;
+
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Arrays;

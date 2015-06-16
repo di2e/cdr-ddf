@@ -19,8 +19,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import net.di2e.ecdr.libs.cache.Cache;
-import net.di2e.ecdr.libs.cache.CacheManager;
+import net.di2e.ecdr.api.cache.Cache;
+import net.di2e.ecdr.api.cache.CacheManager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,13 +66,13 @@ public class MetacardMemoryCacheManager implements CacheManager<Metacard> {
     protected int getSize( Map<String, Object> cacheProperties ) {
         int size = -1;
         if ( cacheProperties != null ) {
-            Object cacheSize = cacheProperties.get( net.di2e.ecdr.libs.cache.CacheManager.CACHE_SIZE );
+            Object cacheSize = cacheProperties.get( net.di2e.ecdr.api.cache.CacheManager.CACHE_SIZE );
             if ( cacheSize != null ) {
                 if ( cacheSize instanceof Integer ) {
                     LOGGER.debug( "Setting cache maximum size of newly created cache to [{}] entries", cacheSize );
                     size = (Integer) cacheSize;
                 } else {
-                    LOGGER.warn( "Cache property [{}] was not the expected type of Integer, instead it was [{}]", net.di2e.ecdr.libs.cache.CacheManager.CACHE_SIZE, cacheSize.getClass()
+                    LOGGER.warn( "Cache property [{}] was not the expected type of Integer, instead it was [{}]", net.di2e.ecdr.api.cache.CacheManager.CACHE_SIZE, cacheSize.getClass()
                             .getName() );
                 }
             }

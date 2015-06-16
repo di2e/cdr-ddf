@@ -20,7 +20,7 @@ import javax.cache.Cache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JCache<T> implements net.di2e.ecdr.libs.cache.Cache<T> {
+public class JCache<T> implements net.di2e.ecdr.api.cache.Cache<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( JCache.class );
 

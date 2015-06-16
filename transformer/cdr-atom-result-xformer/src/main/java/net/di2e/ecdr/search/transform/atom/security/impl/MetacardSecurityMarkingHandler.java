@@ -19,10 +19,11 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import net.di2e.ecdr.api.security.SecurityData;
+import net.di2e.ecdr.api.security.SecurityMarkingHandler;
 import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.constants.SecurityConstants;
-import net.di2e.ecdr.search.transform.atom.security.SecurityData;
-import net.di2e.ecdr.search.transform.atom.security.SecurityMarkingHandler;
+import net.di2e.ecdr.search.transform.atom.security.SecurityDataImpl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +50,7 @@ public class MetacardSecurityMarkingHandler implements SecurityMarkingHandler {
 
         Map<String, List<String>> security = new CDRMetacard( metacard ).getSecurity();
         if ( security != null && !security.isEmpty() ) {
-            return new SecurityData( security, namespace );
+            return new SecurityDataImpl( security, namespace );
         }
         return null;
     }

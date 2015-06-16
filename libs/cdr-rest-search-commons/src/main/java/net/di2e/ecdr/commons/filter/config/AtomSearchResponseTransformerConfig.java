@@ -15,7 +15,8 @@
  */
 package net.di2e.ecdr.commons.filter.config;
 
-public class FilterConfig {
+
+public class AtomSearchResponseTransformerConfig {
 
     public enum AtomContentXmlWrapOption {
         ALWAYS_WRAP, NEVER_WRAP, WRAP_HTML_AND_TEXT
@@ -30,7 +31,7 @@ public class FilterConfig {
 
     private AtomContentXmlWrapOption wrapOption = AtomContentXmlWrapOption.NEVER_WRAP;
 
-    public FilterConfig() {
+    public AtomSearchResponseTransformerConfig() {
         thumbnailLinkRelation = "preview";
         metadataLinkRelation = "related";
         productLinkRelation = "alternate";

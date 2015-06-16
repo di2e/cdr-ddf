@@ -36,7 +36,7 @@
                                    update-strategy="container-managed">
 
         <osgix:interfaces>
-            <beans:value>net.di2e.ecdr.commons.sort.SortTypeConfiguration</beans:value>
+            <beans:value>net.di2e.ecdr.api.sort.SortTypeConfiguration</beans:value>
         </osgix:interfaces>
 
         <beans:bean id="SortTypeConfiguration" class="net.di2e.ecdr.endpoint.sort.SortTypeConfigurationImpl" />

@@ -13,25 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.search.transform.atom.security;
+package net.di2e.ecdr.api.sort;
 
-import java.util.Map;
-import java.util.Set;
+public interface SortTypeConfiguration {
 
-/**
- * Interface that details a simple security configurations. Can be used to populate entries with pre-set information.
- */
-public interface SecurityConfiguration {
+    String getSortKey();
 
-    /**
-     * Used for fallback configurations, only one configuration should use this format
-     */
-    String DEFAULT_FORMAT_CONFIGURATION = "default";
+    String getSortAttribute();
 
-    Set<String> getFormats();
-
-    String getNamespace();
-
-    Map<String, String> getAttributes();
+    String getSortOrder();
 
 }

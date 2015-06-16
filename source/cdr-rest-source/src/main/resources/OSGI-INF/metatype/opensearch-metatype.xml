@@ -52,6 +52,11 @@
 
         <AD name="Minimum Source Ping Interval" id="availableCheckCacheTime" required="true" type="Integer" default="60"
             description="The minimum time interval (in seconds) between source availability checks.  Source status will be pulled from cache if the minimum time has not passed." />
+            
+        <AD name="Response Transformer Override" id="responseTransformer" type="String" default="atom"
+            description="The 'id' of the response transformer (InputTransformer) to use when returning results.  If left blank the default CDR Atom Transformer (used or handling most atom results) will be used along with
+            the configuration values that are set for Atom specific results on this page.">
+        </AD>
 
         <AD name="Wrap Atom Content with XML Fragment" id="wrapContentWithXmlOption" type="String" default="NEVER_WRAP"
             description="Check the box if you want the atom content value to be wrapped with an xml-fragment tag.  This must be done if the metadata value returned is not valid XML, 

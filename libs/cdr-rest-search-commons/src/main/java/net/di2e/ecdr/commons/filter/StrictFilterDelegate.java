@@ -23,7 +23,7 @@ import java.util.Set;
 
 import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.constants.SearchConstants;
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -70,7 +70,7 @@ public class StrictFilterDelegate extends AbstractFilterDelegate<Map<String, Str
         PROPERTY_NAME_MAP.put( CDRMetacard.METACARD_CONTENT_COLLECTION_ATTRIBUTE, SearchConstants.CONTENT_COLLECTIONS_PARAMETER );
     }
 
-    public StrictFilterDelegate( boolean strictMode, double defaultRadiusforNN, FilterConfig config ) {
+    public StrictFilterDelegate( boolean strictMode, double defaultRadiusforNN, AtomSearchResponseTransformerConfig config ) {
         super( defaultRadiusforNN, config );
         this.strictMode = strictMode;
     }

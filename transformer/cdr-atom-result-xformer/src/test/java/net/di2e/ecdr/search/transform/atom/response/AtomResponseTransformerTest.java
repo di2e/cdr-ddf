@@ -20,7 +20,7 @@ import static org.mockito.Mockito.mock;
 
 import java.util.List;
 
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -115,7 +115,7 @@ public class AtomResponseTransformerTest extends net.di2e.ecdr.search.transform.
 
     @Test
     public void testInvalidEntry() throws Exception {
-        FilterConfig config = mock( FilterConfig.class );
+        AtomSearchResponseTransformerConfig config = mock( AtomSearchResponseTransformerConfig.class );
         QueryRequest request = mock( QueryRequest.class );
         AtomResponseTransformer transformer = new AtomResponseTransformer( config );
         String atomXML = IOUtils.toString( getClass().getResourceAsStream( ATOM_INVALID_FILE ) );
@@ -125,7 +125,7 @@ public class AtomResponseTransformerTest extends net.di2e.ecdr.search.transform.
     }
 
     private SourceResponse getTransformResponse( final String LOCATION_XML ) throws Exception {
-        FilterConfig config = mock( FilterConfig.class );
+        AtomSearchResponseTransformerConfig config = mock( AtomSearchResponseTransformerConfig.class );
         QueryRequest request = mock( QueryRequest.class );
         AtomResponseTransformer transformer = new AtomResponseTransformer( config );
         String atomXML = IOUtils.toString( getClass().getResourceAsStream( ATOM_TEMPLATE_FILE ) );

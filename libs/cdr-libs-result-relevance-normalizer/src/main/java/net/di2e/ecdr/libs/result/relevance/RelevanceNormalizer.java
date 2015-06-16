@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -170,7 +170,7 @@ public class RelevanceNormalizer {
      */
     protected String getSearchPhrase( ddf.catalog.operation.Query query ) {
         try {
-            Map<String, String> filterParameters = filterAdapter.adapt( query, new StrictFilterDelegate( false, 50000.00, new FilterConfig() ) );
+            Map<String, String> filterParameters = filterAdapter.adapt( query, new StrictFilterDelegate( false, 50000.00, new AtomSearchResponseTransformerConfig() ) );
             if ( filterParameters.containsKey( PHRASE_KEY ) ) {
                 // Add the ~ to make it a fuzzy term search
                 return filterParameters.get( PHRASE_KEY ) + "~";

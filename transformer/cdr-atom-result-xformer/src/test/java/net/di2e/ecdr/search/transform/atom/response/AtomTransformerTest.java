@@ -30,11 +30,11 @@ import java.util.Set;
 
 import javax.activation.MimeType;
 
+import net.di2e.ecdr.api.security.SecurityConfiguration;
 import net.di2e.ecdr.commons.constants.SearchConstants;
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 import net.di2e.ecdr.search.transform.atom.AtomTransformer;
 import net.di2e.ecdr.search.transform.atom.geo.GeoHelper;
-import net.di2e.ecdr.search.transform.atom.security.SecurityConfiguration;
 
 import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
@@ -124,7 +124,7 @@ public class AtomTransformerTest extends net.di2e.ecdr.search.transform.atom.res
     public void testResponseTransform() throws Exception {
         String sourceName = "Example";
         String sourceName2 = "Bad Example";
-        AtomResponseTransformer responseTransformer = new AtomResponseTransformer( new FilterConfig() );
+        AtomResponseTransformer responseTransformer = new AtomResponseTransformer( new AtomSearchResponseTransformerConfig() );
         QueryRequest request = new QueryRequestImpl( new QueryImpl( CQL.toFilter( "title like 'test'" ) ) );
         SourceResponse sourceResponse = responseTransformer.processSearchResponse( getClass().getResourceAsStream( RESPONSE_FILE ), request, sourceName );
         QueryResponseImpl queryResponse = new QueryResponseImpl( sourceResponse, sourceName );
@@ -153,7 +153,7 @@ public class AtomTransformerTest extends net.di2e.ecdr.search.transform.atom.res
     @Test
     public void testResponseTransformNoDetails() throws Exception {
         String sourceName = "Example";
-        AtomResponseTransformer responseTransformer = new AtomResponseTransformer( new FilterConfig() );
+        AtomResponseTransformer responseTransformer = new AtomResponseTransformer( new AtomSearchResponseTransformerConfig() );
         QueryRequest request = new QueryRequestImpl( new QueryImpl( CQL.toFilter( "title like 'test'" ) ) );
         SourceResponse sourceResponse = responseTransformer.processSearchResponse( getClass().getResourceAsStream( RESPONSE_FILE ), request, sourceName );
         QueryResponseImpl queryResponse = new QueryResponseImpl( sourceResponse, sourceName );
@@ -171,7 +171,7 @@ public class AtomTransformerTest extends net.di2e.ecdr.search.transform.atom.res
     @Test
     public void testLocalResponseTransform() throws Exception {
         String sourceName = "Example";
-        AtomResponseTransformer responseTransformer = new AtomResponseTransformer( new FilterConfig() );
+        AtomResponseTransformer responseTransformer = new AtomResponseTransformer( new AtomSearchResponseTransformerConfig() );
         QueryRequest request = new QueryRequestImpl( new QueryImpl( CQL.toFilter( "title like 'test'" ) ) );
         SourceResponse sourceResponse = responseTransformer.processSearchResponse( getClass().getResourceAsStream( RESPONSE_FILE ), request, sourceName );
         QueryResponseImpl queryResponse = new QueryResponseImpl( sourceResponse, sourceName );

@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.net.URI;
 import java.security.GeneralSecurityException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -37,9 +38,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import net.di2e.ecdr.api.queryresponse.SearchResponseTransformer;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 import net.di2e.ecdr.commons.util.SearchUtils;
 import net.di2e.ecdr.search.transform.atom.response.AtomResponseTransformer;
 
@@ -54,6 +56,11 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.codice.ddf.security.common.jaxrs.RestSecurity;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
+import org.osgi.framework.Bundle;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.InvalidSyntaxException;
+import org.osgi.framework.ServiceReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,6 +141,8 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
     private int maxResultsCount = 0;
     private String defaultResponseFormat = null;
 
+    private String responseTransformer = null;
+
     private Map<String, String> parameterMap = new HashMap<>();
 
     private Map<String, String> sortMap = Collections.emptyMap();
@@ -144,7 +153,7 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
 
     public abstract Map<String, String> getStaticUrlQueryValues();
 
-    public abstract FilterConfig getFilterConfig();
+    public abstract AtomSearchResponseTransformerConfig getFilterConfig();
 
     public abstract SourceResponse enhanceResults( SourceResponse response );
 
@@ -180,6 +189,9 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
 
     protected SourceResponse doQuery( Map<String, String> filterParameters, QueryRequest queryRequest ) throws UnsupportedQueryException {
         SourceResponse sourceResponse;
+        SearchResponseTransformer transformer = null;
+        transformer = lookupSearchResponseTransformer();
+
         setSecurityCredentials( cdrRestClient, queryRequest.getProperties() );
         filterParameters.putAll( getInitialFilterParameters( queryRequest ) );
         setURLQueryString( filterParameters );
@@ -188,7 +200,7 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
         LOGGER.debug( "Query to source [{}] returned http status code [{}] and media type [{}]", getId(), response.getStatus(), response.getMediaType() );
 
         if ( response.getStatus() == Status.OK.getStatusCode() ) {
-            AtomResponseTransformer transformer = new AtomResponseTransformer( getFilterConfig() );
+
 
             sourceResponse = transformer.processSearchResponse( (InputStream) response.getEntity(), queryRequest, getId() );
             sourceResponse = enhanceResults( sourceResponse );
@@ -403,6 +415,21 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
         return resourceResponse;
     }
 
+    protected SearchResponseTransformer lookupSearchResponseTransformer() throws UnsupportedQueryException {
+        SearchResponseTransformer transformer;
+        if ( StringUtils.isBlank( responseTransformer ) ) {
+            transformer = new AtomResponseTransformer( getFilterConfig() );
+            LOGGER.debug( "Using the default Atom Response Transformer to transform response from site [{}]", getId() );
+        } else {
+            transformer = this.getSearchResponseTransformer( responseTransformer );
+        }
+        if ( transformer == null ) {
+            throw new UnsupportedQueryException( "The query was not executed on the source " + getId() + " because the response transformer was not a valid value [" + responseTransformer
+                    + "]. Please check the source configuration value for 'Response Transformer Override'" );
+        }
+        return transformer;
+    }
+
     protected void setURLQueryString( Map<String, String> filterParameters ) {
         cdrRestClient.resetQuery();
         for ( Entry<String, String> entry : filterParameters.entrySet() ) {
@@ -451,7 +478,7 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
         if ( timeout > 1000 ) {
             filterParameters.put( SearchConstants.TIMEOUT_PARAMETER, String.valueOf( timeout ) );
         }
-        
+
         if ( parameterMap.containsKey( SearchConstants.COUNT_PARAMETER ) ) {
             int pageSize = query.getPageSize();
             filterParameters.put( SearchConstants.COUNT_PARAMETER, maxResultsCount > 0 && pageSize > maxResultsCount ? String.valueOf( maxResultsCount ) : String.valueOf( pageSize ) );
@@ -538,10 +565,9 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
     }
 
     /*
-     * This method is needed because of a CXF deficiency of not using the
-     * keystore values from the java system properties. So this specifically
-     * pulls the values from the system properties then sets them to a
-     * KeyManager being used
+     * This method is needed because of a CXF deficiency of not using the keystore values from the java system
+     * properties. So this specifically pulls the values from the system properties then sets them to a KeyManager being
+     * used
      */
     protected TLSClientParameters getTlsClientParameters() {
         TLSClientParameters tlsClientParameters = new TLSClientParameters();
@@ -584,19 +610,20 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
         pingMethod = method;
     }
 
+    public void setResponseTransformer( String transformer ) {
+        this.responseTransformer = transformer;
+    }
+
     /**
-     * Sets the time (in seconds) that availability should be cached (that is,
-     * the minimum amount of time between 2 perform availability checks). For
-     * example if set to 60 seconds, then if an availability check is called 30
-     * seconds after a previous availability check was called, the second call
-     * will just return a cache value and not do another check.
+     * Sets the time (in seconds) that availability should be cached (that is, the minimum amount of time between 2
+     * perform availability checks). For example if set to 60 seconds, then if an availability check is called 30
+     * seconds after a previous availability check was called, the second call will just return a cache value and not do
+     * another check.
      * <p/>
-     * This settings allow admins to ensure that a site is not overloaded with
-     * availability checks
+     * This settings allow admins to ensure that a site is not overloaded with availability checks
      *
      * @param newCacheTime
-     *            New time period, in seconds, to check the availability of the
-     *            federated source.
+     *            New time period, in seconds, to check the availability of the federated source.
      */
     public void setAvailableCheckCacheTime( long newCacheTime ) {
         if ( newCacheTime < 1 ) {
@@ -691,6 +718,29 @@ public abstract class AbstractCDRSource extends MaskableImpl implements Federate
                 }
             }
         }
+    }
+
+    protected SearchResponseTransformer getSearchResponseTransformer( String id ) {
+        SearchResponseTransformer transformer = null;
+        Bundle bundle = FrameworkUtil.getBundle( this.getClass() );
+        if ( bundle != null ) {
+            BundleContext context = bundle.getBundleContext();
+            Collection<ServiceReference<SearchResponseTransformer>> transformers;
+            try {
+                transformers = context.getServiceReferences( SearchResponseTransformer.class, "(id=" + id + ")" );
+                int size = transformers.size();
+                if ( size > 0 ) {
+                    transformer = context.getService( transformers.iterator().next() );
+                    if ( size > 1 ) {
+                        LOGGER.debug( "Multiple [{}] InputTransformers were returned when looking up InputTransformer with id [{}], using the first one {}", size, id, transformer.getClass()
+                                .getName() );
+                    }
+                }
+            } catch ( InvalidSyntaxException e ) {
+                LOGGER.warn( "Could not lookup input transformer with id [{}]", id, e.getMessage() );
+            }
+        }
+        return transformer;
     }
 
 }

@@ -630,8 +630,8 @@ public class CDRMetacard implements Metacard, Serializable {
         Attribute attribute = getAttribute( attributeName );
 
         if ( attribute == null ) {
-            if ( LOGGER.isDebugEnabled() ) {
-                LOGGER.debug( "Attribute " + attributeName + " was not found, returning null" );
+            if ( LOGGER.isTraceEnabled() ) {
+                LOGGER.trace( "Attribute " + attributeName + " was not found, returning null" );
             }
             return null;
         }

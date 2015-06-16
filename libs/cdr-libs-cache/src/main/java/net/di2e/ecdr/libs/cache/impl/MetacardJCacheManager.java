@@ -39,7 +39,7 @@ import com.hazelcast.core.Hazelcast;
 
 import ddf.catalog.data.Metacard;
 
-public class MetacardJCacheManager implements net.di2e.ecdr.libs.cache.CacheManager<Metacard> {
+public class MetacardJCacheManager implements net.di2e.ecdr.api.cache.CacheManager<Metacard> {
 
     private static final String CACHE_ID_PREFIX = "jcache-metacard-";
     private static final Logger LOGGER = LoggerFactory.getLogger( MetacardJCacheManager.class );
@@ -76,7 +76,7 @@ public class MetacardJCacheManager implements net.di2e.ecdr.libs.cache.CacheMana
     }
 
     @Override
-    public net.di2e.ecdr.libs.cache.Cache<Metacard> createCacheInstance( String cacheId, Map<String, Object> cacheProperties ) {
+    public net.di2e.ecdr.api.cache.Cache<Metacard> createCacheInstance( String cacheId, Map<String, Object> cacheProperties ) {
         if ( cacheId == null ) {
             throw new IllegalArgumentException( "CacheId cannot be null when calling the MetacardJCacheManager.createCache method" );
         } else if ( cacheManager.getCache( CACHE_ID_PREFIX + cacheId ) != null ) {
@@ -115,13 +115,13 @@ public class MetacardJCacheManager implements net.di2e.ecdr.libs.cache.CacheMana
     protected Duration getDuration( Map<String, Object> cacheProperties ) {
         Duration duration = null;
         if ( cacheProperties != null ) {
-            Object minutes = cacheProperties.get( net.di2e.ecdr.libs.cache.CacheManager.CACHE_EXPIRE_AFTER_MINUTES );
+            Object minutes = cacheProperties.get( net.di2e.ecdr.api.cache.CacheManager.CACHE_EXPIRE_AFTER_MINUTES );
             if ( minutes != null ) {
                 if ( minutes instanceof Long ) {
                     LOGGER.debug( "Setting cache duration of newly created cache to [{}] minutes", minutes );
                     duration = new Duration( TimeUnit.MINUTES, (Long) minutes );
                 } else {
-                    LOGGER.warn( "Cache property [{}] was not the expected type of Long, instead it was [{}]", net.di2e.ecdr.libs.cache.CacheManager.CACHE_EXPIRE_AFTER_MINUTES, minutes.getClass()
+                    LOGGER.warn( "Cache property [{}] was not the expected type of Long, instead it was [{}]", net.di2e.ecdr.api.cache.CacheManager.CACHE_EXPIRE_AFTER_MINUTES, minutes.getClass()
                             .getName() );
                 }
             }

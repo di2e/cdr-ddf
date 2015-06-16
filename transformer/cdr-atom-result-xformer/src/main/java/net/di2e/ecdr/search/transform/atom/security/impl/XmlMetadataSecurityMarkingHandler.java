@@ -19,9 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.di2e.ecdr.api.security.SecurityData;
+import net.di2e.ecdr.api.security.SecurityMarkingHandler;
 import net.di2e.ecdr.search.transform.atom.response.security.SecurityMarkingParser;
-import net.di2e.ecdr.search.transform.atom.security.SecurityData;
-import net.di2e.ecdr.search.transform.atom.security.SecurityMarkingHandler;
+import net.di2e.ecdr.search.transform.atom.security.SecurityDataImpl;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Attr;
@@ -38,7 +39,7 @@ public class XmlMetadataSecurityMarkingHandler implements SecurityMarkingHandler
     private static final String XMLNS_PREFIX = "xmlns";
 
     @Override
-    public SecurityData getSecurityData(Metacard metacard) {
+    public SecurityData getSecurityData( Metacard metacard ) {
         String metadata = metacard.getMetadata();
         if ( StringUtils.isNotBlank( metadata ) ) {
             XPathHelper helper = new XPathHelper( metacard.getMetadata() );
@@ -62,7 +63,7 @@ public class XmlMetadataSecurityMarkingHandler implements SecurityMarkingHandler
                     }
                 }
                 if ( !securityProps.isEmpty() ) {
-                    return new SecurityData( securityProps, securityNamespace );
+                    return new SecurityDataImpl( securityProps, securityNamespace );
                 }
             }
         }

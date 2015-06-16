@@ -13,19 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.libs.cache;
+package net.di2e.ecdr.api.security;
 
-import java.util.Map;
+import ddf.catalog.data.Metacard;
 
-public interface CacheManager<T> {
+public interface SecurityMarkingHandler {
 
-    String CACHE_EXPIRE_AFTER_MINUTES = "cache-expire-after-minutes";
-    String CACHE_SIZE = "cache-size";
-
-    Cache<T> createCacheInstance( String cacheId, Map<String, Object> cacheProperties );
-
-    void removeCacheInstance( String cacheId );
-
-    void destroy();
+    SecurityData getSecurityData( Metacard metacard );
 
 }

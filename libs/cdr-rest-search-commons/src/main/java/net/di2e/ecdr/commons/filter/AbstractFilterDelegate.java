@@ -18,7 +18,7 @@ package net.di2e.ecdr.commons.filter;
 import java.util.Date;
 import java.util.List;
 
-import net.di2e.ecdr.commons.filter.config.FilterConfig;
+import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,9 +45,9 @@ public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger( StrictFilterDelegate.class );
     private double defaultRadiusforNN = 0;
 
-    private FilterConfig filterConfig = null;
+    private AtomSearchResponseTransformerConfig filterConfig = null;
 
-    public AbstractFilterDelegate( double defaultRadiusforNN, FilterConfig config ) {
+    public AbstractFilterDelegate( double defaultRadiusforNN, AtomSearchResponseTransformerConfig config ) {
         this.defaultRadiusforNN = defaultRadiusforNN;
         this.filterConfig = config;
     }
@@ -94,7 +94,7 @@ public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
 
     public abstract T handleNot( T operand );
 
-    public FilterConfig getFilterConfig() {
+    public AtomSearchResponseTransformerConfig getFilterConfig() {
         return filterConfig;
     }
 
