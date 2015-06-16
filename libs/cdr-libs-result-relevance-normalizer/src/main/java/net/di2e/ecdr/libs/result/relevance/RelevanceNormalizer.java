@@ -15,16 +15,13 @@
  */
 package net.di2e.ecdr.libs.result.relevance;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
+import ddf.catalog.data.Result;
+import ddf.catalog.data.impl.ResultImpl;
+import ddf.catalog.filter.FilterAdapter;
+import ddf.catalog.operation.Query;
+import ddf.catalog.source.UnsupportedQueryException;
 import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
 import net.di2e.ecdr.commons.filter.config.FilterConfig;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -47,11 +44,12 @@ import org.opengis.filter.sort.SortBy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ddf.catalog.data.Result;
-import ddf.catalog.data.impl.ResultImpl;
-import ddf.catalog.filter.FilterAdapter;
-import ddf.catalog.operation.Query;
-import ddf.catalog.source.UnsupportedQueryException;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Normalizes the Relevance of a result set by looking at the contextual criteria, then doing a local calculation of
@@ -66,6 +64,7 @@ public class RelevanceNormalizer {
     private static final String ID_FIELD = "id";
     private static final String SOURCE_FIELD = "src";
     private static final String PHRASE_KEY = "q";
+    private static final String FUZZY_KEY = "fuzzy";
 
     private FilterAdapter filterAdapter;
 
@@ -172,8 +171,18 @@ public class RelevanceNormalizer {
         try {
             Map<String, String> filterParameters = filterAdapter.adapt( query, new StrictFilterDelegate( false, 50000.00, new FilterConfig() ) );
             if ( filterParameters.containsKey( PHRASE_KEY ) ) {
-                // Add the ~ to make it a fuzzy term search
-                return filterParameters.get( PHRASE_KEY ) + "~";
+                String searchPhrase = filterParameters.get( PHRASE_KEY );
+                if ( filterParameters.containsKey( FUZZY_KEY ) && filterParameters.get( FUZZY_KEY ).equals( "1" ) ) {
+                    // Add the ~ to make it a fuzzy term search
+                    String[] words = StringUtils.split( searchPhrase );
+                    StringBuilder builder = new StringBuilder();
+                    for ( String word : words ) {
+                        builder.append( word );
+                        builder.append( "~" );
+                        builder.append( " " );
+                    }
+                }
+                return searchPhrase;
             }
         } catch ( UnsupportedQueryException uqe ) {
             LOGGER.debug( "Query did not contain any contextual criteria (search phrases), cannot perform re-relevance on this query." );
