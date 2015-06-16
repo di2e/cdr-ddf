@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
 import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 
@@ -38,8 +39,12 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
 import org.apache.lucene.util.Version;
@@ -64,8 +69,6 @@ public class RelevanceNormalizer {
     private static final Logger LOGGER = LoggerFactory.getLogger( RelevanceNormalizer.class );
     private static final String METADATA_FIELD = "metadata";
     private static final String ID_FIELD = "id";
-    private static final String SOURCE_FIELD = "src";
-    private static final String PHRASE_KEY = "q";
 
     private FilterAdapter filterAdapter;
 
@@ -86,8 +89,9 @@ public class RelevanceNormalizer {
         // We want to do relevance sort if no sort order was specfied or if Relevance sort was specified
         if ( sortBy == null || sortBy.getPropertyName() == null || sortBy.getPropertyName().getPropertyName() == null || Result.RELEVANCE.equals( sortBy.getPropertyName().getPropertyName() ) ) {
 
-            String searchPhrase = getSearchPhrase( originalQuery );
-            if ( StringUtils.isNotBlank( searchPhrase ) ) {
+            Map<String, String> filterParameters = getFilterParameters( originalQuery );
+
+            if ( canNormalizeQuery( filterParameters ) ) {
                 LOGGER.debug( "Query contained search phrase and will be sorted by relevance, performing re-indexing to normalize relevance." );
                 Directory directory = null;
                 DirectoryReader iReader = null;
@@ -122,7 +126,7 @@ public class RelevanceNormalizer {
                     IndexSearcher iSearcher = new IndexSearcher( iReader );
                     // Parse a simple query that searches for "text":
                     QueryParser parser = new QueryParser( METADATA_FIELD, analyzer );
-                    org.apache.lucene.search.Query query = parser.parse( searchPhrase );
+                    org.apache.lucene.search.Query query = getQuery( parser, filterParameters );
                     ScoreDoc[] hits = iSearcher.search( query, null, docMap.size() ).scoreDocs;
                     LOGGER.debug( "Got back {} results", hits.length );
 
@@ -162,24 +166,61 @@ public class RelevanceNormalizer {
     }
 
     /**
-     * Pull out the string-based search phrase from a query.
+     * Checks to see if this query can be normalized.
      *
-     * @param query
-     *            Query that possibly contains a search phrase.
-     * @return Search phrase or null if no search phrase was found.
+     * @param filterParameters parameters from original ddf query
+     * @return true if this query can be normalzed, false if not
      */
-    protected String getSearchPhrase( ddf.catalog.operation.Query query ) {
-        try {
-            Map<String, String> filterParameters = filterAdapter.adapt( query, new StrictFilterDelegate( false, 50000.00, new AtomSearchResponseTransformerConfig() ) );
-            if ( filterParameters.containsKey( PHRASE_KEY ) ) {
-                // Add the ~ to make it a fuzzy term search
-                return filterParameters.get( PHRASE_KEY ) + "~";
+    protected boolean canNormalizeQuery( Map<String, String> filterParameters ) {
+        return StringUtils.isNotBlank( getSearchPhrase( filterParameters ) );
+    }
+
+    protected org.apache.lucene.search.Query getQuery( QueryParser parser, Map<String, String> filterParameters ) throws ParseException {
+        String searchPhrase = getSearchPhrase( filterParameters );
+        org.apache.lucene.search.Query query = parser.parse( searchPhrase );
+        if ( filterParameters.containsKey( SearchConstants.FUZZY_PARAMETER ) && StringUtils.equals( filterParameters.get( SearchConstants.FUZZY_PARAMETER ), "1" ) ) {
+            // should get a boolean query for keyword-based searches
+            if ( query instanceof BooleanQuery ) {
+                BooleanQuery booleanQuery = (BooleanQuery) query;
+                for ( BooleanClause clause : booleanQuery.getClauses() ) {
+                    if ( clause.getQuery() instanceof TermQuery ) {
+                        TermQuery oldQuery = (TermQuery) clause.getQuery();
+                        FuzzyQuery newQuery = new FuzzyQuery( oldQuery.getTerm() );
+                        clause.setQuery( newQuery );
+                    }
+                }
+            } else {
+                LOGGER.debug( "Query was too complex for adding fuzzy. Expected BooleanQuery but ended up being of type {}", query.getClass().getName() );
             }
-        } catch ( UnsupportedQueryException uqe ) {
-            LOGGER.debug( "Query did not contain any contextual criteria (search phrases), cannot perform re-relevance on this query." );
         }
 
-        return null;
+        return query;
+    }
+
+    /**
+     * Pull out the string-based search phrase from a query.
+     *
+     * @param filterParameters
+     *            filterparameters from the original query
+     * @return Search phrase or null if no search phrase was found.
+     */
+    protected String getSearchPhrase( Map<String, String> filterParameters ) {
+        String searchPhrase = null;
+        if ( filterParameters.containsKey( SearchConstants.KEYWORD_PARAMETER ) ) {
+            searchPhrase = filterParameters.get( SearchConstants.KEYWORD_PARAMETER );
+        }
+
+        return searchPhrase;
+    }
+
+    protected Map<String, String> getFilterParameters(Query originalQuery) {
+        HashMap<String, String> map = new HashMap<>();
+        try {
+            map.putAll( filterAdapter.adapt( originalQuery, new StrictFilterDelegate( false, 50000.00, new AtomSearchResponseTransformerConfig() ) ) );
+        } catch (UnsupportedQueryException uqe) {
+            LOGGER.debug( "Query did not contain any contextual criteria (search phrases), cannot perform re-relevance on this query." );
+        }
+        return map;
     }
 
     /**
