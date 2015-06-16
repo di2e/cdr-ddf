@@ -18,6 +18,8 @@ package net.di2e.ecdr.commons.query;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -134,6 +136,10 @@ public class CDRQueryImpl implements Query {
 
     public Collection<String> getSiteNames() {
         return sources;
+    }
+
+    public Map<String, List<String>> getQueryParameters() {
+        return queryCriteria.getParameterValues();
     }
 
     protected void populateSourceList( MultivaluedMap<String, String> queryParameters ) {

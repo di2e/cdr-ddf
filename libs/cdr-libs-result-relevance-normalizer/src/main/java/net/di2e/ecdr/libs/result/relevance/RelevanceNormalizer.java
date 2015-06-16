@@ -23,6 +23,7 @@ import ddf.catalog.source.UnsupportedQueryException;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
 import net.di2e.ecdr.commons.filter.config.FilterConfig;
+import net.di2e.ecdr.commons.query.CDRQueryImpl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.StopWatch;
@@ -89,7 +90,7 @@ public class RelevanceNormalizer {
 
             Map<String, String> filterParameters = getFilterParameters( originalQuery );
 
-            if ( canNormalizeQuery( filterParameters ) ) {
+            if ( canNormalizeQuery( originalQuery, filterParameters ) ) {
                 LOGGER.debug( "Query contained search phrase and will be sorted by relevance, performing re-indexing to normalize relevance." );
                 Directory directory = null;
                 DirectoryReader iReader = null;
@@ -155,7 +156,7 @@ public class RelevanceNormalizer {
                     LOGGER.debug( "{} Total relevance process took {} seconds.", RELEVANCE_TIMER, (double) stopWatch.getTime() / 1000.0 );
                 }
             } else {
-                LOGGER.debug( "Query is not sorted based on relevance with contextual criteria. Skipping relevance normalization." );
+                LOGGER.debug( "Query does not contain search phrase or does not use the keyword query language. Skipping relevance normalization." );
             }
         } else {
             LOGGER.debug( "Query is not sorted based on relevance with contextual criteria. Skipping relevance normalization." );
@@ -169,14 +170,24 @@ public class RelevanceNormalizer {
      * @param filterParameters parameters from original ddf query
      * @return true if this query can be normalzed, false if not
      */
-    protected boolean canNormalizeQuery( Map<String, String> filterParameters ) {
-        return StringUtils.isNotBlank( getSearchPhrase( filterParameters ) );
+    protected boolean canNormalizeQuery( Query query, Map<String, String> filterParameters ) {
+        boolean canNormalize = StringUtils.isNotBlank( getSearchPhrase( filterParameters ) );
+        if ( canNormalize && query instanceof CDRQueryImpl ) {
+            CDRQueryImpl cdrQuery = (CDRQueryImpl) query;
+            if ( cdrQuery.getQueryParameters().containsKey( SearchConstants.QUERYLANGUAGE_PARAMETER ) ) {
+                List<String> languageParam = cdrQuery.getQueryParameters().get( SearchConstants.QUERYLANGUAGE_PARAMETER );
+                if (languageParam != null && !languageParam.isEmpty()) {
+                    canNormalize = StringUtils.equals( languageParam.get( 0 ), SearchConstants.CDR_KEYWORD_QUERY_LANGUAGE );
+                }
+            }
+        }
+        return canNormalize;
     }
 
     protected org.apache.lucene.search.Query getQuery( QueryParser parser, Map<String, String> filterParameters ) throws ParseException {
         String searchPhrase = getSearchPhrase( filterParameters );
         org.apache.lucene.search.Query query = parser.parse( searchPhrase );
-        if ( filterParameters.containsKey( SearchConstants.FUZZY_PARAMETER ) && StringUtils.equals( filterParameters.get( SearchConstants.FUZZY_PARAMETER ), "1" ) ) {
+        if ( StringUtils.equals( filterParameters.get( SearchConstants.FUZZY_PARAMETER ), "1" ) ) {
             // should get a boolean query for keyword-based searches
             if ( query instanceof BooleanQuery ) {
                 BooleanQuery booleanQuery = (BooleanQuery) query;
