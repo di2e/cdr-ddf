@@ -35,13 +35,13 @@
             <beans:value>ddf.catalog.source.FederatedSource</beans:value>
         </osgix:interfaces>
 
-        <beans:bean id="OpenSearchSourceBean" class="net.di2e.ecdr.source.rest.OpenSearchSource" destroy-method="cleanUp">
+        <beans:bean id="OpenSearchSourceBean" class="net.di2e.ecdr.source.rest.CDROpenSearchSource" destroy-method="cleanUp">
             <beans:constructor-arg ref="filterAdapter" />
             <beans:constructor-arg ref="metacardCacheManager" />
             
             <!-- properties supported by Maskable Impl that are not set through Metatype -->  
-            <beans:property name="title" value="OpenSearch Federation" />
-            <beans:property name="description" value="OpenSearch Federated Source" />
+            <beans:property name="title" value="CDR OpenSearch Federation" />
+            <beans:property name="description" value="CDR OpenSearch Federated Source" />
             <beans:property name="organization" value="DI2E" />
             <beans:property name="version" value="1.1" />
             <!-- don't set the metatype properties in here -->
@@ -56,13 +56,13 @@
             <beans:value>ddf.catalog.source.ConnectedSource</beans:value>
         </osgix:interfaces>
 
-        <beans:bean id="OpenSearchConnectedSourceBean" class="net.di2e.ecdr.source.rest.OpenSearchSource" destroy-method="cleanUp">
+        <beans:bean id="OpenSearchConnectedSourceBean" class="net.di2e.ecdr.source.rest.CDROpenSearchSource" destroy-method="cleanUp">
             <beans:constructor-arg ref="filterAdapter" />
             <beans:constructor-arg ref="metacardCacheManager" />
             
             <!-- properties supported by Maskable Impl that are not set through Metatype -->  
-            <beans:property name="title" value="OpenSearch Connected Federation" />
-            <beans:property name="description" value="OpenSearch Connected Source" />
+            <beans:property name="title" value="CDR OpenSearch Connected Federation" />
+            <beans:property name="description" value="CDR OpenSearch Connected Source" />
             <beans:property name="organization" value="DI2E" />
             <beans:property name="version" value="1.1" />
             <!-- don't set the metatype properties in here -->
@@ -78,7 +78,7 @@
             <beans:value>ecdr-opensearch-source</beans:value>
         </beans:constructor-arg>
         <beans:constructor-arg>
-            <beans:value>CDR REST Brokered Search Service</beans:value>
+            <beans:value>CDR REST Search Service</beans:value>
         </beans:constructor-arg>
     </beans:bean>
 

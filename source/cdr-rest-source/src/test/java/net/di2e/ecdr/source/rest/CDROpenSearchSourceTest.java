@@ -15,6 +15,8 @@
  */
 package net.di2e.ecdr.source.rest;
 
+import java.util.Arrays;
+
 import net.di2e.ecdr.api.cache.CacheManager;
 import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 import net.di2e.ecdr.libs.cache.impl.MetacardMemoryCacheManager;
@@ -28,8 +30,8 @@ public class CDROpenSearchSourceTest extends CDRAbstractSourceTest {
     private CacheManager<Metacard> cacheManager = new MetacardMemoryCacheManager();
 
     @Override
-    AbstractCDRSource createSource() {
-        OpenSearchSource source = new OpenSearchSource(FILTER_ADAPTER, cacheManager);
+    CDROpenSearchSource createSource() {
+        CDROpenSearchSource source = new CDROpenSearchSource( FILTER_ADAPTER, cacheManager );
         source.setCacheExpirationMinutes( new Long(1) );
         source.setParameterMap( "os:searchTerms=q,os:count=count,os:startIndex=startIndex,time:start=dtStart,time:end=dtEnd,geo:uid=uid,geo:box=box,geo:lat=lat,geo:lon=lon,geo:radius=radius,geo:geometry=geometry,sru:sortKeys=sortKeys" );
         source.setStartIndexStartNumber( "1" );
@@ -38,14 +40,14 @@ public class CDROpenSearchSourceTest extends CDRAbstractSourceTest {
         source.setThumbnailLinkRelation( "preview" );
         source.setProxyProductUrls( true );
         source.setWrapContentWithXmlOption( AtomSearchResponseTransformerConfig.AtomContentXmlWrapOption.NEVER_WRAP.toString() );
-        source.setHardCodedParameters( "test=example" );
+        source.setHardCodedParameters( Arrays.asList( new String[] { "test=example" } ) );
         return source;
     }
 
     @Test
     public void testCleanUp() {
         CacheManager<Metacard> caches = new MetacardMemoryCacheManager();
-        OpenSearchSource source = new OpenSearchSource(FILTER_ADAPTER, caches);
+        CDROpenSearchSource source = new CDROpenSearchSource( FILTER_ADAPTER, caches );
         source.cleanUp();
     }
 
