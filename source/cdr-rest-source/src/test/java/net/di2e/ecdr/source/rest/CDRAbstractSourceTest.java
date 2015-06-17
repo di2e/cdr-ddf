@@ -77,7 +77,7 @@ public abstract class CDRAbstractSourceTest {
     @Test
     public void testGetPing() {
         WebClient pingClient = mock( WebClient.class );
-        AbstractCDRSource source = configureSource();
+        CDROpenSearchSource source = configureSource();
         source.setCdrAvailabilityCheckClient( pingClient );
         Response response = mock( Response.class );
         when( response.getStatus() ).thenReturn( Response.Status.OK.getStatusCode() );
@@ -96,12 +96,12 @@ public abstract class CDRAbstractSourceTest {
     public void testHeadPing() {
         SourceMonitor monitor = mock( SourceMonitor.class );
         WebClient pingClient = mock( WebClient.class );
-        AbstractCDRSource source = configureSource();
+        CDROpenSearchSource source = configureSource();
         source.setCdrAvailabilityCheckClient( pingClient );
         Response response = mock( Response.class );
         when( response.getStatus() ).thenReturn( Response.Status.OK.getStatusCode() );
         when( pingClient.head() ).thenReturn( response );
-        source.setPingMethod( AbstractCDRSource.PingMethod.HEAD );
+        source.setPingMethodString( CDRSourceConfiguration.PingMethod.HEAD.toString() );
         assertTrue( source.isAvailable( monitor ) );
         // test cache
         assertTrue( source.isAvailable() );
@@ -119,12 +119,12 @@ public abstract class CDRAbstractSourceTest {
     public void testPingNotAvailable() {
         SourceMonitor monitor = mock( SourceMonitor.class );
         WebClient pingClient = mock( WebClient.class );
-        AbstractCDRSource source = configureSource();
+        CDROpenSearchSource source = configureSource();
         source.setCdrAvailabilityCheckClient( pingClient );
         Response response = mock( Response.class );
         when( response.getStatus() ).thenReturn( Response.Status.NOT_FOUND.getStatusCode() );
         when( pingClient.head() ).thenReturn( response );
-        source.setPingMethod( AbstractCDRSource.PingMethod.HEAD );
+        source.setPingMethodString( CDRSourceConfiguration.PingMethod.HEAD.toString() );
         assertFalse( source.isAvailable( monitor ) );
         verify( pingClient ).head();
         // verify monitor was called unavailable and not available
@@ -139,12 +139,12 @@ public abstract class CDRAbstractSourceTest {
     public void testNoPingAvailable() {
         SourceMonitor monitor = mock( SourceMonitor.class );
         WebClient pingClient = mock( WebClient.class );
-        AbstractCDRSource source = configureSource();
+        CDROpenSearchSource source = configureSource();
         source.setCdrAvailabilityCheckClient( pingClient );
         Response response = mock( Response.class );
         when( response.getStatus() ).thenReturn( Response.Status.OK.getStatusCode() );
         when( pingClient.head() ).thenReturn( response );
-        source.setPingMethod( AbstractCDRSource.PingMethod.NONE );
+        source.setPingMethodString( CDRSourceConfiguration.PingMethod.NONE.toString() );
         assertTrue( source.isAvailable( monitor ) );
         // test cache
         assertTrue( source.isAvailable() );
@@ -157,7 +157,7 @@ public abstract class CDRAbstractSourceTest {
 
     @Test( expected = UnsupportedQueryException.class )
     public void testBadQueryResponse() throws Exception {
-        AbstractCDRSource source = configureSource();
+        CDROpenSearchSource source = configureSource();
         QueryRequest request = new QueryRequestImpl( new QueryImpl( CQL.toFilter( "id = '12345678910'" ) ) );
         when( client.getCurrentURI() ).thenReturn( new URI( SERVICE_URL ) );
         Response webResponse = mock( Response.class );
@@ -190,7 +190,7 @@ public abstract class CDRAbstractSourceTest {
 
     @Test
     public void testdoRetrieval() throws Exception {
-        AbstractCDRSource source = configureSource();
+        CDROpenSearchSource source = configureSource();
         WebClient retrievalClient = mock( WebClient.class );
         Response retrievalResponse = mock( Response.class );
         when( retrievalResponse.getStatus() ).thenReturn( Response.Status.OK.getStatusCode() );
@@ -202,7 +202,7 @@ public abstract class CDRAbstractSourceTest {
 
     @Test
     public void testdoRetrievalSkipBytes() throws Exception {
-        AbstractCDRSource source = configureSource();
+        CDROpenSearchSource source = configureSource();
         WebClient retrievalClient = mock( WebClient.class );
         Response retrievalResponse = mock( Response.class );
         when( retrievalResponse.getStatus() ).thenReturn( Response.Status.OK.getStatusCode() );
@@ -224,7 +224,7 @@ public abstract class CDRAbstractSourceTest {
     }
 
     private void performQuery( String CQLStr, String responseTransformer ) throws Exception {
-        AbstractCDRSource source = configureSource();
+        CDROpenSearchSource source = configureSource();
         if ( StringUtils.isNotBlank( responseTransformer ) ) {
             source.setResponseTransformer( responseTransformer );
         }
@@ -244,14 +244,13 @@ public abstract class CDRAbstractSourceTest {
         assertEquals( 19, response.getResults().size() );
     }
 
-    private AbstractCDRSource configureSource() {
-        AbstractCDRSource source = createSource();
+    private CDROpenSearchSource configureSource() {
+        CDROpenSearchSource source = createSource();
         source.setId( "example_site" );
         source.setPingUrl( PING_URL );
-        source.setPingMethod( AbstractCDRSource.PingMethod.GET );
+        source.setPingMethodString( CDRSourceConfiguration.PingMethod.GET.toString() );
         source.setAvailableCheckCacheTime( 60 );
         source.setMaxResultCount( 10 );
-        source.setDefaultResponseFormat( "atom-cdr" );
         source.setUrl( SERVICE_URL );
         source.setReceiveTimeoutSeconds( 10 );
         source.setConnectionTimeoutSeconds( 1 );
@@ -260,6 +259,6 @@ public abstract class CDRAbstractSourceTest {
         return source;
     }
 
-    abstract AbstractCDRSource createSource();
+    abstract CDROpenSearchSource createSource();
 
 }

@@ -26,7 +26,7 @@ import java.net.SocketException;
 import javax.net.ssl.SSLHandshakeException;
 import javax.ws.rs.client.ClientException;
 
-import net.di2e.ecdr.source.rest.AbstractCDRSource.PingMethod;
+import net.di2e.ecdr.libs.cache.impl.MetacardMemoryCacheManager;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
@@ -104,7 +104,7 @@ public class CDRRestSourceSecureTest {
     @Test
     public void testGoodCertificates() {
 
-        CDRRestSource restSource = createSecuredSource( "/serverKeystore.jks", "changeit", "/serverTruststore.jks", "changeit" );
+        CDROpenSearchSource restSource = createSecuredSource( "/serverKeystore.jks", "changeit", "/serverTruststore.jks", "changeit" );
         // quick check that getters do not cause exceptions
         restSource.getContentTypes();
         restSource.getOptions( null );
@@ -123,7 +123,7 @@ public class CDRRestSourceSecureTest {
     @Test
     public void testBadClientCertificate() {
 
-        CDRRestSource restSource = createSecuredSource( "/client-bad.jks", "", "/serverTruststore.jks", "changeit" );
+        CDROpenSearchSource restSource = createSecuredSource( "/client-bad.jks", "", "/serverTruststore.jks", "changeit" );
         // hit server
         try {
             if ( restSource.isAvailable() ) {
@@ -141,7 +141,7 @@ public class CDRRestSourceSecureTest {
     // @Test
     public void testBadServerCertificate() {
 
-        CDRRestSource restSource = createSecuredSource( "/serverKeystore.jks", "changeit", "/client-bad.jks", "" );
+        CDROpenSearchSource restSource = createSecuredSource( "/serverKeystore.jks", "changeit", "/client-bad.jks", "" );
         // hit server
         try {
             if ( restSource.isAvailable() ) {
@@ -156,21 +156,19 @@ public class CDRRestSourceSecureTest {
     /**
      * Creates the Rest Source and sets the ping method and no ping caching so it the tests will return the proper value
      */
-    private CDRRestSource createSecuredSource( String keyStorePath, String keyStorePassword, String trustStorePath, String trustStorePassword ) {
+    private CDROpenSearchSource createSecuredSource( String keyStorePath, String keyStorePassword, String trustStorePath, String trustStorePassword ) {
         System.setProperty( SSL_KEYSTORE_JAVA_PROPERTY, CDRRestSourceSecureTest.class.getResource( keyStorePath ).getPath() );
         System.setProperty( SSL_KEYSTORE_PASSWORD_JAVA_PROPERTY, keyStorePassword );
         System.setProperty( SSL_TRUSTSTORE_JAVA_PROPERTY, CDRRestSourceSecureTest.class.getResource( trustStorePath ).getPath() );
         System.setProperty( SSL_TRUSTSTORE_PASSWORD_JAVA_PROPERTY, trustStorePassword );
         
         FilterAdapter filterAdapter = mock( FilterAdapter.class );
-        CDRRestSource source = new CDRRestSource( filterAdapter );
+        CDROpenSearchSource source = new CDROpenSearchSource( filterAdapter, new MetacardMemoryCacheManager() );
 
         source.setPingUrl( "https://localhost:" + serverPort + "/" );
-        source.setPingMethodString( PingMethod.HEAD.toString() );
-        source.setPingMethod( PingMethod.GET );
+        source.setPingMethodString( CDRSourceConfiguration.PingMethod.HEAD.toString() );
         source.setAvailableCheckCacheTime( 0 );
         source.setMaxResultCount( 10 );
-        source.setDefaultResponseFormat( "atom-cdr" );
         source.setUrl( "https://localhost:" + serverPort + "/" );
         source.setReceiveTimeoutSeconds( 10 );
         source.setConnectionTimeoutSeconds( 1 );
