@@ -47,7 +47,7 @@
         <argument value="text/html" />
     </bean>
 
-    <reference-list id="feedSecurityConfigList" interface="net.di2e.ecdr.search.transform.atom.security.SecurityConfiguration" availability="optional" />
+    <reference-list id="feedSecurityConfigList" interface="net.di2e.ecdr.api.security.SecurityConfiguration" availability="mandatory" />
 
     <bean id="atomPayloadTransformer" class="net.di2e.ecdr.search.transform.atom.AtomTransformerWithPayload">
         <cm:managed-properties persistent-id="cdr-atom-result-xformer" update-strategy="container-managed" />
