@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -54,6 +55,7 @@ import net.di2e.ecdr.commons.xml.osd.Query;
 import net.di2e.ecdr.commons.xml.osd.SyndicationRight;
 import net.di2e.ecdr.commons.xml.osd.Url;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.BooleanUtils;
@@ -156,6 +158,8 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         try {
             String localSourceId = platformConfig.getSiteName();
             MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
+            addHeaderParameters( servletRequest, queryParameters );
+
             if ( !isValidQuery( queryParameters, localSourceId ) ) {
                 throw new UnsupportedQueryException( "Invalid query parameters passed in" );
             }
@@ -311,6 +315,20 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         return sb.toString();
     }
 
+    protected void addHeaderParameters( HttpServletRequest servletRequest, MultivaluedMap<String, String> queryParameters ) {
+        Enumeration<String> headerNames = servletRequest.getHeaderNames();
+        List<String> headerProperties = queryConfiguration.getHeaderPropertyList();
+        if ( CollectionUtils.isNotEmpty( headerProperties ) ) {
+            for ( String headerProp : headerProperties ) {
+                String value = servletRequest.getHeader( headerProp );
+                if ( StringUtils.isNotBlank( value ) ) {
+                    LOGGER.trace( "Matching HTTP Header key/value pair found, adding [{}]=[{}] to queryParameters", headerProp, value );
+                    queryParameters.putSingle( headerProp, value );
+                }
+            }
+        }
+    }
+
     private String getQueryLanguagesString() {
         StringBuilder builder = new StringBuilder();
         for ( QueryLanguage lang : queryLanguageList ) {
@@ -366,10 +384,11 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         for ( String key : queryParameters.keySet() ) {
             String value = queryParameters.getFirst( key );
             if ( StringUtils.isNotBlank( value ) && queryConfiguration.getParameterPropertyList().contains( key ) ) {
+                LOGGER.trace( "Adding key/value pair  [{}]=[{}] to queryProperties that get sent in with query request", key, value );
                 queryProperties.put( key, value );
             }
         }
-
+        LOGGER.debug( "Setting the query properties tp {}", queryProperties );
         return queryProperties;
     }
 
@@ -382,6 +401,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         urlBuilder.append( getServiceRelativeUrl() );
         urlBuilder.append( getParameterTemplate( lang.getName() ) );
         urlBuilder.append( lang.getUrlTemplateParameters() );
+        LOGGER.debug( "Generating the following template URL for OSDD: {}", urlBuilder );
         return urlBuilder.toString();
     }
 
@@ -437,6 +457,8 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
                 isUniqueQuery = false;
                 LOGGER.debug( "The '{}' with value '{}' contains the local source id {}", SearchConstants.PATH_PARAMETER, path, sourceId );
             }
+        } else {
+            queryParameters.putSingle( SearchConstants.PATH_PARAMETER, catalogFramework.getId() );
         }
         return isUniqueQuery;
     }

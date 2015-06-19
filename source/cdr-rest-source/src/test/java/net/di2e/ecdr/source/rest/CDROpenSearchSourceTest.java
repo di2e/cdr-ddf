@@ -33,7 +33,8 @@ public class CDROpenSearchSourceTest extends CDRAbstractSourceTest {
     CDROpenSearchSource createSource() {
         CDROpenSearchSource source = new CDROpenSearchSource( FILTER_ADAPTER, cacheManager );
         source.setCacheExpirationMinutes( new Long(1) );
-        source.setParameterMap( "os:searchTerms=q,os:count=count,os:startIndex=startIndex,time:start=dtStart,time:end=dtEnd,geo:uid=uid,geo:box=box,geo:lat=lat,geo:lon=lon,geo:radius=radius,geo:geometry=geometry,sru:sortKeys=sortKeys" );
+        source.setParameterMap( Arrays.asList( new String[] {"os:searchTerms=q","os:count=count","os:startIndex=startIndex","time:start=dtStart","time:end=dtEnd",
+                "geo:uid=uid","geo:box=box","geo:lat=lat","geo:lon=lon","geo:radius=radius","geo:geometry=geometry","sru:sortKeys=sortKeys" } ) );
         source.setStartIndexStartNumber( "1" );
         source.setMetadataLinkRelation( "alternate" );
         source.setProductLinkRelation( "enclosure" );

@@ -15,7 +15,7 @@
  */
 package net.di2e.ecdr.commons.query;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -35,15 +35,19 @@ public class QueryConfigurationImpl implements QueryConfiguration {
     private long defaultTimeoutMillis = 300000;
     private String defaultDateType = "effective";
     private String defaultDateTypeCustom = null;
-    private double defaultRadius = 10000;
+    private double defaultRadius = 50000;
     private String defaultResponseFormat = SearchConstants.ATOM_RESPONSE_FORMAT;
+    private String defaultResponseFormatCustom = null;
     private boolean defaultFuzzySearch = true;
     private boolean defaultDeduplication = false;
-    private Map<String, String> parameterExtensionMap = SearchUtils.convertToMap( "uid=id" );
-    private List<String> parameterPropertyList = new ArrayList<>();
+
     private String defaultQueryLanguage = SearchConstants.CDR_KEYWORD_QUERY_LANGUAGE;
     private String defaultQueryLanguageCustom = null;
     private int queryRequestCacheSize = 1000;
+
+    private Map<String, String> parameterExtensionMap = SearchUtils.convertToMap( "id=id" );
+    private List<String> parameterPropertyList = Arrays.asList( new String[] { "oid", "path" } );
+    private List<String> headerPropertyList = Arrays.asList( new String[] { "EMID" } );
 
     @Override
     public int getDefaultCount() {
@@ -60,9 +64,9 @@ public class QueryConfigurationImpl implements QueryConfiguration {
         return defaultTimeoutMillis;
     }
 
-    public void setDefaultTimeoutMillis( long millis ) {
-        LOGGER.debug( "ConfigUpdate: Updating the default timeout (in milliseconds) to [{}]", millis );
-        this.defaultTimeoutMillis = millis;
+    public void setDefaultTimeoutSeconds( long seconds ) {
+        LOGGER.debug( "ConfigUpdate: Updating the default timeout (in seconds) to [{}]", seconds );
+        this.defaultTimeoutMillis = seconds * 1000L;
     }
 
     @Override
@@ -85,19 +89,24 @@ public class QueryConfigurationImpl implements QueryConfiguration {
         return defaultRadius;
     }
 
-    public void setDefaultRadius( double radius ) {
+    public void setDefaultRadiusMeters( double radius ) {
         LOGGER.debug( "ConfigUpdate: Updating the default radius (in meters) to [{}]", radius );
         this.defaultRadius = radius;
     }
 
     @Override
     public String getDefaultResponseFormat() {
-        return defaultResponseFormat;
+        return StringUtils.defaultIfBlank( defaultResponseFormatCustom, defaultResponseFormat );
     }
 
     public void setDefaultResponseFormat( String format ) {
         LOGGER.debug( "ConfigUpdate: Updating the default response format to [{}]", format );
         this.defaultResponseFormat = format;
+    }
+    
+    public void setDefaultResponseFormatCustom( String format ) {
+        LOGGER.debug( "ConfigUpdate: Updating the default response format custom override value to [{}]", format );
+        this.defaultResponseFormatCustom = format;
     }
 
     @Override
@@ -140,7 +149,8 @@ public class QueryConfigurationImpl implements QueryConfiguration {
         return parameterExtensionMap;
     }
 
-    public void setParameterExtensionMap( Map<String, String> paramMap ) {
+    public void setParameterExtensionMap( List<String> paramList ) {
+        Map<String, String> paramMap = SearchUtils.convertToMap( paramList );
         LOGGER.debug( "ConfigUpdate: Updating the default parameter extension map value to [{}]", paramMap );
         this.parameterExtensionMap = paramMap;
     }
@@ -153,6 +163,16 @@ public class QueryConfigurationImpl implements QueryConfiguration {
     public void setParameterPropertyList( List<String> propList ) {
         LOGGER.debug( "ConfigUpdate: Updating the default parameter property map value to [{}]", propList );
         this.parameterPropertyList = propList;
+    }
+
+    @Override
+    public List<String> getHeaderPropertyList() {
+        return headerPropertyList;
+    }
+
+    public void setHeaderPropertyList( List<String> propList ) {
+        LOGGER.debug( "ConfigUpdate: Updating the default HTTP Header property map value to [{}]", propList );
+        this.headerPropertyList = propList;
     }
 
     @Override

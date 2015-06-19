@@ -66,7 +66,7 @@
     </bean>
 
     <bean id="queryConfiguration" class="net.di2e.ecdr.commons.query.QueryConfigurationImpl">
-        <cm:managed-properties persistent-id="cdr-rest-search-endpoint-1.1" update-strategy="container-managed" />
+        <cm:managed-properties persistent-id="cdr-rest-broker-endpoint" update-strategy="container-managed" />
     </bean>
 
     <bean id="cdrRestSearchService" class="net.di2e.ecdr.broker.endpoint.rest.CDRRestBrokerServiceImpl">

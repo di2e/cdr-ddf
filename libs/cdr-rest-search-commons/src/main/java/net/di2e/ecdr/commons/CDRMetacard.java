@@ -220,8 +220,12 @@ public class CDRMetacard implements Metacard, Serializable {
 
     @Override
     public String getMetadata() {
-        String metadata = requestString( Metacard.METADATA );
-        if ( StringUtils.isBlank( metadata ) ) {
+        String metadata = null;
+        // We can't call getString here because it will get in an endless loop because of the explicit checks in
+        // getAttribute (for METADATA), so instead we check the values ourselves then try to pull from the link (on
+        // demand)
+        Attribute metadataAttribute = (wrappedMetacard != null) ? wrappedMetacard.getAttribute( METADATA ) : map.get( METADATA );
+        if ( metadataAttribute == null || StringUtils.isBlank( getAttributeValue( metadataAttribute, String.class ) ) ) {
             URI metadataURI = getMetadataURL();
             if ( metadataURI != null ) {
                 try ( InputStream in = metadataURI.toURL().openStream() ) {
@@ -240,6 +244,8 @@ public class CDRMetacard implements Metacard, Serializable {
                     LOGGER.warn( "Could not read metadata from remote URL[" + metadataURI + "] due to: " + e.getMessage(), e );
                 }
             }
+        } else {
+            metadata = getAttributeValue( metadataAttribute, String.class );
         }
         return metadata;
     }
@@ -258,8 +264,12 @@ public class CDRMetacard implements Metacard, Serializable {
 
     @Override
     public byte[] getThumbnail() {
-        byte[] thumbnail = requestBytes( Metacard.THUMBNAIL );
-        if ( thumbnail == null ) {
+        byte[] thumbnail = null;
+        // We can't call getData here because it will get in an endless loop because of the explicit checks in
+        // getAttribute (for THUMBNAIL), so instead we check the values ourselves then try to pull from the link (on
+        // demand)
+        Attribute thumbnailAttribute = (wrappedMetacard != null) ? wrappedMetacard.getAttribute( THUMBNAIL ) : map.get( THUMBNAIL );
+        if ( thumbnailAttribute == null || getAttributeValue( thumbnailAttribute, byte[].class ) == null ) {
             URI thumbnailURI = getThumbnailURL();
             if ( thumbnailURI != null ) {
                 try ( InputStream in = thumbnailURI.toURL().openStream() ) {
@@ -636,6 +646,10 @@ public class CDRMetacard implements Metacard, Serializable {
             return null;
         }
 
+        return getAttributeValue( attribute, returnType );
+    }
+
+    protected <T> T getAttributeValue( Attribute attribute, Class<T> returnType ) {
         Serializable data = attribute.getValue();
 
         if ( returnType.isAssignableFrom( data.getClass() ) ) {
@@ -645,7 +659,6 @@ public class CDRMetacard implements Metacard, Serializable {
                 LOGGER.trace( data.getClass().toString() + " can not be assigned to " + returnType.toString() );
             }
         }
-
         return null;
     }
 
@@ -760,7 +773,13 @@ public class CDRMetacard implements Metacard, Serializable {
 
     @Override
     public Attribute getAttribute( String name ) {
-        return (wrappedMetacard != null) ? wrappedMetacard.getAttribute( name ) : map.get( name );
+        if ( Metacard.THUMBNAIL.equals( name ) ) {
+            return new AttributeImpl( name, this.getThumbnail() );
+        } else if ( Metacard.METADATA.equals( name ) ) {
+            return new AttributeImpl( name, this.getMetadata() );
+        } else {
+            return (wrappedMetacard != null) ? wrappedMetacard.getAttribute( name ) : map.get( name );
+        }
     }
 
     /**

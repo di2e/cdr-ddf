@@ -93,7 +93,7 @@ public class AtomTransformerWithPayload extends AtomTransformer {
      */
     protected String getMetadataXML( Metacard metacard, String format ) {
         String metadata = null;
-        LOGGER.debug( "Getting metadata to include in atom response in the format [{}]", format );
+        LOGGER.debug( "Getting metadata to include in atom response in the format [{}] from metacardTransformerMap {}", format, metacardTransformerMap.keySet() );
         if ( StringUtils.isNotBlank( format ) ) {
             MetacardTransformer metacardTransformer = metacardTransformerMap.get( format );
             if ( metacardTransformer != null ) {
@@ -119,7 +119,9 @@ public class AtomTransformerWithPayload extends AtomTransformer {
                     "A MetacardTransform didn't exist for format [{}] or ran into problems when transforming Metacard, so falling back to using the Metadata in the Metacard",
                     format );
             metadata = metacard.getMetadata();
+
         }
+        LOGGER.trace( "Atom Transformer setting Metacard.METADATA to:{}{}", System.lineSeparator(), metadata );
         return metadata;
     }
 

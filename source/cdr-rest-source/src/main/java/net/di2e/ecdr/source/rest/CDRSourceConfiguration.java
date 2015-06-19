@@ -18,7 +18,7 @@ package net.di2e.ecdr.source.rest;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +34,7 @@ import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig.AtomContentXmlWrapOption;
 import net.di2e.ecdr.commons.util.SearchUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.net.util.KeyManagerUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
@@ -105,14 +106,28 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
 
     private String responseTransformer = null;
 
-    private Map<String, String> hardcodedParamMap = new HashMap<String, String>();
-    private Map<String, String> parameterMap = new HashMap<>();
-    private Map<String, String> sortMap = Collections.emptyMap();
+    private Map<String, String> hardcodedParamMap = null;
+    private Map<String, String> parameterMap = null;
+    private Map<String, String> sortMap = null;
+    private Map<String, String> hardcodedHttpHeaders = null;
+    private List<String> httpHeaders = null;
 
     public CDRSourceConfiguration( CacheManager<Metacard> manager ) {
         super();
+        hardcodedParamMap = new HashMap<>();
         hardcodedParamMap.put( SearchConstants.FORMAT_PARAMETER, "atom-ddms" );
         hardcodedParamMap.put( SearchConstants.QUERYLANGUAGE_PARAMETER, SearchConstants.CDR_CQL_QUERY_LANGUAGE );
+
+        sortMap = new HashMap<>();
+        sortMap = SearchUtils.convertToMap( "title=entry/title,modified=entry/date,RELEVANCE=score" );
+
+        parameterMap = new HashMap<>();
+        parameterMap.putAll( parameterMatchMap );
+
+        hardcodedHttpHeaders = new HashMap<>();
+        httpHeaders = new ArrayList<>();
+        httpHeaders.add( "EMID" );
+
         cacheManager = manager;
         atomTransformerConfig = new AtomSearchResponseTransformerConfig();
     }
@@ -257,7 +272,7 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         hardcodedParamMap = SearchUtils.convertToMap( hardcodedString );
     }
 
-    public void setParameterMap( String parameterMapStr ) {
+    public void setParameterMap( List<String> parameterMapStr ) {
         Map<String, String> convertedMap = SearchUtils.convertToMap( parameterMapStr );
         Map<String, String> translateMap = new HashMap<>( convertedMap.size() );
         for ( Entry<String, String> entry : convertedMap.entrySet() ) {
@@ -269,6 +284,20 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         }
         LOGGER.debug( "ConfigUpdate: Updating parameterMap with new entries: {}", convertedMap.toString() );
         parameterMap = translateMap;
+    }
+
+    public void setHttpHeaders( List<String> headers ) {
+        hardcodedHttpHeaders.clear();
+        httpHeaders.clear();
+        if ( CollectionUtils.isNotEmpty( headers ) ) {
+            for ( String header : headers ) {
+                if ( header.contains( "=" ) ) {
+                    hardcodedHttpHeaders.putAll( SearchUtils.convertToMap( header ) );
+                } else {
+                    httpHeaders.add( header );
+                }
+            }
+        }
     }
 
     public void setCacheExpirationMinutes( Long minutes ) {
@@ -325,6 +354,14 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
 
     protected Map<String, String> getHardcodedQueryParameters() {
         return hardcodedParamMap;
+    }
+
+    protected Map<String, String> getHardcodedHttpHeaders() {
+        return hardcodedHttpHeaders;
+    }
+
+    protected List<String> getHttpHeaderList() {
+        return httpHeaders;
     }
 
     protected AtomSearchResponseTransformerConfig getAtomResponseTransformerConfig() {
