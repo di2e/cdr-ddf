@@ -26,6 +26,7 @@
         <bundle>mvn:net.di2e.ecdr.api/cdr-api/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-rest-search-commons/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.transformer/cdr-atom-result-xformer/${project.version}</bundle>
+        <bundle>mvn:net.di2e.ecdr.transformer/cdr-rome-result-xformer/${project.version}</bundle>
     </feature>
 
     <feature name="cdr-rest-search-endpoint" install="manual" version="${project.version}" description="CDR REST Search endpoint.">

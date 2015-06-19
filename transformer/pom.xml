@@ -30,6 +30,7 @@
 
     <modules>
         <module>cdr-atom-result-xformer</module>
+        <module>cdr-rome-result-xformer</module>
         <module>cdr-transformer-mapper</module>
     </modules>
 </project>
