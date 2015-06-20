@@ -40,7 +40,9 @@ import net.di2e.ecdr.querylanguage.basic.PropertyCriteria.Operator;
 import net.di2e.ecdr.querylanguage.basic.keywordparser.ASTNode;
 import net.di2e.ecdr.querylanguage.basic.keywordparser.KeywordTextParser;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.opengis.filter.Filter;
 import org.opengis.filter.sort.SortBy;
 import org.opengis.filter.sort.SortOrder;
@@ -299,6 +301,7 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
             throw new UnsupportedQueryException( "There was no valid search criteria presented from the user, cannot complete search" );
         }
 
+        SearchUtils.logSort( sortBy );
         return new CDRQueryCriteriaImpl( filterBuilder.allOf( filters ), sortBy, humanReadableQuery.toString(), true, queryParameters, new HashMap<String, String>(), queryConfig );
     }
 
@@ -399,10 +402,10 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
                 String[] bboxArray = box.split( " |,\\p{Space}?" );
 
                 if ( bboxArray.length != 3 ) {
-                    double minX = Double.parseDouble( bboxArray[0] );
-                    double minY = Double.parseDouble( bboxArray[1] );
-                    double maxX = Double.parseDouble( bboxArray[2] );
-                    double maxY = Double.parseDouble( bboxArray[3] );
+                    double minX = NumberUtils.createDouble( bboxArray[0] );
+                    double minY = NumberUtils.createDouble( bboxArray[1] );
+                    double maxX = NumberUtils.createDouble( bboxArray[2] );
+                    double maxY = NumberUtils.createDouble( bboxArray[3] );
                     geoCriteria = new GeospatialCriteria( minX, minY, maxX, maxY );
                 } else {
                     throw new UnsupportedQueryException( "Invalid values found for bbox [" + box + "]" );
@@ -415,9 +418,9 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
             // Only check lat and lon. If Radius is blank is should be defaulted
         } else if ( StringUtils.isNotBlank( lat ) && StringUtils.isNotBlank( lon ) ) {
             try {
-                double longitude = Double.parseDouble( lon );
-                double latitude = Double.parseDouble( lat );
-                double radius = StringUtils.isNotBlank( rad ) ? Double.parseDouble( rad ) : defaultRadius;
+                double longitude = NumberUtils.createDouble( lon );
+                double latitude = NumberUtils.createDouble( lat );
+                double radius = StringUtils.isNotBlank( rad ) ? NumberUtils.createDouble( rad ) : defaultRadius;
                 geoCriteria = new GeospatialCriteria( latitude, longitude, radius );
 
             } catch ( NumberFormatException e ) {
@@ -556,9 +559,12 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
         List<PropertyCriteria> criteriaList = new ArrayList<PropertyCriteria>();
         for ( Entry<String, List<String>> entry : queryParameters.entrySet() ) {
             String key = entry.getKey();
-            String value = queryParameters.getFirst( key );
-            if ( StringUtils.isNotBlank( value ) && parameterExtensionMap.containsKey( key ) ) {
-                criteriaList.add( new PropertyCriteria( parameterExtensionMap.get( key ), value, Operator.LIKE ) );
+            List<String> valueList = entry.getValue();
+            if ( CollectionUtils.isNotEmpty( valueList ) ) {
+                String value = valueList.get( 0 );
+                if ( StringUtils.isNotBlank( value ) && parameterExtensionMap.containsKey( key ) ) {
+                    criteriaList.add( new PropertyCriteria( parameterExtensionMap.get( key ), value, Operator.LIKE ) );
+                }
             }
         }
         if ( queryParameters.containsKey( SearchConstants.CONTENT_COLLECTIONS_PARAMETER ) ) {

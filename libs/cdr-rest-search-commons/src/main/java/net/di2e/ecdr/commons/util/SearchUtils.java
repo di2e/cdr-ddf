@@ -193,6 +193,16 @@ public final class SearchUtils {
         return sortBy;
     }
 
+    public static void logSort( SortBy sortBy ) {
+        if ( LOGGER.isDebugEnabled() ) {
+            if ( sortBy != null ) {
+                LOGGER.debug( "SortBy for query is set to [{}]", sortBy.getPropertyName().getPropertyName() + "/" + sortBy.getSortOrder() );
+            } else {
+                LOGGER.debug( "SortBy for query is set to null" );
+            }
+        }
+    }
+
     private static SortTypeConfiguration getSortConfiguration( String sortKey, List<SortTypeConfiguration> sortTypeConfigurationList ) {
         for ( SortTypeConfiguration sortType : sortTypeConfigurationList ) {
             LOGGER.debug( "Comparing incoming sort key of {} with configuration of key {}", sortKey, sortType.getSortKey() );
