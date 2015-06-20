@@ -22,7 +22,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -554,8 +554,8 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
 
     protected List<PropertyCriteria> getPropertyCriteria( MultivaluedMap<String, String> queryParameters, Map<String, String> parameterExtensionMap ) {
         List<PropertyCriteria> criteriaList = new ArrayList<PropertyCriteria>();
-        Set<String> keySet = queryParameters.keySet();
-        for ( String key : keySet ) {
+        for ( Entry<String, List<String>> entry : queryParameters.entrySet() ) {
+            String key = entry.getKey();
             String value = queryParameters.getFirst( key );
             if ( StringUtils.isNotBlank( value ) && parameterExtensionMap.containsKey( key ) ) {
                 criteriaList.add( new PropertyCriteria( parameterExtensionMap.get( key ), value, Operator.LIKE ) );
@@ -585,7 +585,7 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
                         sb.append( URLEncoder.encode( uriSubstring.substring( 0, index ), "UTF-8" ) );
                         sb.append( "#" );
                         uriSubstring = uriSubstring.substring( index + 1 );
-                        sb.append( URLEncoder.encode( uriSubstring.substring( 0 ), "UTF-8" ) );
+                        sb.append( URLEncoder.encode( uriSubstring, "UTF-8" ) );
 
                         uriString = sb.toString();
                     } catch ( UnsupportedEncodingException | RuntimeException e ) {

@@ -278,8 +278,8 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
 
     protected void populateMetadata( Entry entry, CDRMetacard metacard, AtomContentXmlWrapOption wrap, String metadata ) {
         if ( metadata != null ) {
-            if ( wrap != null && !wrap.equals( AtomContentXmlWrapOption.NEVER_WRAP ) ) {
-                if ( wrap.equals( AtomContentXmlWrapOption.WRAP_HTML_AND_TEXT ) ) {
+            if ( wrap != null && wrap != AtomContentXmlWrapOption.NEVER_WRAP ) {
+                if ( wrap == AtomContentXmlWrapOption.WRAP_HTML_AND_TEXT ) {
                     Content.Type contentType = entry.getContentType();
                     // certain content types may not follow XML structure
                     switch ( contentType ) {
