@@ -41,6 +41,8 @@ import ddf.catalog.data.Metacard;
 
 public class MetacardJCacheManager implements net.di2e.ecdr.api.cache.CacheManager<Metacard> {
 
+    private static final long DEFAULT_CACHE_MINUTES = 60;
+
     private static final String CACHE_ID_PREFIX = "jcache-metacard-";
     private static final Logger LOGGER = LoggerFactory.getLogger( MetacardJCacheManager.class );
 
@@ -128,7 +130,7 @@ public class MetacardJCacheManager implements net.di2e.ecdr.api.cache.CacheManag
         }
         if ( duration == null ) {
             LOGGER.debug( "Duration was not passed into cache creation, so defaulting to cache of 60 minutes" );
-            duration = new Duration( TimeUnit.MINUTES, 60 );
+            duration = new Duration( TimeUnit.MINUTES, DEFAULT_CACHE_MINUTES );
         }
         return duration;
     }

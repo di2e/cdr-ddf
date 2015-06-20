@@ -84,7 +84,7 @@
             <Option label="0-Based (Starts at 0)" value="0" />
         </AD>
             
-        <AD name="Hard Coded Query Parameters" id="hardCodedParameters" required="true" type="String" default="format=atom-ddms,queryLanguage=cdr-kw-basic-2.0" cardinality="100"
+        <AD name="Hard Coded Query Parameters" id="hardCodedParameters" required="false" type="String" default="format=atom-ddms,queryLanguage=cdr-kw-basic-2.0" cardinality="100"
             description="Query parameter and value pairs (e.g. format=atom or timeout=300000) that will appear in every search request that gets sent out" />
 
         <AD name="Parameter Mapping" id="parameterMap" required="false" type="String" 
@@ -95,6 +95,10 @@
                      sru:sortKeys=sortKeys" cardinality="100"
             description="Mapping for this source that converts the query request into opensearch parameters. The mapping should be done by using &lt;opensearch parameter definition&gt;=&lt;URL parameter&gt; format.">
         </AD>
+        
+        <AD name="Custom HTTP Headers" id="httpHeaders" required="false" type="String" default="EMID" cardinality="100"
+            description="Custom HTTP Header name/value pairs that should be sent in the request if the name exists in the queryParameters or properties and has a non null/empty value.  To set a hardcoded value
+            use name=value, and it will automatically include that name/value pair in the HTTP Header." />
         
         <AD name="Result Cache Expires" id="cacheExpirationMinutes" type="Long" default="60"
             description="If the geo:uid parameter is not populated/supported, the results will be cached which will enable lookups by ID.  This specifies the number of minutes before the results are removed from the cache" />
@@ -177,7 +181,7 @@
             <Option label="0-Based (Starts at 0)" value="0" />
         </AD>
             
-        <AD name="Hard Coded Query Parameters" id="hardCodedParameters" required="true" type="String" default="format=atom-ddms,queryLanguage=cdr-kw-basic-2.0" cardinality="100"
+        <AD name="Hard Coded Query Parameters" id="hardCodedParameters" required="false" type="String" default="format=atom-ddms,queryLanguage=cdr-kw-basic-2.0" cardinality="100"
             description="Query parameter and value pairs (e.g. format=atom or timeout=300000) that will appear in every search request that gets sent out" />
 
         <AD name="Parameter Mapping" id="parameterMap" required="false" type="String" 
@@ -188,6 +192,11 @@
                      sru:sortKeys=sortKeys" cardinality="100"
             description="Mapping for this source that converts the query request into opensearch parameters. The mapping should be done by using &lt;opensearch parameter definition&gt;=&lt;URL parameter&gt; format.">
         </AD>
+        
+         <AD name="Custom HTTP Headers" id="httpHeaders" required="false" type="String" default="EMID" cardinality="100"
+            description="Custom HTTP Header name/value pairs that should be sent in the request if the name exists in the queryParameters or properties and has a non null/empty value.  To set a hardcoded value
+            use name=value, and it will automatically include that name/value pair in the HTTP Header." />
+        
         
         <AD name="Result Cache Expires" id="cacheExpirationMinutes" type="Long" default="60"
             description="If the geo:uid parameter is not populated/supported, the results will be cached which will enable lookups by ID.  This specifies the number of minutes before the results are removed from the cache" />

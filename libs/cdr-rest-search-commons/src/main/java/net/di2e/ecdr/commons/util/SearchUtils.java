@@ -29,6 +29,7 @@ import javax.ws.rs.core.UriInfo;
 import net.di2e.ecdr.api.sort.SortTypeConfiguration;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.DateTimeFormatterBuilder;
@@ -125,19 +126,21 @@ public final class SearchUtils {
     public static Map<String, String> convertToMap( String mapStr ) {
         Map<String, String> inputMap = new HashMap<String, String>();
         if ( StringUtils.isNotBlank( mapStr ) ) {
-            inputMap = convertToMap( Arrays.asList(mapStr.split( "," )));
+            inputMap = convertToMap( Arrays.asList( mapStr.split( "," ) ) );
         }
         return inputMap;
     }
 
     public static Map<String, String> convertToMap( List<String> mapList ) {
-        Map<String, String> inputMap = new HashMap<String, String>();
-        for ( String sortPair : mapList ) {
-            String[] pairAry = sortPair.split( MAP_ENTRY_DELIMITER );
-            if ( pairAry.length == 2 ) {
-                inputMap.put( pairAry[0], pairAry[1] );
-            } else {
-                LOGGER.warn( "Could not parse out map entry from {}, skipping this item.", sortPair );
+        Map<String, String> inputMap = new HashMap<>();
+        if ( CollectionUtils.isNotEmpty( mapList ) ) {
+            for ( String sortPair : mapList ) {
+                String[] pairAry = sortPair.split( MAP_ENTRY_DELIMITER );
+                if ( pairAry.length == 2 ) {
+                    inputMap.put( StringUtils.trimToEmpty( pairAry[0] ), StringUtils.trimToEmpty( pairAry[1] ) );
+                } else {
+                    LOGGER.warn( "Could not parse out map entry from {}, skipping this item.", sortPair );
+                }
             }
         }
         return inputMap;

@@ -50,6 +50,7 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
 import org.apache.abdera.parser.Parser;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -89,8 +90,17 @@ public class AtomResponseTransformer implements SearchResponseTransformer {
 
             Thread.currentThread().setContextClassLoader( AtomResponseTransformer.class.getClassLoader() );
             parser = ABDERA.getParser();
+            if ( LOGGER.isTraceEnabled() ) {
+                StringWriter writer = new StringWriter();
+                try {
+                    IOUtils.copy( inputStream, writer );
+                    LOGGER.trace( "Transforming the following atom feed into a DDF SourceResponse:{}{}", System.lineSeparator(), writer );
+                    inputStream = IOUtils.toInputStream( writer.toString() );
+                } catch ( IOException e ) {
+                    LOGGER.trace( "Could not print out atom stream for log: {}", e.getMessage() );
+                }
+            }
             atomDoc = parser.parse( new InputStreamReader( inputStream ) );
-
         } finally {
             Thread.currentThread().setContextClassLoader( tccl );
         }

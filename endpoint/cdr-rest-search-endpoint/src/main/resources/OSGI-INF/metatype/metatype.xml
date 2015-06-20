@@ -18,7 +18,7 @@
 -->
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
 
-    <OCD name="CDR REST Search Endpoint (Profile v1.1)" id="cdr-rest-search-endpoint-1.1">
+    <OCD name="CDR REST Search Endpoint" id="cdr-rest-search-endpoint" description="RESTful endpoint that aligns with the CDR REST Search Specificaiton">
 
         <AD name="Default Response Format" id="defaultResponseFormat" required="true" type="String" default="atom"
             description="The default response format to return results as if no format parameter is supplied in the query">
@@ -60,19 +60,25 @@
         <AD name="Query Request Cache Size" id="queryRequestCacheSize" required="true" type="Integer" default="1000"
             description="The number of query IDs (OID) to keep in cache to check against when  checking for unique queries.  Updating this value will clear the current cache." />
 
-        <AD name="Parameter Query Extensions" id="extensionMap" required="false" type="String" default="id=id" cardinality="100"
+        <AD name="Parameter Query Extensions" id="parameterExtensionMap" required="false" type="String" default="id=id" cardinality="100"
             description="List of property parameter extensions that should be added to the query (using property equality critiera) if present in the query request. The mapping should be done by using &lt;parameter name&gt;=&lt;criteria
             field&gt; where the criteria field is what the value of the incoming parameter will be compared to in metacards.">
         </AD>
 
-        <AD name="Parameter Properties" id="propertyList" required="false" type="String" default="oid,path" cardinality="100"
-            description="List of OpenSearch parameters that should be passed through the system as properties. Properties are not evaluated as criteria but will be propagated through DDF to the underlying source or catalog.">
+        <AD name="Parameter Properties" id="parameterPropertyList" required="false" type="String" default="oid,path" cardinality="100"
+            description="List of OpenSearch parameters that should be passed through the system as properties. 
+            Properties are not evaluated as criteria but will be propagated through DDF to the underlying source or catalog.">
+        </AD>
+        
+        <AD name="Header Properties" id="headerPropertyList" required="false" type="String" default="EMID" cardinality="100"
+            description="List of HTTP Header values that should be passed through the system as properties. 
+            Properties are not evaluated as criteria but will be propagated through DDF to the underlying source or catalog.">
         </AD>
             
     </OCD>
 
-    <Designate pid="cdr-rest-search-endpoint-1.1">
-        <Object ocdref="cdr-rest-search-endpoint-1.1" />
+    <Designate pid="cdr-rest-search-endpoint">
+        <Object ocdref="cdr-rest-search-endpoint" />
     </Designate>
 
 </metatype:MetaData>

@@ -28,7 +28,7 @@ public class QueryRequestCache {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( QueryRequestCache.class );
 
-    private LRUCache<String, Boolean> cache = null;
+    private static LRUCache<String, Boolean> cache = null;
 
     public QueryRequestCache( int cacheSize ) {
         cache = new LRUCache<String, Boolean>( cacheSize );
@@ -40,10 +40,10 @@ public class QueryRequestCache {
             if ( cache.containsKey( id ) ) {
                 unique = false;
             } else {
-                cache.put( id, Boolean.TRUE );
+                add( id );
             }
         }
-        LOGGER.debug( "Checking uniqueness of query with {}={} and isUnique={}", SearchConstants.OID_PARAMETER, id, unique );
+        LOGGER.debug( "Checking uniqueness of query with {}=[{}] and returning value for isUnique={}", SearchConstants.OID_PARAMETER, id, unique );
         return unique;
     }
 
@@ -73,6 +73,7 @@ public class QueryRequestCache {
         @Override
         public V put( K k, V v ) {
             if ( cacheSize > 0 ) {
+                LOGGER.debug( "Adding the queryId value to query request cache [{}]", k );
                 return super.put( k, v );
             }
             return null;
@@ -80,7 +81,9 @@ public class QueryRequestCache {
 
         public void updateCacheSize( int size ) {
             this.clear();
+            LOGGER.debug( "Updating the query request cache size from [{}]  to [{}]", cacheSize, size );
             cacheSize = size;
+
         }
 
     }

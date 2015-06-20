@@ -38,6 +38,8 @@ public interface QueryConfiguration {
 
     List<String> getParameterPropertyList();
 
+    List<String> getHeaderPropertyList();
+
     String getDefaultQueryLanguage();
 
     int getQueryRequestCacheSize();

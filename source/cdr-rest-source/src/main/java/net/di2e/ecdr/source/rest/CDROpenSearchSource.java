@@ -42,6 +42,8 @@ import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
 import net.di2e.ecdr.search.transform.atom.response.AtomResponseTransformer;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
@@ -90,7 +92,6 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
     private static final String BYTES = "bytes";
     private static final String BYTES_EQUAL = "bytes=";
 
-
     private SourceMonitor siteAvailabilityCallback = null;
     private FilterAdapter filterAdapter = null;
 
@@ -99,7 +100,6 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
     private WebClient cdrRestClient = null;
     private WebClient cdrAvailabilityCheckClient = null;
-
 
     public CDROpenSearchSource( FilterAdapter adapter, CacheManager<Metacard> manager ) {
         super( manager );
@@ -142,6 +142,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         setSecurityCredentials( cdrRestClient, queryRequest.getProperties() );
         filterParameters.putAll( getInitialFilterParameters( queryRequest ) );
         setURLQueryString( filterParameters );
+        setHttpHeaders( filterParameters, cdrRestClient );
         LOGGER.debug( "Executing http GET query to source [{}] with url [{}]", getId(), cdrRestClient.getCurrentURI().toString() );
         Response response = cdrRestClient.get();
         LOGGER.debug( "Query to source [{}] returned http status code [{}] and media type [{}]", getId(), response.getStatus(), response.getMediaType() );
@@ -437,18 +438,18 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         }
 
         for ( Entry<String, Serializable> entry : queryRequestProps.entrySet() ) {
-            if ( getParameterMap().containsKey( entry.getKey() ) ) {
+            String key = entry.getKey();
+            if ( getParameterMap().containsKey( key ) || getHttpHeaderList().contains( key ) ) {
                 String value = (String) entry.getValue();
                 if ( StringUtils.isNotBlank( value ) ) {
-                    filterParameters.put( entry.getKey(), String.valueOf( entry.getValue() ) );
+                    filterParameters.put( key, value );
                 }
             }
         }
 
+        LOGGER.trace( "Filter Parameters being evaluated for inclusion in outgoing query {} which were parsed from", filterParameters );
         return filterParameters;
     }
-
-
 
     protected URI getURIFromMetacard( URI uri ) {
         URI returnUri = null;
@@ -465,9 +466,6 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         return returnUri;
     }
 
-
-
-
     public SourceResponse cacheResults( SourceResponse sourceResponse ) {
         for ( Result result : sourceResponse.getResults() ) {
             Metacard metacard = result.getMetacard();
@@ -475,16 +473,6 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         }
         return sourceResponse;
     }
-
-
-    protected void setCdrRestClient( WebClient restClient ) {
-        this.cdrRestClient = restClient;
-    }
-
-    protected void setCdrAvailabilityCheckClient( WebClient availabilityCheckClient ) {
-        this.cdrAvailabilityCheckClient = availabilityCheckClient;
-    }
-
 
     private void setSecurityCredentials( WebClient client, Map<String, Serializable> requestProperties ) {
         if ( isSendSecurityCookie() ) {
@@ -534,6 +522,28 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             throw new UnsupportedQueryException( "Queries for parameter uid are not supported by source [" + getId() + "]" );
         }
         return sourceResponse;
+    }
+
+    protected void setHttpHeaders( Map<String, String> filterParameters, WebClient client ) {
+        Map<String, String> hardcodedHeaders = getHardcodedHttpHeaders();
+        if ( MapUtils.isNotEmpty( hardcodedHeaders ) ) {
+            for ( String key : hardcodedHeaders.keySet() ) {
+                String value = hardcodedHeaders.get( key );
+                client.header( key, value );
+                LOGGER.trace( "Adding the following HTTP Header to outgoing request [{}]=[{}]", key, value );
+            }
+        }
+
+        List<String> headers = getHttpHeaderList();
+        if ( CollectionUtils.isNotEmpty( headers ) ) {
+            for ( String header : headers ) {
+                if ( filterParameters.containsKey( header ) ) {
+                    String value = filterParameters.get( header );
+                    client.header( header, value );
+                    LOGGER.trace( "Adding the following HTTP Header to outgoing request [{}]=[{}]", header, value );
+                }
+            }
+        }
     }
 
     protected boolean supportsQueryById() {

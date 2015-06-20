@@ -97,6 +97,7 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
         return "&id={geo:uid?}"
                 + "&resource-uri={ddf:resource-uri?}"
                 + "&caseSensitive={cdrsx:caseSensitive?}"
+                + "&collections={ecdr:collections?}"
                 + "&fuzzy={ecdr:fuzzy?}"
                 + "&box={geo:box?}"
                 + "&lat={geo:lat?}"

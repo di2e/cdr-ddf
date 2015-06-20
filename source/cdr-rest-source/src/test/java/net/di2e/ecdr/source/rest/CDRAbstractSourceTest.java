@@ -78,7 +78,7 @@ public abstract class CDRAbstractSourceTest {
     public void testGetPing() {
         WebClient pingClient = mock( WebClient.class );
         CDROpenSearchSource source = configureSource();
-        source.setCdrAvailabilityCheckClient( pingClient );
+        source.setPingClient( pingClient );
         Response response = mock( Response.class );
         when( response.getStatus() ).thenReturn( Response.Status.OK.getStatusCode() );
         when( pingClient.get() ).thenReturn( response );
@@ -97,7 +97,7 @@ public abstract class CDRAbstractSourceTest {
         SourceMonitor monitor = mock( SourceMonitor.class );
         WebClient pingClient = mock( WebClient.class );
         CDROpenSearchSource source = configureSource();
-        source.setCdrAvailabilityCheckClient( pingClient );
+        source.setPingClient( pingClient );
         Response response = mock( Response.class );
         when( response.getStatus() ).thenReturn( Response.Status.OK.getStatusCode() );
         when( pingClient.head() ).thenReturn( response );
@@ -120,7 +120,7 @@ public abstract class CDRAbstractSourceTest {
         SourceMonitor monitor = mock( SourceMonitor.class );
         WebClient pingClient = mock( WebClient.class );
         CDROpenSearchSource source = configureSource();
-        source.setCdrAvailabilityCheckClient( pingClient );
+        source.setPingClient( pingClient );
         Response response = mock( Response.class );
         when( response.getStatus() ).thenReturn( Response.Status.NOT_FOUND.getStatusCode() );
         when( pingClient.head() ).thenReturn( response );
@@ -140,7 +140,7 @@ public abstract class CDRAbstractSourceTest {
         SourceMonitor monitor = mock( SourceMonitor.class );
         WebClient pingClient = mock( WebClient.class );
         CDROpenSearchSource source = configureSource();
-        source.setCdrAvailabilityCheckClient( pingClient );
+        source.setPingClient( pingClient );
         Response response = mock( Response.class );
         when( response.getStatus() ).thenReturn( Response.Status.OK.getStatusCode() );
         when( pingClient.head() ).thenReturn( response );
@@ -232,6 +232,8 @@ public abstract class CDRAbstractSourceTest {
         QueryRequestImpl request = new QueryRequestImpl( new QueryImpl( CQL.toFilter( CQLStr ), 0, 20, sort, true, 10000 ) );
         Map<String, Serializable> properties = new HashMap<String, Serializable>();
         properties.put( SearchConstants.STRICTMODE_PARAMETER, Boolean.TRUE );
+        properties.put( "EMID", "value" );
+        properties.put( "NoHeaderMatch", "value" );
         request.setProperties( properties );
         when( client.getCurrentURI() ).thenReturn( new URI( SERVICE_URL ) );
         Response webResponse = mock( Response.class );
@@ -254,7 +256,7 @@ public abstract class CDRAbstractSourceTest {
         source.setUrl( SERVICE_URL );
         source.setReceiveTimeoutSeconds( 10 );
         source.setConnectionTimeoutSeconds( 1 );
-        source.setCdrRestClient( client );
+        source.setRestClient( client );
 
         return source;
     }
