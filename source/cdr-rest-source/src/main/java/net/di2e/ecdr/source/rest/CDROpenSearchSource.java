@@ -139,7 +139,6 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         SearchResponseTransformer transformer = null;
         transformer = lookupSearchResponseTransformer();
 
-        // cdrRestClient = cdrRestClient.reset();
         setSecurityCredentials( cdrRestClient, queryRequest.getProperties() );
         filterParameters.putAll( getInitialFilterParameters( queryRequest ) );
         setURLQueryString( filterParameters );
@@ -173,7 +172,6 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
     public boolean isAvailable() {
         LOGGER.debug( "isAvailable method called on CDR Rest Source named [{}], determining whether to check availability or pull from cache", getId() );
         if ( getPingMethod() != null && !PingMethod.NONE.equals( getPingMethod() ) && cdrAvailabilityCheckClient != null ) {
-            // cdrAvailabilityCheckClient = cdrAvailabilityCheckClient.reset();
             if ( !isCurrentlyAvailable || (lastAvailableCheckDate.getTime() < System.currentTimeMillis() - getAvailableCheckCacheTime()) ) {
                 LOGGER.debug( "Checking availability on CDR Rest Source named [{}] in real time by calling endpoint [{}]", getId(), cdrAvailabilityCheckClient.getBaseURI() );
                 try {
@@ -474,14 +472,6 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             getMetacardCache().put( metacard.getId(), metacard );
         }
         return sourceResponse;
-    }
-
-    protected void setCdrRestClient( WebClient restClient ) {
-        this.cdrRestClient = restClient;
-    }
-
-    protected void setCdrAvailabilityCheckClient( WebClient availabilityCheckClient ) {
-        this.cdrAvailabilityCheckClient = availabilityCheckClient;
     }
 
     private void setSecurityCredentials( WebClient client, Map<String, Serializable> requestProperties ) {
