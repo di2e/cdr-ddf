@@ -96,7 +96,7 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
     @Override
     public String getUrlTemplateParameters() {
         // @formatter:off
-        return "&id={geo:uid?}"
+        return "&uid={geo:uid?}"
                 + "&resource-uri={ddf:resource-uri?}"
                 + "&caseSensitive={cdrsx:caseSensitive?}"
                 + "&collections={ecdr:collections?}"
