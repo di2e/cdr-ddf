@@ -440,14 +440,16 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         }
 
         for ( Entry<String, Serializable> entry : queryRequestProps.entrySet() ) {
-            if ( getParameterMap().containsKey( entry.getKey() ) ) {
+            String key = entry.getKey();
+            if ( getParameterMap().containsKey( key ) || getHttpHeaderList().contains( key ) ) {
                 String value = (String) entry.getValue();
                 if ( StringUtils.isNotBlank( value ) ) {
-                    filterParameters.put( entry.getKey(), String.valueOf( entry.getValue() ) );
+                    filterParameters.put( key, value );
                 }
             }
         }
 
+        LOGGER.trace( "Filter Parameters being evaluated for inclusion in outgoing query {} which were parsed from", filterParameters );
         return filterParameters;
     }
 

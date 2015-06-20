@@ -383,12 +383,12 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
 
         for ( String key : queryParameters.keySet() ) {
             String value = queryParameters.getFirst( key );
-            if ( StringUtils.isNotBlank( value ) && queryConfiguration.getParameterPropertyList().contains( key ) ) {
+            if ( StringUtils.isNotBlank( value ) && (queryConfiguration.getParameterPropertyList().contains( key ) || queryConfiguration.getHeaderPropertyList().contains( key )) ) {
                 LOGGER.trace( "Adding key/value pair  [{}]=[{}] to queryProperties that get sent in with query request", key, value );
                 queryProperties.put( key, value );
             }
         }
-        LOGGER.debug( "Setting the query properties tp {}", queryProperties );
+        LOGGER.trace( "Setting the query properties to {} based on values in query parameters {}", queryProperties, queryParameters );
         return queryProperties;
     }
 
