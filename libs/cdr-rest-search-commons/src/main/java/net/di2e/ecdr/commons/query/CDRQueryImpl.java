@@ -25,6 +25,7 @@ import net.di2e.ecdr.api.query.QueryCriteria;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.util.SearchUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.opengis.filter.FilterVisitor;
@@ -76,7 +77,7 @@ public class CDRQueryImpl implements Query {
         appendParameter( SearchConstants.STATUS_PARAMETER, includeStatus );
 
         populateSourceList( queryCriteria.getParameterValues() );
-        if ( !sources.isEmpty() ) {
+        if ( CollectionUtils.isNotEmpty( sources ) ) {
             appendParameter( SearchConstants.SOURCE_PARAMETER, StringUtils.join( sources, ", " ) );
         }
     }

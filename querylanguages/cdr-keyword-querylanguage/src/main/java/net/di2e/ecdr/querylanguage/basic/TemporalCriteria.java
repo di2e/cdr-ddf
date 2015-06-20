@@ -23,16 +23,16 @@ public class TemporalCriteria {
     private Date endDate;
     private String dateType;
 
-    public TemporalCriteria( Date startDate, Date endDate, String dateType ) {
+    public TemporalCriteria( Date start, Date end, String type ) {
         if ( dateType == null ) {
             throw new IllegalArgumentException( "Null is not valid for dateType" );
         }
         if ( startDate == null && endDate == null ) {
             throw new IllegalArgumentException( "startDate and endDate parameters cannot both be null" );
         }
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.dateType = dateType;
+        this.startDate = start;
+        this.endDate = end;
+        this.dateType = type;
     }
 
     public Date getStartDate() {

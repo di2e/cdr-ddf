@@ -136,8 +136,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
     protected SourceResponse doQuery( Map<String, String> filterParameters, QueryRequest queryRequest ) throws UnsupportedQueryException {
         SourceResponse sourceResponse;
-        SearchResponseTransformer transformer = null;
-        transformer = lookupSearchResponseTransformer();
+        SearchResponseTransformer transformer = lookupSearchResponseTransformer();
 
         setSecurityCredentials( cdrRestClient, queryRequest.getProperties() );
         filterParameters.putAll( getInitialFilterParameters( queryRequest ) );

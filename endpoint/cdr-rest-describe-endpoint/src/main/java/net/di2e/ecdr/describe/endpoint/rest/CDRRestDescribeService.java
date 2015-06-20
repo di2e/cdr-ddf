@@ -71,8 +71,8 @@ public class CDRRestDescribeService implements RegistrableService {
     public Response describe() {
         LOGGER.debug( "Describe request sent, returning the description that is located at {}", pathToDescribeFile );
         if ( StringUtils.isNotBlank( pathToDescribeFile ) ) {
-            try {
-                FileInputStream fis = new FileInputStream( pathToDescribeFile );
+            try ( FileInputStream fis = new FileInputStream( pathToDescribeFile ) ) {
+
                 return Response.ok( fis, new MediaType( "application", "xml" ) ).build();
             } catch ( IOException e ) {
                 LOGGER.warn( "The describe service could not read the file located at {} becuase encountered error {}", pathToDescribeFile, e.getMessage(), e );
