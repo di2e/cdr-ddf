@@ -91,7 +91,7 @@
             default="os:searchTerms=q,os:count=count,os:startIndex=startIndex,cdrs:timeout=timeout,cdrsx:originQueryID=oid,cdrb:path=path,cdrsx:strictMode=strictMode,
                      ddf:resource-uri=resource-uri,cdrsx:caseSensitive=caseSensitive,ecdr:fuzzy=fuzzy,ecdr:collections=collections,ddf:metadata-content-type=metadata-content-type,ecdr:textPath=textPath,
                      time:start=dtStart,time:end=dtEnd,cdrsx:dateType=dtType,time:relation=dtRelation,
-                     geo:uid=id,geo:box=box,geo:lat=lat,geo:lon=lon,geo:radius=radius,geo:geometry=geometry,geo:polygon=polygon,geo:relation=spatialOp,
+                     geo:uid=uid,geo:box=box,geo:lat=lat,geo:lon=lon,geo:radius=radius,geo:geometry=geometry,geo:polygon=polygon,geo:relation=spatialOp,
                      sru:sortKeys=sortKeys" cardinality="100"
             description="Mapping for this source that converts the query request into opensearch parameters. The mapping should be done by using &lt;opensearch parameter definition&gt;=&lt;URL parameter&gt; format.">
         </AD>

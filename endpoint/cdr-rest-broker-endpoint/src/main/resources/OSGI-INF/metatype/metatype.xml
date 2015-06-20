@@ -63,7 +63,7 @@
         <AD name="Default to deduplicate results" id="defaultDeduplication" type="Boolean" default="true"
             description="Check the box if you want to deduplicate results from multiple sources" />
         -->
-        <AD name="Parameter Query Extensions" id="parameterExtensionMap" required="false" type="String" default="id=id" cardinality="100"
+        <AD name="Parameter Query Extensions" id="parameterExtensionMap" required="false" type="String" default="uid=id" cardinality="100"
             description="List of property parameter extensions that should be added to the query (using property equality critiera) if present in the query request. The mapping should be done by using &lt;parameter name&gt;=&lt;criteria
             field&gt; where the criteria field is what the value of the incoming parameter will be compared to in metacards.">
         </AD>

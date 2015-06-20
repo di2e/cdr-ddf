@@ -45,7 +45,7 @@ public class QueryConfigurationImpl implements QueryConfiguration {
     private String defaultQueryLanguageCustom = null;
     private int queryRequestCacheSize = 1000;
 
-    private Map<String, String> parameterExtensionMap = SearchUtils.convertToMap( "id=id" );
+    private Map<String, String> parameterExtensionMap = SearchUtils.convertToMap( "uid=id" );
     private List<String> parameterPropertyList = Arrays.asList( new String[] { "oid", "path" } );
     private List<String> headerPropertyList = Arrays.asList( new String[] { "EMID" } );
 
