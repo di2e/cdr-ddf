@@ -101,9 +101,11 @@ public class CQLQueryLanguage implements QueryLanguage {
         List<Filter> filters = new ArrayList<Filter>();
 
         SortBy sortBy = SearchUtils.getSortBy( queryParameters, sortTypeConfigurationList );
+        SearchUtils.logSort( sortBy );
 
-        LOGGER.debug( "Received CQL-based query." );
         String cqlStr = queryParameters.getFirst( SearchConstants.KEYWORD_PARAMETER );
+        LOGGER.debug( "Received CQL-based query [{}]", cqlStr );
+
         try {
             Filter filter = ECQL.toFilter( cqlStr );
             SearchUtils.addFilter( filters, filter );
