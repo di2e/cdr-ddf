@@ -75,8 +75,12 @@ public class QueryConfigurationImpl implements QueryConfiguration {
     }
 
     public void setDefaultDateType( String dateType ) {
-        LOGGER.debug( "ConfigUpdate: Updating the default dateType to [{}]", dateType );
-        this.defaultDateType = dateType;
+        if ( StringUtils.isNotBlank( dateType ) ) {
+            LOGGER.debug( "ConfigUpdate: Updating the default dateType to [{}]", dateType );
+            this.defaultDateType = dateType;
+        } else {
+            LOGGER.debug( "ConfigUpdateError: Configuration update for defaultDateType in endpoint was empty or null so leaving at existing value for [{}]", defaultDateType );
+        }
     }
 
     public void setDefaultDateTypeCustom( String dateType ) {
@@ -100,10 +104,14 @@ public class QueryConfigurationImpl implements QueryConfiguration {
     }
 
     public void setDefaultResponseFormat( String format ) {
-        LOGGER.debug( "ConfigUpdate: Updating the default response format to [{}]", format );
-        this.defaultResponseFormat = format;
+        if ( StringUtils.isNotBlank( format ) ) {
+            LOGGER.debug( "ConfigUpdate: Updating the default response format to [{}]", format );
+            this.defaultResponseFormat = format;
+        } else {
+            LOGGER.debug( "ConfigUpdateError: Configuration update for defaultResponseFormat in endpoint was empty or null so leaving at existing value for [{}]", defaultResponseFormat );
+        }
     }
-    
+
     public void setDefaultResponseFormatCustom( String format ) {
         LOGGER.debug( "ConfigUpdate: Updating the default response format custom override value to [{}]", format );
         this.defaultResponseFormatCustom = format;
