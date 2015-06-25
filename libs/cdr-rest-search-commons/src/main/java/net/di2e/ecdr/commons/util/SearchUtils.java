@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
@@ -168,26 +167,27 @@ public final class SearchUtils {
         return returnDate;
     }
 
-    public static SortBy getSortBy( MultivaluedMap<String, String> queryParameters, List<SortTypeConfiguration> sortTypeConfigurationList ) {
-        String sortByString = queryParameters.getFirst( SearchConstants.SORTKEYS_PARAMETER );
+    public static SortBy getSortBy( String sortByString, List<SortTypeConfiguration> sortTypeConfigurationList, boolean supportWildcards ) {
         SortBy sortBy = null;
         if ( StringUtils.isNotBlank( sortByString ) ) {
             String[] sortValues = sortByString.split( "," );
             String sortKey = sortValues[0];
-            SortTypeConfiguration sortType = getSortConfiguration( sortKey, sortTypeConfigurationList );
-            if ( sortType != null ) {
-                String sortAttribute = sortType.getSortAttribute();
-                SortOrder sortOrder = null;
-                if ( sortValues.length >= 3 ) {
-                    if ( Boolean.FALSE.toString().equalsIgnoreCase( sortValues[2] ) ) {
-                        sortOrder = SortOrder.DESCENDING;
+            if ( StringUtils.isNotBlank( sortKey ) ) {
+                SortTypeConfiguration sortType = getSortConfiguration( sortKey, sortTypeConfigurationList, supportWildcards );
+                if ( sortType != null ) {
+                    String sortAttribute = sortType.getSortAttribute();
+                    SortOrder sortOrder = null;
+                    if ( sortValues.length >= 3 ) {
+                        if ( Boolean.FALSE.toString().equalsIgnoreCase( sortValues[2] ) ) {
+                            sortOrder = SortOrder.DESCENDING;
+                        } else {
+                            sortOrder = SortOrder.ASCENDING;
+                        }
                     } else {
-                        sortOrder = SortOrder.ASCENDING;
+                        sortOrder = SortOrder.valueOf( sortType.getSortOrder() );
                     }
-                } else {
-                    sortOrder = SortOrder.valueOf( sortType.getSortOrder() );
+                    sortBy = new SortByImpl( sortAttribute, sortOrder );
                 }
-                sortBy = new SortByImpl( sortAttribute, sortOrder );
             }
         }
         return sortBy;
@@ -203,10 +203,20 @@ public final class SearchUtils {
         }
     }
 
-    private static SortTypeConfiguration getSortConfiguration( String sortKey, List<SortTypeConfiguration> sortTypeConfigurationList ) {
+    private static SortTypeConfiguration getSortConfiguration( String sortKey, List<SortTypeConfiguration> sortTypeConfigurationList, boolean supportWildcard ) {
         for ( SortTypeConfiguration sortType : sortTypeConfigurationList ) {
-            LOGGER.debug( "Comparing incoming sort key of {} with configuration of key {}", sortKey, sortType.getSortKey() );
-            if ( sortType.getSortKey().equals( sortKey ) ) {
+            String configSortKey = sortType.getSortKey();
+            LOGGER.trace( "Comparing incoming sort key of {} with configuration of key {}", sortKey, configSortKey );
+            if ( supportWildcard ) {
+                if ( configSortKey.startsWith( SortTypeConfiguration.SORT_WILDCARD ) ) {
+                    configSortKey = StringUtils.substringAfterLast( configSortKey, SortTypeConfiguration.SORT_XPATH_DELIMITTER );
+                    if ( sortKey.contains( SortTypeConfiguration.SORT_XPATH_DELIMITTER ) ) {
+                        sortKey = StringUtils.substringAfterLast( sortKey, SortTypeConfiguration.SORT_XPATH_DELIMITTER );
+                    }
+                }
+                LOGGER.trace( "SortKeys being compated after wildcard normalization query sortKey=[{}] and configuration sortKey=[{}]", sortKey, configSortKey );
+            }
+            if ( StringUtils.equalsIgnoreCase( configSortKey, sortKey ) ) {
                 return sortType;
             }
         }
@@ -251,6 +261,14 @@ public final class SearchUtils {
         } else {
             LOGGER.debug( "Filter was null, not adding to the Filter list" );
         }
+    }
+
+    public static String getAllowedSortValues( List<SortTypeConfiguration> sortTypes ) {
+        StringBuilder sb = new StringBuilder();
+        for ( SortTypeConfiguration sortType : sortTypes ) {
+            sb.append( "'" + sortType.getSortKey() + "' " );
+        }
+        return sb.toString();
     }
 
 }

@@ -16,13 +16,20 @@
 package net.di2e.ecdr.commons.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import net.di2e.ecdr.api.sort.SortTypeConfiguration;
+
 import org.junit.Test;
+import org.opengis.filter.sort.SortBy;
+import org.opengis.filter.sort.SortOrder;
+
+import ddf.catalog.data.Metacard;
 
 public class SearchUtilsTest {
 
@@ -59,4 +66,64 @@ public class SearchUtilsTest {
         assertTrue( SearchUtils.isBoolean( "1" ) );
     }
 
+    @Test
+    public void testGetSortBy(){
+        SortTypeConfiguration sortConfig = new SortTypeConfiguration() {
+            @Override
+            public String getSortOrder() {
+                return SortOrder.ASCENDING.name();
+            }
+            
+            @Override
+            public String getSortKey() {
+                return "*/title";
+            }
+            
+            @Override
+            public String getSortAttribute() {
+                return Metacard.TITLE;
+            }
+        };
+        SortBy sortBy = SearchUtils.getSortBy( "title", Arrays.asList( new SortTypeConfiguration[] { sortConfig } ), false );
+        assertNull( sortBy );
+
+        sortBy = SearchUtils.getSortBy( "title", Arrays.asList( new SortTypeConfiguration[] { sortConfig } ), true );
+        assertEquals( sortBy.getSortOrder().name(), SortOrder.ASCENDING.name() );
+        assertEquals( sortBy.getPropertyName().getPropertyName(), Metacard.TITLE );
+
+        sortBy = SearchUtils.getSortBy( "entry/title", Arrays.asList( new SortTypeConfiguration[] { sortConfig } ), true );
+        assertEquals( sortBy.getSortOrder().name(), SortOrder.ASCENDING.name() );
+        assertEquals( sortBy.getPropertyName().getPropertyName(), Metacard.TITLE );
+
+        sortBy = SearchUtils.getSortBy( "entry/blah/title", Arrays.asList( new SortTypeConfiguration[] { sortConfig } ), true );
+        assertEquals( sortBy.getSortOrder().name(), SortOrder.ASCENDING.name() );
+        assertEquals( sortBy.getPropertyName().getPropertyName(), Metacard.TITLE );
+
+        sortConfig = new SortTypeConfiguration() {
+            @Override
+            public String getSortOrder() {
+                return SortOrder.ASCENDING.name();
+            }
+
+            @Override
+            public String getSortKey() {
+                return "entry/title";
+            }
+
+            @Override
+            public String getSortAttribute() {
+                return Metacard.TITLE;
+            }
+        };
+        sortBy = SearchUtils.getSortBy( "title", Arrays.asList( new SortTypeConfiguration[] { sortConfig } ), true );
+        assertNull( sortBy );
+        sortBy = SearchUtils.getSortBy( "entry/blah/title", Arrays.asList( new SortTypeConfiguration[] { sortConfig } ), true );
+        assertNull( sortBy );
+        sortBy = SearchUtils.getSortBy( "entry/title", Arrays.asList( new SortTypeConfiguration[] { sortConfig } ), false );
+        assertEquals( sortBy.getSortOrder().name(), SortOrder.ASCENDING.name() );
+        assertEquals( sortBy.getPropertyName().getPropertyName(), Metacard.TITLE );
+        sortBy = SearchUtils.getSortBy( "entry/title", Arrays.asList( new SortTypeConfiguration[] { sortConfig } ), true );
+        assertEquals( sortBy.getSortOrder().name(), SortOrder.ASCENDING.name() );
+        assertEquals( sortBy.getPropertyName().getPropertyName(), Metacard.TITLE );
+    }
 }

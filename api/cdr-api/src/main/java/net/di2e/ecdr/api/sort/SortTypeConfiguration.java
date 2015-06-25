@@ -16,6 +16,10 @@
 package net.di2e.ecdr.api.sort;
 
 public interface SortTypeConfiguration {
+    
+    String SORT_WILDCARD = "*";
+
+    String SORT_XPATH_DELIMITTER = "/";
 
     String getSortKey();
 

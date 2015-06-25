@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ddf.catalog.data.Metacard;
+import ddf.catalog.data.Result;
 import ddf.catalog.util.impl.MaskableImpl;
 
 public abstract class CDRSourceConfiguration extends MaskableImpl {
@@ -119,7 +120,8 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         hardcodedParamMap.put( SearchConstants.QUERYLANGUAGE_PARAMETER, SearchConstants.CDR_CQL_QUERY_LANGUAGE );
 
         sortMap = new HashMap<>();
-        sortMap = SearchUtils.convertToMap( "title=entry/title,modified=entry/date,RELEVANCE=score" );
+        sortMap = SearchUtils.convertToMap( Metacard.TITLE + "=title," + Metacard.MODIFIED + "=updated," + Metacard.EFFECTIVE + "=published," + Metacard.CREATED + "=createdDate,"
+                + Result.RELEVANCE + "=score," + Result.DISTANCE + "=distance" );
 
         parameterMap = new HashMap<>();
         parameterMap.putAll( parameterMatchMap );
@@ -232,8 +234,13 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
     }
 
     public void setWrapContentWithXmlOption( String option ) {
-        LOGGER.debug( "ConfigUpdate: Updating the WrapContentWithXmlOption value from [{}] to [{}]", atomTransformerConfig.getAtomContentXmlWrapOption(), option );
-        atomTransformerConfig.setAtomContentXmlWrapOption( AtomContentXmlWrapOption.valueOf( option ) );
+        if ( StringUtils.isNotBlank( option ) ) {
+            LOGGER.debug( "ConfigUpdate: Updating the WrapContentWithXmlOption value from [{}] to [{}]", atomTransformerConfig.getAtomContentXmlWrapOption(), option );
+            atomTransformerConfig.setAtomContentXmlWrapOption( AtomContentXmlWrapOption.valueOf( option ) );
+        } else {
+            LOGGER.debug( "ConfigUpdateError: Configuration update for wrapContentWithXml option was empty or null so leaving at existing value for [{}]",
+                    atomTransformerConfig.getAtomContentXmlWrapOption() );
+        }
     }
 
     public void setThumbnailLinkRelation( String rel ) {
@@ -257,13 +264,18 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
     }
 
     public void setStartIndexStartNumber( String startNumber ) {
-        try {
-            // get the existing start index (0 or 1) to use in the log statement after setting the index
-            String oldIndex = atomTransformerConfig.isZeroBasedStartIndex() ? "0" : "1";
-            atomTransformerConfig.setZeroBasedStartIndex( Integer.parseInt( startNumber ) == 0 );
-            LOGGER.debug( "ConfigUpdate: Updating the Start Index Numbering value from [{}] to [{}]", oldIndex, startNumber );
-        } catch ( NumberFormatException e ) {
-            LOGGER.warn( "ConfigUpdate Failed: Attempted to update the 'start index number method' due to non valid (must be 1 or 0) start index numbering passed in[" + startNumber + "]" );
+        if ( StringUtils.isNotBlank( startNumber ) ) {
+            try {
+                // get the existing start index (0 or 1) to use in the log statement after setting the index
+                String oldIndex = atomTransformerConfig.isZeroBasedStartIndex() ? "0" : "1";
+                atomTransformerConfig.setZeroBasedStartIndex( Integer.parseInt( startNumber ) == 0 );
+                LOGGER.debug( "ConfigUpdate: Updating the Start Index Numbering value from [{}] to [{}]", oldIndex, startNumber );
+            } catch ( NumberFormatException e ) {
+                LOGGER.warn( "ConfigUpdate Failed: Attempted to update the 'start index number method' due to non valid (must be 1 or 0) start index numbering passed in[" + startNumber + "]" );
+            }
+        } else {
+            LOGGER.debug( "ConfigUpdateError: Configuration update for startNumber was empty or null so leaving at existing value for isZeroBasedStartIndex=[{}]",
+                    atomTransformerConfig.isZeroBasedStartIndex() );
         }
     }
 
@@ -392,7 +404,9 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         String sortOrderString = null;
         if ( sortBy != null ) {
             SortOrder sortOrder = sortBy.getSortOrder();
-            String sortField = sortMap.get( sortBy.getPropertyName().getPropertyName() );
+            String sortProperty = sortBy.getPropertyName().getPropertyName();
+            LOGGER.trace( "Translating sort order from original form order=[{}] and propertyName=[{}] to CDR form", sortOrder, sortProperty );
+            String sortField = sortMap.get( sortProperty );
             if ( sortField != null ) {
                 sortOrderString = sortField + (SortOrder.DESCENDING.equals( sortOrder ) ? ",,false" : ",,true");
             }
