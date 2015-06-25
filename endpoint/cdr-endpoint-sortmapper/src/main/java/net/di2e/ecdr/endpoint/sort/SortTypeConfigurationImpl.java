@@ -37,20 +37,32 @@ public class SortTypeConfigurationImpl implements SortTypeConfiguration {
         LOGGER.info( "Creating a new sort type configuration." );
     }
 
-    public void setSortKey (String key) {
+    public void setSortKey( String key ) {
+        LOGGER.debug( "ConfigUpdate: Updating the SortKey to [{}] from [{}]", key, sortKey );
         this.sortKey = key;
     }
 
-    public void setSortAttribute (String attribute) {
-        this.sortAttribute = attribute;
+    public void setSortAttribute( String attribute ) {
+        if ( StringUtils.isNotBlank( attribute ) ) {
+            LOGGER.debug( "ConfigUpdate: Updating the sortAttribute to [{}] from [{}]", attribute, sortAttribute );
+            this.sortAttribute = attribute;
+        } else {
+            LOGGER.debug( "ConfigUpdateError: Configuration update for SortAttribute in sortMapper for key=[{}] was empty or null so leaving at existing value for [{}]", sortKey, sortAttribute );
+        }
     }
 
-    public void setCustomSortAttribute ( String attribute ) {
+    public void setCustomSortAttribute( String attribute ) {
+        LOGGER.debug( "ConfigUpdate: Updating the customSortAttribute to [{}] from [{}]", attribute, customAttribute );
         this.customAttribute = attribute;
     }
 
-    public void setSortOrder (String order) {
-        this.sortOrder = order;
+    public void setSortOrder( String order ) {
+        if ( StringUtils.isNotBlank( order ) ) {
+            LOGGER.debug( "ConfigUpdate: Updating the SortOrder to [{}] from [{}]", order, sortOrder );
+            this.sortOrder = order;
+        } else {
+            LOGGER.debug( "ConfigUpdateError: Configuration update for SortOrder in sortMapper for key=[{}] was empty or null so leaving at existing value for [{}]", sortKey, sortOrder );
+        }
     }
 
     @Override
@@ -60,7 +72,7 @@ public class SortTypeConfigurationImpl implements SortTypeConfiguration {
 
     @Override
     public String getSortAttribute() {
-        if (StringUtils.isNotBlank( customAttribute )) {
+        if ( StringUtils.isNotBlank( customAttribute ) ) {
             return customAttribute;
         } else {
             return sortAttribute;
