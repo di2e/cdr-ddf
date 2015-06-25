@@ -70,7 +70,7 @@ public class AtomTransformerWithPayload extends AtomTransformer {
             CDRMetacard newMetacard = new CDRMetacard( metacard );
             newMetacard.setMetadata( metadata );
 
-            super.setEntrySecurity( entry, newMetacard );
+            setEntrySecurity( entry, newMetacard );
         } finally {
             Thread.currentThread().setContextClassLoader( currentClassLoader );
         }

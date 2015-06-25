@@ -212,14 +212,16 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
                + System.lineSeparator()
                + "sru:sortKeys - space-separated list of sort keys, with individual sort keys comprised of a comma-separated sequence of "
                + "sub-parameters in the order listed below." + System.lineSeparator()
-               + "    path - Mandatory. An XPath expression for a tagpath to be used in the sort." + System.lineSeparator()
+               + "    path - Mandatory. An XPath expression for a tagpath to be used in the sort  (wildcards '*' may be supported, see allowed values)" + System.lineSeparator()
                + "    sortSchema - Optional. A short name for a URI identifying an XML schema to which the XPath expression applies" + System.lineSeparator()
                + "    ascending - Optional. Boolean, default 'true'." + System.lineSeparator()
                + "    caseSensitive - Optional. Boolean, default 'false'." + System.lineSeparator()
                + "    missingValue - Optional. Default is 'highValue'." + System.lineSeparator()
                + "            examples: Sort by relevance - score,relevance" + System.lineSeparator()
                + "                      Sort by updated time descending - entry/date,,false " + System.lineSeparator()
-               + "                      Sort by distance - distance,cdrsx" + System.lineSeparator();
+               + "                      Sort by distance - distance,cdrsx" + System.lineSeparator()
+               + "            'path' allowedValues: " + SearchUtils.getAllowedSortValues( sortTypeConfigurationList ) + System.lineSeparator();
+        
         // @formatter:on
         boolean fuzzy = queryConfig.isDefaultFuzzySearch();
         description = StringUtils.replace( description, "${defaultFuzzy}", String.valueOf( fuzzy ), 1 );
@@ -240,7 +242,7 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
         LOGGER.debug( "Parsing query using the CDRKeywordQueryLanguage" );
         List<Filter> filters = new ArrayList<Filter>();
 
-        SortBy sortBy = SearchUtils.getSortBy( queryParameters, sortTypeConfigurationList );
+        SortBy sortBy = SearchUtils.getSortBy( queryParameters.getFirst( SearchConstants.SORTKEYS_PARAMETER ), sortTypeConfigurationList, true );
         StringBuilder humanReadableQuery = new StringBuilder();
 
         boolean defaultFuzzySearch = queryConfig.isDefaultFuzzySearch();

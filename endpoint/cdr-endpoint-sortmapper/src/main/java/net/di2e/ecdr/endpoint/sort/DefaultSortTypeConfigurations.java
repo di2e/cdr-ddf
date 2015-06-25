@@ -45,8 +45,9 @@ public class DefaultSortTypeConfigurations {
 
     public enum SortMap {
 
-        TITLE( "entry/title", Metacard.TITLE, SortOrder.ASCENDING.name() ), MODIFIED_DATE( "entry/date", Metacard.MODIFIED, SortOrder.DESCENDING.name() ), EFFECTIVE_DATE( "effective",
-                Metacard.EFFECTIVE, SortOrder.DESCENDING.name() ), SCORE( "score", Result.RELEVANCE, SortOrder.DESCENDING.name() ), DISTANCE( "distance", Result.DISTANCE, SortOrder.ASCENDING.name() );
+        TITLE( "*/title", Metacard.TITLE, SortOrder.ASCENDING.name() ), MODIFIED_DATE( "*/updated", Metacard.MODIFIED, SortOrder.DESCENDING.name() ), EFFECTIVE_DATE( "*/published",
+                Metacard.EFFECTIVE, SortOrder.DESCENDING.name() ), CREATED_DATE( "*/createdDate", Metacard.EFFECTIVE, SortOrder.DESCENDING.name() ), SCORE( "*/score", Result.RELEVANCE,
+                SortOrder.DESCENDING.name() ), DISTANCE( "*/distance", Result.DISTANCE, SortOrder.ASCENDING.name() );
 
         private final String key;
         private final String attribute;

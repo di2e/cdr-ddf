@@ -432,6 +432,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         }
 
         String sortOrderString = getSortOrderString( query.getSortBy() );
+        LOGGER.trace( "Getting sort order for query [{}]", sortOrderString );
         if ( sortOrderString != null ) {
             filterParameters.put( SearchConstants.SORTKEYS_PARAMETER, sortOrderString );
         }
