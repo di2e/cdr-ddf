@@ -13,18 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.api.sort;
+package net.di2e.ecdr.api.config;
 
-public interface SortTypeConfiguration {
+public interface DateTypeConfiguration {
     
-    String SORT_WILDCARD = "*";
-
-    String SORT_XPATH_DELIMITTER = "/";
-
-    String getSortKey();
-
-    String getSortAttribute();
-
-    String getSortOrder();
+    String getCDRDateType();
+    
+    String getInternalDateType();
 
 }

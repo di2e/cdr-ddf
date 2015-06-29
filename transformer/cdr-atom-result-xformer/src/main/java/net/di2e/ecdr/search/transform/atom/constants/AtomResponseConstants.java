@@ -15,6 +15,8 @@
  */
 package net.di2e.ecdr.search.transform.atom.constants;
 
+import ddf.catalog.data.Metacard;
+
 public final class AtomResponseConstants {
 
     private AtomResponseConstants() {
@@ -36,8 +38,8 @@ public final class AtomResponseConstants {
 
     public static final String METACARD_ATOM_NAMESPACE = "urn:catalog:metacard:atom";
     public static final String METACARD_ATOM_NAMESPACE_PREFIX = "metacard";
-    public static final String METACARD_CREATED_DATE_ELEMENT = "createdDate";
-    public static final String METADATA_EXPIRATION_DATE_ELEMENT = "expirationDate";
+    public static final String METACARD_CREATED_DATE_ELEMENT = Metacard.CREATED;
+    public static final String METADATA_EXPIRATION_DATE_ELEMENT = Metacard.EXPIRATION;
 
     public static final String ATOM_MIME_TYPE = "application/atom+xml";
 

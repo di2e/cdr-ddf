@@ -30,6 +30,7 @@ import javax.net.ssl.KeyManager;
 import net.di2e.ecdr.api.cache.Cache;
 import net.di2e.ecdr.api.cache.CacheManager;
 import net.di2e.ecdr.commons.constants.SearchConstants;
+import net.di2e.ecdr.commons.filter.AbstractFilterDelegate.SupportedGeosOptions;
 import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig.AtomContentXmlWrapOption;
 import net.di2e.ecdr.commons.util.SearchUtils;
@@ -59,7 +60,7 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         GET, HEAD, NONE
     }
 
-    // matches 'user-friendly' OS terms with parameter
+    // matches 'user-friendly' OS terms with value used produced by the filter delegate
     private static Map<String, String> parameterMatchMap = new HashMap<>();
 
     static {
@@ -111,7 +112,10 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
     private Map<String, String> parameterMap = null;
     private Map<String, String> sortMap = null;
     private Map<String, String> hardcodedHttpHeaders = null;
+    private Map<String, String> dateTypeMap = null;
+    private Map<String, String> propertyMap = null;
     private List<String> httpHeaders = null;
+    private SupportedGeosOptions supportedGeoOption = null;
 
     public CDRSourceConfiguration( CacheManager<Metacard> manager ) {
         super();
@@ -120,7 +124,7 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         hardcodedParamMap.put( SearchConstants.QUERYLANGUAGE_PARAMETER, SearchConstants.CDR_CQL_QUERY_LANGUAGE );
 
         sortMap = new HashMap<>();
-        sortMap = SearchUtils.convertToMap( Metacard.TITLE + "=title," + Metacard.MODIFIED + "=updated," + Metacard.EFFECTIVE + "=published," + Metacard.CREATED + "=createdDate,"
+        sortMap = SearchUtils.convertToMap( Metacard.TITLE + "=title," + Metacard.MODIFIED + "=updated," + Metacard.EFFECTIVE + "=published," + Metacard.CREATED + "=created,"
                 + Result.RELEVANCE + "=score," + Result.DISTANCE + "=distance" );
 
         parameterMap = new HashMap<>();
@@ -129,6 +133,14 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         hardcodedHttpHeaders = new HashMap<>();
         httpHeaders = new ArrayList<>();
         httpHeaders.add( "EMID" );
+
+        dateTypeMap = new HashMap<String, String>();
+        dateTypeMap.put( Metacard.MODIFIED, "updated" );
+        dateTypeMap.put( Metacard.EFFECTIVE, "published" );
+        dateTypeMap.put( Metacard.CREATED, "created" );
+
+        propertyMap = new HashMap<String, String>();
+        propertyMap.put( Metacard.ID, SearchConstants.UID_PARAMETER );
 
         cacheManager = manager;
         atomTransformerConfig = new AtomSearchResponseTransformerConfig();
@@ -284,6 +296,16 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         hardcodedParamMap = SearchUtils.convertToMap( hardcodedString );
     }
 
+    public void setDateParameterMap( List<String> dates ) {
+        LOGGER.debug( "ConfigUpdate: Updating the date parameters map for source [{}] to [{}]", getId(), dates );
+        dateTypeMap = SearchUtils.convertToMap( dates );
+    }
+
+    public void setPropertyParameterMap( List<String> props ) {
+        LOGGER.debug( "ConfigUpdate: Updating the property parameters map for source [{}] to [{}]", getId(), props );
+        propertyMap = SearchUtils.convertToMap( props );
+    }
+
     public void setParameterMap( List<String> parameterMapStr ) {
         Map<String, String> convertedMap = SearchUtils.convertToMap( parameterMapStr );
         Map<String, String> translateMap = new HashMap<>( convertedMap.size() );
@@ -364,6 +386,14 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         return parameterMap;
     }
 
+    protected Map<String, String> getPropertyMap() {
+        return propertyMap;
+    }
+
+    protected Map<String, String> getDateTypeMap() {
+        return dateTypeMap;
+    }
+
     protected Map<String, String> getHardcodedQueryParameters() {
         return hardcodedParamMap;
     }
@@ -398,6 +428,14 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
 
     protected long getMaxResultsCount() {
         return maxResultsCount;
+    }
+
+    public void setSupportedGeoOption( String option ) {
+        supportedGeoOption = SupportedGeosOptions.valueOf( option );
+    }
+
+    protected SupportedGeosOptions getSupportedGeoOption() {
+        return supportedGeoOption;
     }
 
     protected String getSortOrderString( SortBy sortBy ) {

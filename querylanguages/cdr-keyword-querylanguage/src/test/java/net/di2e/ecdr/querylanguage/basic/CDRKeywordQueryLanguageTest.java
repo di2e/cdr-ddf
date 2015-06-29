@@ -24,12 +24,14 @@ import java.util.Collections;
 
 import javax.ws.rs.core.MultivaluedMap;
 
-import net.di2e.ecdr.api.sort.SortTypeConfiguration;
+import net.di2e.ecdr.api.config.SortTypeConfiguration;
 import net.di2e.ecdr.commons.constants.SearchConstants;
+import net.di2e.ecdr.commons.util.DateTypeMap;
 import net.di2e.ecdr.querylanguage.basic.GeospatialCriteria.SpatialOperator;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import ddf.catalog.filter.FilterBuilder;
 
@@ -41,7 +43,7 @@ public class CDRKeywordQueryLanguageTest {
     @Test
     public void testGeospatialBasicQueryParser() throws Exception {
         FilterBuilder filterBuilder = mock( FilterBuilder.class );
-        CDRKeywordQueryLanguage lang = new CDRKeywordQueryLanguage( filterBuilder, Collections.<SortTypeConfiguration> emptyList() );
+        CDRKeywordQueryLanguage lang = new CDRKeywordQueryLanguage( filterBuilder, Collections.<SortTypeConfiguration> emptyList(), new DateTypeMap( null ) );
 
         // point radius
         GeospatialCriteria geospatialCriteria = lang.createGeospatialCriteria( "5", "10", "15", null, null, null, SpatialOperator.Contains.toString(), 10.0 );
@@ -83,8 +85,13 @@ public class CDRKeywordQueryLanguageTest {
 
     @Test
     public void testTemporalBasicQueryParser() throws Exception {
+        DateTypeMap dateType = mock( DateTypeMap.class );
+        Mockito.when( dateType.containsKey( "created" ) ).thenReturn( true );
+        Mockito.when( dateType.containsKey( "" ) ).thenReturn( false );
+        Mockito.when( dateType.getMappedValue( "created" ) ).thenReturn( "created" );
         FilterBuilder filterBuilder = mock( FilterBuilder.class );
-        CDRKeywordQueryLanguage lang = new CDRKeywordQueryLanguage( filterBuilder, Collections.<SortTypeConfiguration> emptyList() );
+        CDRKeywordQueryLanguage lang = new CDRKeywordQueryLanguage( filterBuilder, Collections.<SortTypeConfiguration> emptyList(), dateType );
+
 
         lang.createTemporalCriteria( "2014-05-05T00:00:00Z", "2014-05-05T00:00:00Z", "created", new StringBuilder(), "default" );
         lang.createTemporalCriteria( "2014-05-05T00:00:00Z", "2014-05-05T00:00:00Z", "", new StringBuilder(), "created" );
@@ -93,7 +100,7 @@ public class CDRKeywordQueryLanguageTest {
     @Test
     public void testKeywordFuzzyBasicQueryParser() throws Exception {
         FilterBuilder filterBuilder = mock( FilterBuilder.class );
-        CDRKeywordQueryLanguage lang = new CDRKeywordQueryLanguage( filterBuilder, Collections.<SortTypeConfiguration> emptyList() );
+        CDRKeywordQueryLanguage lang = new CDRKeywordQueryLanguage( filterBuilder, Collections.<SortTypeConfiguration> emptyList(), new DateTypeMap( null ) );
         MultivaluedMap<String, String> props = new MetadataMap<String, String>();
 
         props.putSingle( SearchConstants.KEYWORD_PARAMETER, "test" );

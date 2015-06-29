@@ -16,10 +16,8 @@
 package net.di2e.ecdr.endpoint.sort;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
 
 import net.di2e.ecdr.commons.util.ConfigAdminUtils;
 
@@ -35,18 +33,16 @@ import ddf.catalog.data.Result;
 
 public class DefaultSortTypeConfigurations {
 
-    private static final String MAPPING_PID = "ecdr-sort-mapping";
+    private static final String MAPPING_PID = "cdr-endpoint-sort-mapping";
 
     private static final Logger LOGGER = LoggerFactory.getLogger( DefaultSortTypeConfigurations.class );
 
     private ConfigurationAdmin configAdmin;
 
-    private List<Configuration> configurationList = new ArrayList<>();
-
     public enum SortMap {
 
         TITLE( "*/title", Metacard.TITLE, SortOrder.ASCENDING.name() ), MODIFIED_DATE( "*/updated", Metacard.MODIFIED, SortOrder.DESCENDING.name() ), EFFECTIVE_DATE( "*/published",
-                Metacard.EFFECTIVE, SortOrder.DESCENDING.name() ), CREATED_DATE( "*/createdDate", Metacard.EFFECTIVE, SortOrder.DESCENDING.name() ), SCORE( "*/score", Result.RELEVANCE,
+                Metacard.EFFECTIVE, SortOrder.DESCENDING.name() ), CREATED_DATE( "*/created", Metacard.CREATED, SortOrder.DESCENDING.name() ), SCORE( "*/score", Result.RELEVANCE,
                 SortOrder.DESCENDING.name() ), DISTANCE( "*/distance", Result.DISTANCE, SortOrder.ASCENDING.name() );
 
         private final String key;
@@ -87,7 +83,6 @@ public class DefaultSortTypeConfigurations {
                 properties.put( "sortAttribute", map.getAttribute() );
                 properties.put( "sortOrder", map.getOrder() );
                 configuration.update( properties );
-                configurationList.add( configuration );
             }
         }
     }

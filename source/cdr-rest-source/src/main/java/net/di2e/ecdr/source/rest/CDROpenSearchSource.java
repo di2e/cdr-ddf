@@ -112,7 +112,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             Query query = queryRequest.getQuery();
             SourceResponse sourceResponse;
             // ECDR-72 Add in default radius
-            Map<String, String> filterParameters = filterAdapter.adapt( query, new StrictFilterDelegate( false, 50000.00, getAtomResponseTransformerConfig() ) );
+            Map<String, String> filterParameters = filterAdapter.adapt( query, new StrictFilterDelegate( false, getSupportedGeoOption(), getPropertyMap(), getDateTypeMap() ) );
             String id = filterParameters.get( SearchConstants.UID_PARAMETER );
             // check if this is an id-only query
             if ( StringUtils.isBlank( id ) ) {

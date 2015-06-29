@@ -25,7 +25,8 @@ import java.util.Map;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import net.di2e.ecdr.api.sort.SortTypeConfiguration;
+import net.di2e.ecdr.api.config.DateTypeConfiguration;
+import net.di2e.ecdr.api.config.SortTypeConfiguration;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -62,8 +63,8 @@ public final class SearchUtils {
      * ISO 8601 Basic profiles.
      */
     static {
-        DateTimeParser[] parsers = { ISODateTimeFormat.dateTime().getParser(), ISODateTimeFormat.dateTimeNoMillis().getParser(), ISODateTimeFormat.basicDateTime().getParser(),
-                ISODateTimeFormat.basicDateTimeNoMillis().getParser() };
+        DateTimeParser[] parsers = { ISODateTimeFormat.date().getParser(), ISODateTimeFormat.dateTime().getParser(), ISODateTimeFormat.dateTimeNoMillis().getParser(),
+                ISODateTimeFormat.basicDateTime().getParser(), ISODateTimeFormat.basicDateTimeNoMillis().getParser() };
         formatter = new DateTimeFormatterBuilder().append( null, parsers ).toFormatter();
     }
 
@@ -140,6 +141,16 @@ public final class SearchUtils {
                 } else {
                     LOGGER.warn( "Could not parse out map entry from {}, skipping this item.", sortPair );
                 }
+            }
+        }
+        return inputMap;
+    }
+
+    public static Map<String, String> convertDateTypeToMap( List<DateTypeConfiguration> dateTypeList ) {
+        Map<String, String> inputMap = new HashMap<>();
+        if ( CollectionUtils.isNotEmpty( dateTypeList ) ) {
+            for ( DateTypeConfiguration dateType : dateTypeList ) {
+                inputMap.put( dateType.getCDRDateType(), dateType.getInternalDateType() );
             }
         }
         return inputMap;

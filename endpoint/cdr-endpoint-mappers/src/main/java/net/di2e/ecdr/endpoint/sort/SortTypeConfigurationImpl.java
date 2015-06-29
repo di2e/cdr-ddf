@@ -15,7 +15,7 @@
  */
 package net.di2e.ecdr.endpoint.sort;
 
-import net.di2e.ecdr.api.sort.SortTypeConfiguration;
+import net.di2e.ecdr.api.config.SortTypeConfiguration;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;

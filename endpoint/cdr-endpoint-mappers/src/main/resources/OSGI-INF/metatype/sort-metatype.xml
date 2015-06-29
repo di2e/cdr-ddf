@@ -18,8 +18,8 @@
 -->
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.2.0 http://www.osgi.org/xmlns/metatype/v1.2.0">
-    <OCD description="Sort Type configuration. Sets up the mapping between sorting from the cdr services to the internal metacard."
-         name="CDR Sort Mapping" id="ecdr-sort-mapping">
+    <OCD description="Sort Type configuration. Sets up the mapping between sorting from the cdr endpoints/services to the internal metacard."
+         name="CDR Endpoint Sort Mapping" id="cdr-endpoint-sort-mapping">
 
         <AD name="Sort Key" id="sortKey" required="true" type="String" default="" />
 
@@ -46,8 +46,8 @@
 
     </OCD>
 
-    <Designate pid="ecdr-sort-mapping" factoryPid="ecdr-sort-mapping">
-        <Object ocdref="ecdr-sort-mapping" />
+    <Designate pid="cdr-endpoint-sort-mapping" factoryPid="cdr-endpoint-sort-mapping">
+        <Object ocdref="cdr-endpoint-sort-mapping" />
     </Designate>
 
 </metatype:MetaData>

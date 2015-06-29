@@ -21,10 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.constants.SearchConstants;
-import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 
+import org.apache.commons.collections.MapUtils;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
@@ -38,41 +37,28 @@ import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 
 import ddf.catalog.data.Metacard;
-import ddf.catalog.data.Result;
 
 public class StrictFilterDelegate extends AbstractFilterDelegate<Map<String, String>> {
+    
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger( StrictFilterDelegate.class );
+    
+    private static final double DEFAULT_RADIUS_NN = 500000;
 
     private static final GeometryFactory GEOMETRY_FACTORY = new GeometryFactory();
     private static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.dateTime();;
-
-    private static final Map<String, String> DATETYPE_MAP = new HashMap<String, String>();
-    public static final Map<String, String> SORTKEYS_MAP = new HashMap<String, String>();
-    private static final Map<String, String> PROPERTY_NAME_MAP = new HashMap<String, String>();
     
+    private Map<String, String> propertyMap = null;
+    private Map<String, String> dateTypeMap = null;
+
     private boolean strictMode = false;
 
-    static {
-        DATETYPE_MAP.put( Metacard.CREATED, "created" );
-        DATETYPE_MAP.put( Metacard.MODIFIED, "updated" );
-        DATETYPE_MAP.put( SearchConstants.POSTED, "posted" );
-        DATETYPE_MAP.put( SearchConstants.INFO_CUT_OFF, "infoCutOff" );
-        DATETYPE_MAP.put( SearchConstants.VALID_TIL, "validTil" );
-        DATETYPE_MAP.put( SearchConstants.TEMPORAL_COVERAGE, "temporalCoverage" );
-        DATETYPE_MAP.put( Metacard.EFFECTIVE, "effective" );
-
-        SORTKEYS_MAP.put( Metacard.TITLE, "entry/title" );
-        SORTKEYS_MAP.put( Metacard.MODIFIED, "entry/date" );
-        SORTKEYS_MAP.put( Result.RELEVANCE, "score" );
-        
-        PROPERTY_NAME_MAP.put( Metacard.ID, SearchConstants.UID_PARAMETER );
-        PROPERTY_NAME_MAP.put( CDRMetacard.METACARD_CONTENT_COLLECTION_ATTRIBUTE, SearchConstants.CONTENT_COLLECTIONS_PARAMETER );
-    }
-
-    public StrictFilterDelegate( boolean strictMode, double defaultRadiusforNN, AtomSearchResponseTransformerConfig config ) {
-        super( defaultRadiusforNN, config );
+    public StrictFilterDelegate( boolean strictMode, SupportedGeosOptions supportedGeos, Map<String, String> propMap, Map<String, String> dtMap ) {
+        super( DEFAULT_RADIUS_NN, supportedGeos );
         this.strictMode = strictMode;
+        propertyMap = propMap;
+        dateTypeMap = dtMap;
     }
 
     @Override
@@ -164,7 +150,6 @@ public class StrictFilterDelegate extends AbstractFilterDelegate<Map<String, Str
                 // Now add in the Content Types if they exist
                 String masterContentType = masterFilter.get( Metacard.CONTENT_TYPE );
                 String andedContentType = andedFilter.get( Metacard.CONTENT_TYPE );
-                String andedVersion = andedFilter.get( Metacard.CONTENT_TYPE_VERSION );
                 if ( andedContentType != null ) {
                     andedFilter.remove( Metacard.CONTENT_TYPE );
                     masterContentType = masterContentType == null ? andedContentType : masterContentType + andedContentType;
@@ -202,12 +187,7 @@ public class StrictFilterDelegate extends AbstractFilterDelegate<Map<String, Str
                 filterContainer.put( SearchConstants.FUZZY_PARAMETER, SearchConstants.TRUE_STRING );
             }
         } else {
-            // Map from the internal filter value to the CDRSource value
-            if ( PROPERTY_NAME_MAP.containsKey( propertyName ) ) {
-                filterContainer.put( PROPERTY_NAME_MAP.get( propertyName ), literal ); 
-            } else {
-                filterContainer.put( propertyName, literal );
-            }
+            filterContainer.put( MapUtils.getString( propertyMap, propertyName, propertyName ), literal );
         }
 
         return filterContainer;
@@ -216,91 +196,80 @@ public class StrictFilterDelegate extends AbstractFilterDelegate<Map<String, Str
     @Override
     public Map<String, String> handlePropertyIsEqualToNumber( String propertyName, double literal ) {
         Map<String, String> filterContainer = new HashMap<String, String>();
-        filterContainer.put( propertyName, String.valueOf( literal ) );
+        filterContainer.put( MapUtils.getString( propertyMap, propertyName, propertyName ), String.valueOf( literal ) );
         return filterContainer;
     }
 
     @Override
     public Map<String, String> handlePropertyIsNotEqualToString( String propertyName, String literal, boolean isCaseSensitive ) {
         failIfStrictMode( "handlePropertyIsNotEqualToString" );
-        Map<String, String> filterContainer = new HashMap<String, String>();
-        return filterContainer;
+        return new HashMap<String, String>();
     }
 
     @Override
     public Map<String, String> handlePropertyIsNotEqualToNumber( String propertyName, double literal ) {
         failIfStrictMode( "handlePropertyIsNotEqualToNumber" );
-        Map<String, String> filterContainer = new HashMap<String, String>();
-        return filterContainer;
+        return new HashMap<String, String>();
     }
 
     @Override
     public Map<String, String> handlePropertyIsGreaterThanString( String propertyName, String literal, boolean inclusive ) {
         failIfStrictMode( "handlePropertyIsGreaterThanString" );
-        Map<String, String> filterContainer = new HashMap<String, String>();
-        return filterContainer;
+        return new HashMap<String, String>();
     }
 
     @Override
     public Map<String, String> handlePropertyIsGreaterThanNumber( String propertyName, double literal, boolean inclusive ) {
         failIfStrictMode( "handlePropertyIsGreaterThanNumber" );
-        Map<String, String> filterContainer = new HashMap<String, String>();
-        return filterContainer;
+        return new HashMap<String, String>();
     }
 
     @Override
     public Map<String, String> handlePropertyIsLessThanString( String propertyName, String literal, boolean inclusive ) {
         failIfStrictMode( "handlePropertyIsLessThanString" );
-        Map<String, String> filterContainer = new HashMap<String, String>();
-        return filterContainer;
+        return new HashMap<String, String>();
     }
 
     @Override
     public Map<String, String> handlePropertyIsLessThanNumber( String propertyName, double literal, boolean inclusive ) {
         failIfStrictMode( "handlePropertyIsLessThanNumber" );
-        Map<String, String> filterContainer = new HashMap<String, String>();
-        return filterContainer;
+        return new HashMap<String, String>();
     }
 
     @Override
     public Map<String, String> handlePropertyBetweenString( String propertyName, String lowerBoundary, String upperBoundary ) {
         failIfStrictMode( "handlePropertyBetweenString" );
-        Map<String, String> filterContainer = new HashMap<String, String>();
-        return filterContainer;
+        return new HashMap<String, String>();
     }
 
     @Override
     public Map<String, String> handleNumericRange( String propertyName, double lowerBoundary, double upperBoundary ) {
         failIfStrictMode( "handleNumericRange" );
-        Map<String, String> filterContainer = new HashMap<String, String>();
-        return filterContainer;
+        return new HashMap<String, String>();
     }
 
     @Override
     public Map<String, String> handleTimeDuring( String propertyName, Date start, Date end ) {
-        String datetype = DATETYPE_MAP.get( propertyName );
         Map<String, String> filterContainer = new HashMap<String, String>();
         filterContainer.put( SearchConstants.STARTDATE_PARAMETER, DATE_FORMATTER.print( start.getTime() ) );
         filterContainer.put( SearchConstants.ENDDATE_PARAMETER, DATE_FORMATTER.print( end.getTime() ) );
-        filterContainer.put( SearchConstants.DATETYPE_PARAMETER, datetype == null ? propertyName : datetype );
+        filterContainer.put( SearchConstants.DATETYPE_PARAMETER, MapUtils.getString( dateTypeMap, propertyName, propertyName ) );
         return filterContainer;
     }
 
     @Override
     public Map<String, String> handleTimeAfter( String propertyName, Date start, boolean inclusive ) {
-        String datetype = DATETYPE_MAP.get( propertyName );
         Map<String, String> filterContainer = new HashMap<String, String>();
         filterContainer.put( SearchConstants.STARTDATE_PARAMETER, DATE_FORMATTER.print( start.getTime() ) );
-        filterContainer.put( SearchConstants.DATETYPE_PARAMETER, datetype == null ? propertyName : datetype );
+        filterContainer.put( SearchConstants.DATETYPE_PARAMETER, MapUtils.getString( dateTypeMap, propertyName, propertyName ) );
         return filterContainer;
     }
 
     @Override
     public Map<String, String> handleTimeBefore( String propertyName, Date end, boolean inclusive ) {
-        String datetype = DATETYPE_MAP.get( propertyName );
         Map<String, String> filterContainer = new HashMap<String, String>();
         filterContainer.put( SearchConstants.ENDDATE_PARAMETER, DATE_FORMATTER.print( end.getTime() ) );
-        filterContainer.put( SearchConstants.DATETYPE_PARAMETER, datetype == null ? propertyName : datetype );
+        filterContainer.put( SearchConstants.DATETYPE_PARAMETER, MapUtils.getString( dateTypeMap, propertyName, propertyName ) );
         return filterContainer;
     }
 

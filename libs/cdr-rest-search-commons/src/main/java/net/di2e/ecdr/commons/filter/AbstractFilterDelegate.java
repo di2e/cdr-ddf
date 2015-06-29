@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
+import net.di2e.ecdr.commons.util.GeospatialUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,10 @@ import com.vividsolutions.jts.io.WKTReader;
 import ddf.catalog.filter.FilterDelegate;
 
 public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
+
+    public enum SupportedGeosOptions {
+        BBOX_ONLY, POINT_RADUIS_AND_BBOX, GEOMETRY_ONLY, ALL
+    };
 
     public enum StringFilterOptions {
         CASE_SENSITIVE, FUZZY
@@ -44,12 +49,13 @@ public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( StrictFilterDelegate.class );
     private double defaultRadiusforNN = 0;
+    private SupportedGeosOptions supportedGeoOptions = null;
 
     private AtomSearchResponseTransformerConfig filterConfig = null;
 
-    public AbstractFilterDelegate( double defaultRadiusforNN, AtomSearchResponseTransformerConfig config ) {
+    public AbstractFilterDelegate( double defaultRadiusforNN, SupportedGeosOptions supportedGeos ) {
         this.defaultRadiusforNN = defaultRadiusforNN;
-        this.filterConfig = config;
+        this.supportedGeoOptions = supportedGeos == null ? SupportedGeosOptions.ALL : supportedGeos;
     }
 
     public abstract T handlePropertyLike( String propertyName, String pattern, StringFilterOptions options );
@@ -93,10 +99,6 @@ public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
     public abstract T handleOr( List<T> operands );
 
     public abstract T handleNot( T operand );
-
-    public AtomSearchResponseTransformerConfig getFilterConfig() {
-        return filterConfig;
-    }
 
     @Override
     public T and( List<T> operands ) {
@@ -191,7 +193,7 @@ public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
     @Override
     public T propertyIsEqualTo( String propertyName, Object literal ) {
         logEntry( "propertyIsEqualTo_Object", propertyName, literal );
-        throw new UnsupportedOperationException( "propertyIsEqualTo(String, Object) not supported by Filter Delegate." );
+        return handlePropertyEqualToString( propertyName, String.valueOf( literal ), null );
     }
 
     @Override
@@ -497,7 +499,7 @@ public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
     @Override
     public T propertyIsBetween( String propertyName, Object lowerBoundary, Object upperBoundary ) {
         logEntry( "propertyIsBetween_Object", propertyName, lowerBoundary, upperBoundary );
-        throw new UnsupportedOperationException( "propertyIsBetween(String, Object, Object) not supported by Filter Delegate." );
+        return handlePropertyBetweenString( propertyName, String.valueOf( lowerBoundary ), String.valueOf( upperBoundary ) );
     }
 
     @Override
@@ -540,6 +542,47 @@ public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
     public T beyond( String propertyName, String wkt, double distance ) {
         logEntry( "beyond", propertyName, wkt, distance );
         return handleGeospatialDistance( propertyName, wkt, distance, GeospatialDistanceFilterOptions.BEYOND );
+    }
+
+    protected T callHandleGeoMethod( String propertyName, String wkt, Double distance, GeospatialFilterOptions geoFilterOptions, GeospatialDistanceFilterOptions geoDistanceFilterOptions ) {
+        T returnValue = null;
+        try {
+            switch ( supportedGeoOptions ) {
+            case ALL:
+                returnValue = distance == null ? handleGeospatial( propertyName, wkt, geoFilterOptions ) : handleGeospatialDistance( propertyName, wkt, distance, geoDistanceFilterOptions );
+                break;
+            case BBOX_ONLY:
+                if ( distance == null ) {
+                    wkt = GeospatialUtils.polygonToBBox( wkt );
+                } else {
+                    wkt = GeospatialUtils.circleToBBox( wkt, distance );
+                    geoFilterOptions = GeospatialFilterOptions.INTERSECTS;
+                }
+                returnValue = handleGeospatial( propertyName, wkt, geoFilterOptions );
+                break;
+            case POINT_RADUIS_AND_BBOX:
+                // Convert all polygons to BBox
+                if ( distance == null ) {
+                    returnValue = handleGeospatial( propertyName, GeospatialUtils.polygonToBBox( wkt ), geoFilterOptions );
+                } else {
+                    returnValue = handleGeospatialDistance( propertyName, wkt, distance, geoDistanceFilterOptions );
+                }
+                break;
+
+            case GEOMETRY_ONLY:
+                if ( distance != null ) {
+                    wkt = GeospatialUtils.circleToBBox( wkt, distance );
+                    geoFilterOptions = GeospatialFilterOptions.INTERSECTS;
+                }
+                returnValue = handleGeospatial( propertyName, GeospatialUtils.polygonToBBox( wkt ), geoFilterOptions );
+                break;
+            default:
+                returnValue = distance == null ? handleGeospatial( propertyName, wkt, geoFilterOptions ) : handleGeospatialDistance( propertyName, wkt, distance, geoDistanceFilterOptions );
+            }
+        } catch ( ParseException e ) {
+            LOGGER.warn( "WKT could not be parsed into a [{}] object wkt=[{}]: [{}]", supportedGeoOptions, wkt, e.getMessage() );
+        }
+        return returnValue;
     }
 
     @Override
