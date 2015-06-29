@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.search.transform.response.rome;
+package net.di2e.ecdr.search.transform.response.rss;
 
 import ddf.catalog.operation.QueryRequest;
 import ddf.catalog.operation.SourceResponse;
@@ -25,7 +25,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-public class RomeResponseTransformerTest {
+public class RSSResponseTransformerTest {
 
     private static final String SITE_NAME = "testSite";
 
@@ -33,7 +33,7 @@ public class RomeResponseTransformerTest {
 
     @Test
     public void testSharepointConversion() throws IOException {
-        RomeResponseTransformer responseTransformer = new RomeResponseTransformer();
+        RSSResponseTransformer responseTransformer = new RSSResponseTransformer();
         QueryRequest queryRequest = mock( QueryRequest.class );
         SourceResponse response = responseTransformer.processSearchResponse( getClass().getResourceAsStream( "/sharepoint-rss.xml" ), queryRequest, SITE_NAME );
         assertNotNull(response);

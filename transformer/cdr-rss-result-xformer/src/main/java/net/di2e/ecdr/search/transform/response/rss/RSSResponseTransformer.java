@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package net.di2e.ecdr.search.transform.response.rome;
+package net.di2e.ecdr.search.transform.response.rss;
 
 import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndEntry;
@@ -41,9 +41,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Map;
 
-public class RomeResponseTransformer implements SearchResponseTransformer {
+public class RSSResponseTransformer implements SearchResponseTransformer {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger( RomeResponseTransformer.class );
+    private static final Logger LOGGER = LoggerFactory.getLogger( RSSResponseTransformer.class );
 
     @Override
     public SourceResponse processSearchResponse( InputStream inputStream, QueryRequest request, String siteName ) {
