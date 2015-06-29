@@ -28,19 +28,26 @@
 
     <reference id="configurationAdmin" interface="org.osgi.service.cm.ConfigurationAdmin" />
 
-    <beans:bean name="defaultMappings" class="net.di2e.ecdr.endpoint.sort.DefaultSortTypeConfigurations" init-method="init">
+    <beans:bean name="defaultSortMappings" class="net.di2e.ecdr.endpoint.sort.DefaultSortTypeConfigurations" init-method="init">
+        <beans:constructor-arg ref="configurationAdmin" />
+    </beans:bean>
+    
+    <beans:bean name="defaultDateMappings" class="net.di2e.ecdr.endpoint.date.DefaultDateTypeConfigurations" init-method="init">
         <beans:constructor-arg ref="configurationAdmin" />
     </beans:bean>
 
-    <osgix:managed-service-factory id="ecdr-sort-mapping" factory-pid="ecdr-sort-mapping"
-                                   update-strategy="container-managed">
-
+    <osgix:managed-service-factory id="cdr-endpoint-sort-mapping" factory-pid="cdr-endpoint-sort-mapping"  update-strategy="container-managed">
         <osgix:interfaces>
-            <beans:value>net.di2e.ecdr.api.sort.SortTypeConfiguration</beans:value>
+            <beans:value>net.di2e.ecdr.api.config.SortTypeConfiguration</beans:value>
         </osgix:interfaces>
-
         <beans:bean id="SortTypeConfiguration" class="net.di2e.ecdr.endpoint.sort.SortTypeConfigurationImpl" />
-
+    </osgix:managed-service-factory>
+    
+    <osgix:managed-service-factory id="cdr-endpoint-date-mapping" factory-pid="cdr-endpoint-date-mapping"  update-strategy="container-managed">
+        <osgix:interfaces>
+            <beans:value>net.di2e.ecdr.api.config.DateTypeConfiguration</beans:value>
+        </osgix:interfaces>
+        <beans:bean id="DateTypeConfiguration" class="net.di2e.ecdr.endpoint.date.DateTypeConfigurationImpl" />
     </osgix:managed-service-factory>
 
 </beans:beans>

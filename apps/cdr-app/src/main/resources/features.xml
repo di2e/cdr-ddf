@@ -35,7 +35,7 @@
         <bundle>mvn:joda-time/joda-time/${joda.time.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.api/cdr-api/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-rest-search-commons/${project.version}</bundle>
-        <bundle>mvn:net.di2e.ecdr.endpoint/cdr-endpoint-sortmapper/${project.version}</bundle>
+        <bundle>mvn:net.di2e.ecdr.endpoint/cdr-endpoint-mappers/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-libs-result-relevance-normalizer/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.querylanguages/cdr-keyword-querylanguage/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.querylanguages/cdr-cql-querylanguage/${project.version}</bundle>
@@ -66,7 +66,7 @@
         <bundle>mvn:joda-time/joda-time/${joda.time.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.api/cdr-api/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-rest-search-commons/${project.version}</bundle>
-        <bundle>mvn:net.di2e.ecdr.endpoint/cdr-endpoint-sortmapper/${project.version}</bundle>
+        <bundle>mvn:net.di2e.ecdr.endpoint/cdr-endpoint-mappers/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-libs-result-relevance-normalizer/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.querylanguages/cdr-keyword-querylanguage/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.querylanguages/cdr-cql-querylanguage/${project.version}</bundle>

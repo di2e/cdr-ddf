@@ -29,9 +29,9 @@
     <name>Enterprise CDR Endpoints</name>
 
     <modules>
+        <module>cdr-endpoint-mappers</module>
         <module>cdr-rest-search-endpoint</module>
         <module>cdr-rest-broker-endpoint</module>
-        <module>cdr-endpoint-sortmapper</module>
         <module>cdr-rest-describe-endpoint</module>
     </modules>
 </project>

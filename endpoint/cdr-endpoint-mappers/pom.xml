@@ -23,9 +23,9 @@
         <artifactId>endpoint</artifactId>
         <version>1.1.1-SNAPSHOT</version>
     </parent>
-    <name>Enterprise CDR :: Endpoints :: Sort Mapper</name>
+    <name>Enterprise CDR :: Endpoints :: Mappers</name>
     <groupId>net.di2e.ecdr.endpoint</groupId>
-    <artifactId>cdr-endpoint-sortmapper</artifactId>
+    <artifactId>cdr-endpoint-mappers</artifactId>
     <packaging>bundle</packaging>
 
     <dependencies>

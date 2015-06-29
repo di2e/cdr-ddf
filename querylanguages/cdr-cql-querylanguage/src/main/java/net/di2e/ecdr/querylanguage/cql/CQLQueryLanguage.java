@@ -21,10 +21,10 @@ import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import net.di2e.ecdr.api.config.SortTypeConfiguration;
 import net.di2e.ecdr.api.query.QueryConfiguration;
 import net.di2e.ecdr.api.query.QueryCriteria;
 import net.di2e.ecdr.api.query.QueryLanguage;
-import net.di2e.ecdr.api.sort.SortTypeConfiguration;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.query.CDRQueryCriteriaImpl;
 import net.di2e.ecdr.commons.util.SearchUtils;

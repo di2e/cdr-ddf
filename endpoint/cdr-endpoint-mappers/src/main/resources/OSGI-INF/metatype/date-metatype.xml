@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.2.0 http://www.osgi.org/xmlns/metatype/v1.2.0">
+    <OCD
+        description="Date Type configuration. Sets up the mapping between the Date Types from the cdr endpoints/services to the internal DDF metacard represntation"
+        name="CDR Endpoint Date Mapping" id="cdr-endpoint-date-mapping">
+
+        <AD name="Endpoint DateType Value" id="cdrDateType" required="true" type="String" default=""
+            description="The value for the date type for incoming queries against the broker and search endpoint" />
+
+        <AD name="Internal DDF Value" id="internalDateType" required="true" type="String" default=""
+            description="The mapped value for the internal DDF date type value that should be used for catalog queries or sent to federated sources" />
+
+    </OCD>
+
+    <Designate pid="cdr-endpoint-date-mapping" factoryPid="cdr-endpoint-date-mapping">
+        <Object ocdref="cdr-endpoint-date-mapping" />
+    </Designate>
+
+</metatype:MetaData>

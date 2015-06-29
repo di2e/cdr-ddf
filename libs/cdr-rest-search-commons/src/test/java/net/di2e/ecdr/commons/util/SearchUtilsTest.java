@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import net.di2e.ecdr.api.sort.SortTypeConfiguration;
+import net.di2e.ecdr.api.config.SortTypeConfiguration;
 
 import org.junit.Test;
 import org.opengis.filter.sort.SortBy;

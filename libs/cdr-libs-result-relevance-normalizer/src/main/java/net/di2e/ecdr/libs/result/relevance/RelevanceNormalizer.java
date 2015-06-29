@@ -17,14 +17,15 @@ package net.di2e.ecdr.libs.result.relevance;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import net.di2e.ecdr.commons.constants.SearchConstants;
+import net.di2e.ecdr.commons.filter.AbstractFilterDelegate.SupportedGeosOptions;
 import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
-import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -140,7 +141,7 @@ public class RelevanceNormalizer {
                         LOGGER.debug( "Relevance for result {} was changed FROM {} TO {}", result.getMetacard().getId(), result.getRelevanceScore(), curHit.score );
                     }
                     // check if there are any results left that did not match the keyword query
-                    for (Map.Entry<String, Result> curEntry : docMap.entrySet()) {
+                    for ( Map.Entry<String, Result> curEntry : docMap.entrySet() ) {
                         // add result in with 0 relevance score
                         updatedResults.add( updateResult( curEntry.getValue(), 0 ) );
                     }
@@ -168,7 +169,8 @@ public class RelevanceNormalizer {
     /**
      * Checks to see if this query can be normalized.
      *
-     * @param filterParameters parameters from original ddf query
+     * @param filterParameters
+     *            parameters from original ddf query
      * @return true if this query can be normalzed, false if not
      */
     protected boolean canNormalizeQuery( Map<String, String> filterParameters ) {
@@ -213,11 +215,12 @@ public class RelevanceNormalizer {
         return searchPhrase;
     }
 
-    protected Map<String, String> getFilterParameters(Query originalQuery) {
+    protected Map<String, String> getFilterParameters( Query originalQuery ) {
         HashMap<String, String> map = new HashMap<>();
         try {
-            map.putAll( filterAdapter.adapt( originalQuery, new StrictFilterDelegate( false, 50000.00, new AtomSearchResponseTransformerConfig() ) ) );
-        } catch (UnsupportedQueryException uqe) {
+            map.putAll( filterAdapter.adapt( originalQuery,
+                    new StrictFilterDelegate( false, SupportedGeosOptions.ALL, Collections.<String, String>emptyMap(), Collections.<String, String>emptyMap() ) ) );
+        } catch ( UnsupportedQueryException uqe ) {
             LOGGER.debug( "Query did not contain any contextual criteria (search phrases), cannot perform re-relevance on this query." );
         }
         return map;

@@ -26,14 +26,15 @@ import java.util.Map.Entry;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+import net.di2e.ecdr.api.config.SortTypeConfiguration;
 import net.di2e.ecdr.api.query.QueryConfiguration;
 import net.di2e.ecdr.api.query.QueryCriteria;
 import net.di2e.ecdr.api.query.QueryLanguage;
-import net.di2e.ecdr.api.sort.SortTypeConfiguration;
 import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.query.CDRQueryCriteriaImpl;
-import net.di2e.ecdr.commons.util.GeospatialHelper;
+import net.di2e.ecdr.commons.util.DateTypeMap;
+import net.di2e.ecdr.commons.util.GeospatialUtils;
 import net.di2e.ecdr.commons.util.SearchUtils;
 import net.di2e.ecdr.querylanguage.basic.GeospatialCriteria.SpatialOperator;
 import net.di2e.ecdr.querylanguage.basic.PropertyCriteria.Operator;
@@ -69,23 +70,12 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
     private static final Logger LOGGER = LoggerFactory.getLogger( CDRKeywordQueryLanguage.class );
     private FilterBuilder filterBuilder = null;
     private List<SortTypeConfiguration> sortTypeConfigurationList = null;
+    private DateTypeMap dateTypeMap = null;
 
-    private static final Map<String, String> DATETYPE_MAP = new HashMap<String, String>();
-
-    static {
-        DATETYPE_MAP.put( "created", Metacard.CREATED );
-        DATETYPE_MAP.put( "updated", Metacard.MODIFIED );
-        DATETYPE_MAP.put( "posted", SearchConstants.POSTED );
-        DATETYPE_MAP.put( "infoCutOff", SearchConstants.INFO_CUT_OFF );
-        DATETYPE_MAP.put( "validTil", SearchConstants.VALID_TIL );
-        DATETYPE_MAP.put( "temporalCoverage", SearchConstants.TEMPORAL_COVERAGE );
-        DATETYPE_MAP.put( "effective", Metacard.EFFECTIVE );
-
-    }
-
-    public CDRKeywordQueryLanguage( FilterBuilder builder, List<SortTypeConfiguration> sortTypeConfigurations ) {
+    public CDRKeywordQueryLanguage( FilterBuilder builder, List<SortTypeConfiguration> sortTypeConfigurations, DateTypeMap dateMap ) {
         filterBuilder = builder;
         sortTypeConfigurationList = sortTypeConfigurations;
+        dateTypeMap = dateMap;
     }
 
     @Override
@@ -228,7 +218,7 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
         description = StringUtils.replace( description, "${defaultFuzzyCustom}", fuzzy ? SearchConstants.TRUE_STRING : SearchConstants.FALSE_STRING, 1 );
         description = StringUtils.replace( description, "${defaultRadius}", String.valueOf( queryConfig.getDefaultRadius() ), 1 );
         description = StringUtils.replace( description, "${defaultDateType}", queryConfig.getDefaultDateType(), 1 );
-        description = StringUtils.replace( description, "${dateTypeValues}", DATETYPE_MAP.keySet().toString(), 1 );
+        description = StringUtils.replace( description, "${dateTypeValues}", dateTypeMap.keySet().toString(), 1 );
         return description;
     }
 
@@ -440,7 +430,7 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
             }
             geoCriteria = new GeospatialCriteria( geom );
         } else if ( StringUtils.isNotBlank( polygon ) ) {
-            String wkt = GeospatialHelper.polygonToWKT( polygon );
+            String wkt = GeospatialUtils.polygonToWKT( polygon );
             try {
                 WKTReader reader = new WKTReader();
                 reader.read( wkt );
@@ -516,8 +506,8 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
             String dateType = null;
             LOGGER.debug( "Getting date type name for type [{}]", type );
             if ( StringUtils.isNotBlank( type ) ) {
-                if ( DATETYPE_MAP.containsKey( type ) ) {
-                    dateType = DATETYPE_MAP.get( type );
+                if ( dateTypeMap.containsKey( type ) ) {
+                    dateType = dateTypeMap.getMappedValue( type );
 
                     LOGGER.debug( "Date type value received in map for request value [{}], setting internal query value to [{}]", type, dateType );
                 } else {
@@ -526,7 +516,7 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
                     throw new UnsupportedQueryException( message );
                 }
             } else {
-                dateType = DATETYPE_MAP.get( defaultDateType );
+                dateType = dateTypeMap.getMappedValue( defaultDateType );
                 LOGGER.debug( "Date type value was not specified in request, defaulting internal query value to [{}]", dateType );
             }
             temporalCriteria = new TemporalCriteria( startDate, endDate, dateType );
