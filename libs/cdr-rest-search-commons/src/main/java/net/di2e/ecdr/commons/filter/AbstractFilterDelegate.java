@@ -541,7 +541,7 @@ public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
     @Override
     public T beyond( String propertyName, String wkt, double distance ) {
         logEntry( "beyond", propertyName, wkt, distance );
-        return handleGeospatialDistance( propertyName, wkt, distance, GeospatialDistanceFilterOptions.BEYOND );
+        return callHandleGeoMethod( propertyName, wkt, distance, null, GeospatialDistanceFilterOptions.BEYOND );
     }
 
     protected T callHandleGeoMethod( String propertyName, String wkt, Double distance, GeospatialFilterOptions geoFilterOptions, GeospatialDistanceFilterOptions geoDistanceFilterOptions ) {
@@ -588,31 +588,31 @@ public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
     @Override
     public T contains( String propertyName, String wkt ) {
         logEntry( "contains", propertyName, wkt );
-        return handleGeospatial( propertyName, wkt, GeospatialFilterOptions.CONTAINS );
+        return callHandleGeoMethod( propertyName, wkt, null, GeospatialFilterOptions.CONTAINS, null );
     }
 
     @Override
     public T crosses( String propertyName, String wkt ) {
         logEntry( "crosses", propertyName, wkt );
-        return handleGeospatial( propertyName, wkt, GeospatialFilterOptions.CROSSES );
+        return callHandleGeoMethod( propertyName, wkt, null, GeospatialFilterOptions.CROSSES, null );
     }
 
     @Override
     public T disjoint( String propertyName, String wkt ) {
         logEntry( "disjoint", propertyName, wkt );
-        return handleGeospatial( propertyName, wkt, GeospatialFilterOptions.DISJOINT );
+        return callHandleGeoMethod( propertyName, wkt, null, GeospatialFilterOptions.DISJOINT, null );
     }
 
     @Override
     public T dwithin( String propertyName, String wkt, double distance ) {
         logEntry( "dwithin", propertyName, wkt, distance );
-        return handleGeospatialDistance( propertyName, wkt, distance, GeospatialDistanceFilterOptions.WITHIN );
+        return callHandleGeoMethod( propertyName, wkt, distance, null, GeospatialDistanceFilterOptions.WITHIN );
     }
 
     @Override
     public T nearestNeighbor( String propertyName, String wkt ) {
         logEntry( "nearestNeighbor", propertyName, wkt );
-        return handleGeospatialDistance( propertyName, wkt, defaultRadiusforNN, GeospatialDistanceFilterOptions.WITHIN );
+        return callHandleGeoMethod( propertyName, wkt, defaultRadiusforNN, null, GeospatialDistanceFilterOptions.WITHIN );
     }
 
     @Override
@@ -625,25 +625,25 @@ public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
         } catch ( ParseException e ) {
             LOGGER.warn( "WKT could not be parsed into geometry object [{}]: " + e.getMessage() );
         }
-        return handleGeospatial( propertyName, wkt, isBbox ? GeospatialFilterOptions.BBOX : GeospatialFilterOptions.INTERSECTS );
+        return callHandleGeoMethod( propertyName, wkt, null, isBbox ? GeospatialFilterOptions.BBOX : GeospatialFilterOptions.INTERSECTS, null );
     }
 
     @Override
     public T overlaps( String propertyName, String wkt ) {
         logEntry( "overlaps", propertyName, wkt );
-        return handleGeospatial( propertyName, wkt, GeospatialFilterOptions.OVERLAPS );
+        return callHandleGeoMethod( propertyName, wkt, null, GeospatialFilterOptions.OVERLAPS, null );
     }
 
     @Override
     public T touches( String propertyName, String wkt ) {
         logEntry( "touches", propertyName, wkt );
-        return handleGeospatial( propertyName, wkt, GeospatialFilterOptions.TOUCHES );
+        return callHandleGeoMethod( propertyName, wkt, null, GeospatialFilterOptions.TOUCHES, null );
     }
 
     @Override
     public T within( String propertyName, String wkt ) {
         logEntry( "within", propertyName, wkt );
-        return handleGeospatial( propertyName, wkt, GeospatialFilterOptions.WITHIN );
+        return callHandleGeoMethod( propertyName, wkt, null, GeospatialFilterOptions.WITHIN, null );
     }
 
     @Override

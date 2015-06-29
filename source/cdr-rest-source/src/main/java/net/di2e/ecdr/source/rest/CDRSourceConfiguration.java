@@ -431,6 +431,7 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
     }
 
     public void setSupportedGeoOption( String option ) {
+        LOGGER.debug( "ConfigUpdate: Updating the supported geo option value from [{}] to [{}]", supportedGeoOption, option );
         supportedGeoOption = SupportedGeosOptions.valueOf( option );
     }
 
