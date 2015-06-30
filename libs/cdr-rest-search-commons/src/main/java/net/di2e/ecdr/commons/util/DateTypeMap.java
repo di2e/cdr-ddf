@@ -47,13 +47,17 @@ public class DateTypeMap {
     }
 
     public void addConfiguration( ServiceReference<DateTypeConfiguration> ref ) {
-        DateTypeConfiguration config = context.getService( ref );
-        dateMap.put( config.getCDRDateType(), config );
+        if (ref != null) {
+            DateTypeConfiguration config = context.getService( ref );
+            dateMap.put( config.getCDRDateType(), config );
+        }
     }
 
     public void removeConfiguration( ServiceReference<DateTypeConfiguration> ref ) {
-        DateTypeConfiguration config = context.getService( ref );
-        dateMap.remove( config.getCDRDateType() );
+        if (ref != null) {
+            DateTypeConfiguration config = context.getService( ref );
+            dateMap.remove( config.getCDRDateType() );
+        }
     }
 
     public Set<String> keySet() {
