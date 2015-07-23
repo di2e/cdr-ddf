@@ -25,15 +25,18 @@
 
     </OCD>
 
-    <OCD name="CDR Security Configuration" id="cdr-security-configurations" description="Sets up defaults for security markings to be used on query responses for records or result sets that do not already contain markings">
+    <OCD name="CDR Security Configuration" id="cdr-security-configurations"
+        description="Sets up defaults for security markings to be used on query responses for records or result sets that do not already contain markings">
 
-        <AD name="Configuration Formats" id="configFormats" required="true" type="String" default="atom-ddms-2.0" description="Names of formats that should be used with this security configuration." />
+        <AD name="Configuration Formats" id="configFormats" required="true" type="String" default="" cardinality="100"
+            description="Names of formats that should be used with this security configuration." />
 
-        <AD name="Default Result Security Namespace" id="namespace" required="true" type="String" default="urn:us:gov:ic:ism:v2"
+        <AD name="Default Result Security Namespace" id="namespace" required="true" type="String" default=""
             description="The XML namespace for the security attributes that are populated in the fields below.  This will be placed in the Atom feed element.
             This will also be placed in atom entry elements where security markings in the metadata could not be found" />
 
-        <AD name="Default Result Security Attributes" id="attributeList" required="true" type="String" default="classification=U,ownerProducer=USA" cardinality="100"
+        <AD name="Default Result Security Attributes" id="attributeList" required="true" type="String" default=""
+            cardinality="100"
             description="Name/Value pairs for the security attributes that should appear in the atom feed to denote the security markings of the Results.  These will also be placed in the
             atom entry elements where security markings in the metadata could not be found" />
     </OCD>

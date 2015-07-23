@@ -20,7 +20,7 @@
     xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.2.0 http://www.osgi.org/xmlns/metatype/v1.2.0"
     xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.2.0">
 
-    <OCD description="ECDR OpenSearch Federated Source Configuration. If federating to another ECDR site, most of the defaults will work." name="CDR OpenSearch Federated Source" id="ecdr-opensearch-source">
+    <OCD description="ECDR OpenSearch Federated Source Configuration. If federating to another ECDR site, most of the defaults will work." name="CDR OpenSearch Federated Source" id="cdr-opensearch-source">
         
         <AD name="Source Name" id="id" required="true" type="String" default="cdr-source" description="The sitename for the remote opensearch or CDR datasource"/>
 
@@ -136,7 +136,7 @@
 
     </OCD>
     
-    <OCD description="CDR OpenSearch Connected Source (will not appear as a federated site, instead will get queried anytime local catalog is queried)" name="CDR OpenSearch Connected Source" id="ecdr-opensearch-connected-source">
+    <OCD description="CDR OpenSearch Connected Source (will not appear as a federated site, instead will get queried anytime local catalog is queried)" name="CDR OpenSearch Connected Source" id="cdr-opensearch-connected-source">
         
         <AD name="Search Endpoint URL" id="url" required="true" type="String" default="http://localhost:8181/services/cdr/search/rest"
             description="OpenSearch base endpoint URL, should include everything up to (and not including) the '?'" />
@@ -249,11 +249,11 @@
 
     </OCD>
 
-    <Designate pid="ecdr-opensearch-source" factoryPid="ecdr-opensearch-source">
-        <Object ocdref="ecdr-opensearch-source" />
+    <Designate pid="cdr-opensearch-source" factoryPid="cdr-opensearch-source">
+        <Object ocdref="cdr-opensearch-source" />
     </Designate>
     
-    <Designate pid="ecdr-opensearch-connected-source" factoryPid="ecdr-opensearch-connected-source">
-        <Object ocdref="ecdr-opensearch-connected-source" />
+    <Designate pid="cdr-opensearch-connected-source" factoryPid="cdr-opensearch-connected-source">
+        <Object ocdref="cdr-opensearch-connected-source" />
     </Designate>
 </metatype:MetaData>

@@ -17,11 +17,14 @@
 
 -->
 <metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.2.0 http://www.osgi.org/xmlns/metatype/v1.2.0">
-    <OCD description="Sort Type configuration. Sets up the mapping between sorting from the cdr endpoints/services to the internal metacard."
-         name="CDR Endpoint Sort Mapping" id="cdr-endpoint-sort-mapping">
+    xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.2.0 http://www.osgi.org/xmlns/metatype/v1.2.0">
+    <OCD
+        description="Sort Type configuration. Sets up the mapping between sorting from the cdr endpoints/services to the internal metacard."
+        name="CDR Endpoint Sort Mapping" id="cdr-endpoint-sort-mapping">
 
-        <AD name="Sort Key" id="sortKey" required="true" type="String" default="" />
+        <AD name="Sort Key" id="sortKey" required="true" type="String" default=""
+            description="The key value that is used in the search endpoints as it aligns with the SRU SortKeys definition.  
+        It should be an xpath like expression, and wildcards can used (e.g */updated will use the first element named updated (ignoring namespaces))" />
 
         <AD name="Sort Attribute" id="sortAttribute" required="true" type="String" default=""
             description="The attribute that sorting will take place on in the metacard/result using defined standard attribute types.">
