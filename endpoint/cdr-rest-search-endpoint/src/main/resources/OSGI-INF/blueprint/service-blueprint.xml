@@ -61,6 +61,8 @@
     <bean id="queryConfiguration" class="net.di2e.ecdr.commons.query.QueryConfigurationImpl">
         <cm:managed-properties persistent-id="cdr-rest-search-endpoint" update-strategy="container-managed" />
     </bean>
+    
+    <reference id="queryRequestCache" interface="net.di2e.ecdr.api.cache.QueryRequestCache" />
 
     <bean id="cdrRestSearchService" class="net.di2e.ecdr.search.endpoint.rest.CDRRestSearchServiceImpl">
         <argument ref="catalogFramework" />
@@ -69,6 +71,7 @@
         <argument ref="transformIdMapper" />
         <argument ref="auditorList" />
         <argument ref="queryConfiguration" />
+        <argument ref="queryRequestCache" />
         <argument ref="fifoFederationStrategyBean" />
     </bean>
     <service ref="cdrRestSearchService" auto-export="interfaces" />

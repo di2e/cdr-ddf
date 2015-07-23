@@ -18,7 +18,6 @@ package net.di2e.ecdr.commons.filter;
 import java.util.Date;
 import java.util.List;
 
-import net.di2e.ecdr.commons.filter.config.AtomSearchResponseTransformerConfig;
 import net.di2e.ecdr.commons.util.GeospatialUtils;
 
 import org.slf4j.Logger;
@@ -50,8 +49,6 @@ public abstract class AbstractFilterDelegate<T> extends FilterDelegate<T> {
     private static final Logger LOGGER = LoggerFactory.getLogger( StrictFilterDelegate.class );
     private double defaultRadiusforNN = 0;
     private SupportedGeosOptions supportedGeoOptions = null;
-
-    private AtomSearchResponseTransformerConfig filterConfig = null;
 
     public AbstractFilterDelegate( double defaultRadiusforNN, SupportedGeosOptions supportedGeos ) {
         this.defaultRadiusforNN = defaultRadiusforNN;

@@ -56,6 +56,14 @@ public class MemoryCache<T> implements Cache<T> {
         }
     }
 
+    public boolean containsKey( String key ) {
+        return metacardCache.containsKey( key );
+    }
+
+    public void updateCacheSize( int size ) {
+        metacardCache.updateCacheSize( size );
+    }
+
     public class LRUCacheMap<K, V> extends LinkedHashMap<K, V> {
 
         private static final long serialVersionUID = 1L;

@@ -21,7 +21,6 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -41,13 +40,13 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
 import net.di2e.ecdr.api.auditor.SearchAuditor;
+import net.di2e.ecdr.api.cache.QueryRequestCache;
 import net.di2e.ecdr.api.query.QueryConfiguration;
 import net.di2e.ecdr.api.query.QueryCriteria;
 import net.di2e.ecdr.api.query.QueryLanguage;
 import net.di2e.ecdr.api.transform.TransformIdMapper;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.query.CDRQueryImpl;
-import net.di2e.ecdr.commons.query.cache.QueryRequestCache;
 import net.di2e.ecdr.commons.util.SearchUtils;
 import net.di2e.ecdr.commons.xml.fs.SourceDescription;
 import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
@@ -105,7 +104,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
      *            String. Query parsers are tied to different versions of a query profile
      */
     public AbstractRestSearchEndpoint( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig ) {
+            QueryConfiguration queryConfig, QueryRequestCache queryReqCache ) {
         this.catalogFramework = framework;
         this.platformConfig = config;
         // this.queryLanguageMap = queryLangs;
@@ -113,7 +112,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         this.transformMapper = mapper;
         this.auditors = auditorList;
         this.queryConfiguration = queryConfig;
-        queryRequestCache = new QueryRequestCache( DEFAULT_QUERYID_CACHE_SIZE );
+        this.queryRequestCache = queryReqCache;
     }
 
     public Response executePing( UriInfo uriInfo, String encodingHeader, String authHeader ) {
@@ -316,7 +315,6 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
     }
 
     protected void addHeaderParameters( HttpServletRequest servletRequest, MultivaluedMap<String, String> queryParameters ) {
-        Enumeration<String> headerNames = servletRequest.getHeaderNames();
         List<String> headerProperties = queryConfiguration.getHeaderPropertyList();
         if ( CollectionUtils.isNotEmpty( headerProperties ) ) {
             for ( String headerProp : headerProperties ) {

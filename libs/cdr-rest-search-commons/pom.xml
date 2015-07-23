@@ -43,6 +43,12 @@
         </dependency>
         
         <dependency>
+            <groupId>net.di2e.ecdr.libs</groupId>
+            <artifactId>cdr-libs-cache</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
             <groupId>org.codice.ddf</groupId>
             <artifactId>platform-configuration-impl</artifactId>
         </dependency>

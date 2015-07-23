@@ -36,12 +36,6 @@
             <artifactId>cdr-rest-search-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
-        
-        <dependency>
-            <groupId>net.di2e.ecdr.libs</groupId>
-            <artifactId>cdr-libs-cache</artifactId>
-            <version>${project.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>net.di2e.ecdr.transformer</groupId>
@@ -74,17 +68,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-bundle</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.hazelcast</groupId>
-            <artifactId>hazelcast</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>javax.cache</groupId>
-            <artifactId>cache-api</artifactId>
-            <version>1.0.0</version>
         </dependency>
 
         <dependency>
@@ -146,19 +129,12 @@
                             catalog-core-api-impl,
                             joda-time,
                             commons-net,
-                            hazelcast,
-                            cache-api,
-                            cdr-libs-cache,
                         </Embed-Dependency>
                         <Import-Package>
-                            !org.joda.convert,
-                            !javax.enterprise.util,
-                            org.apache.logging.log4j.*;resolution:=optional,
                             org.osgi.framework;version="[1.6,2)",
                             net.di2e.ecdr.commons,
                             org.apache.cxf.*;version="[2.7.0, 4.0)",
                             org.apache.ws.security.*;resolution:=optional,
-                            
                             *
                         </Import-Package>
                         <Private-Package>

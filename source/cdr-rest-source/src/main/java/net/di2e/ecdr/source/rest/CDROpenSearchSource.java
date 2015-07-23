@@ -527,8 +527,9 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
     protected void setHttpHeaders( Map<String, String> filterParameters, WebClient client ) {
         Map<String, String> hardcodedHeaders = getHardcodedHttpHeaders();
         if ( MapUtils.isNotEmpty( hardcodedHeaders ) ) {
-            for ( String key : hardcodedHeaders.keySet() ) {
-                String value = hardcodedHeaders.get( key );
+            for ( Entry<String, String> entry : hardcodedHeaders.entrySet() ) {
+                String key = entry.getKey();
+                String value = entry.getValue();
                 client.header( key, value );
                 LOGGER.trace( "Adding the following HTTP Header to outgoing request [{}]=[{}]", key, value );
             }

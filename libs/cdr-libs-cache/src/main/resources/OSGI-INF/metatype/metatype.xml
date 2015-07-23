@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0">
+
+    <OCD name="CDR Endpoints Request Cache" id="cdr-endpoint-query-cache" description="Configuration for the CDR endpoints for caching the OID to ensure that queries are unique">
+
+        <AD name="Query Request Cache Size" id="queryRequestCacheSize" required="true" type="Integer" default="1000"
+            description="The number of query IDs (OID) to keep in cache to check against when checking for unique queries." />
+            
+    </OCD>
+
+    <Designate pid="cdr-endpoint-query-cache">
+        <Object ocdref="cdr-endpoint-query-cache" />
+    </Designate>
+
+</metatype:MetaData>

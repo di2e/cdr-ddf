@@ -24,6 +24,9 @@ public final class SearchConstants {
 
     public static final String ATOM_RESPONSE_FORMAT = "cdr-atom";
 
+    public static final String LINK_REL_PREVIEW = "preview";
+    public static final String LINK_REL_ICON = "icon";
+
     public static final String NO_QUERY_PARAMETERS_MESSAGE = "The query did not contain any of the required critera, one of the following is required [searchTerms, geospatial, or temporal]";
 
     // CONSTANTS for supported date types
