@@ -24,6 +24,8 @@
             description="The default response format to return results as if no format parameter is supplied in the query">
             <Option label="Atom" value="cdr-atom" />
             <Option label="Atom with Metadata Payload (any format)" value="atom-with-payload" />
+            <Option label="Atom with Metadata under Content Tag" value="atom-with-content" />
+            <Option label="Atom OGC (Atom links align with OGC OpenSearch spec)" value="ogc-atom" />
         </AD>
         
         <AD name="Default Response Format Custom Override" id="defaultResponseFormatCustom" required="false" type="String" default=""
@@ -56,9 +58,6 @@
         <AD name="Default Date Type Custom Override" id="defaultDateTypeCustom" required="false" type="String" default=""
             description="Only populate this field if the default response date type you desire is not in the dropdown list above.">
         </AD>
-        
-        <AD name="Query Request Cache Size" id="queryRequestCacheSize" required="true" type="Integer" default="1000"
-            description="The number of query IDs (OID) to keep in cache to check against when  checking for unique queries.  Updating this value will clear the current cache." />
 
         <AD name="Parameter Query Extensions" id="parameterExtensionMap" required="false" type="String" default="uid=id" cardinality="100"
             description="List of property parameter extensions that should be added to the query (using property equality critiera) if present in the query request. The mapping should be done by using &lt;parameter name&gt;=&lt;criteria

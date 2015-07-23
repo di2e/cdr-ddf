@@ -24,6 +24,8 @@
             description="The default response format to return results as if no format parameter is supplied in the query">
             <Option label="Atom" value="cdr-atom" />
             <Option label="Atom with Metadata Payload (any format)" value="atom-with-payload" />
+            <Option label="Atom with Metadata under Content Tag" value="atom-with-content" />
+            <Option label="Atom OGC (Atom links align with OGC OpenSearch spec)" value="ogc-atom" />
         </AD>
         
         <AD name="Default Response Format Custom Override" id="defaultResponseFormatCustom" required="false" type="String" default=""
@@ -57,8 +59,6 @@
             description="Only populate this field if the default response date type you desire is not in the dropdown list above.">
         </AD>
         
-        <AD name="Query Request Cache Size" id="queryRequestCacheSize" required="true" type="Integer" default="1000"
-            description="The number of query IDs (OID) to keep in cache to check against when  checking for unique queries." />
         <!-- 
         <AD name="Default to deduplicate results" id="defaultDeduplication" type="Boolean" default="true"
             description="Check the box if you want to deduplicate results from multiple sources" />
