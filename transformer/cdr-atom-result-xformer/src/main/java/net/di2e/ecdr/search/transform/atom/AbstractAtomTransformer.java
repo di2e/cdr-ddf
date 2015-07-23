@@ -80,7 +80,7 @@ import ddf.catalog.transform.QueryResponseTransformer;
 
 public abstract class AbstractAtomTransformer implements MetacardTransformer, QueryResponseTransformer {
 
-    private static final String CDR_ATOM_TRANSFORMER_ID = "cdr-atom";
+    protected static final String CDR_ATOM_TRANSFORMER_ID = "cdr-atom";
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AbstractAtomTransformer.class );
     private static final DateTimeFormatter DATE_FORMATTER = ISODateTimeFormat.dateTime();
@@ -379,6 +379,10 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
         return viewMetacardActionProvider;
     }
 
+    protected ActionProvider getMetadataActionProvider() {
+        return metadataActionProvider;
+    }
+
     protected ActionProvider getThumbnailActionProvider() {
         return thumbnailActionProvider;
     }
@@ -479,12 +483,13 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
     }
 
     protected void addLinksToEntry( Entry entry, CDRMetacard metacard, String format, Map<String, Serializable> properties ) {
+        LOGGER.debug( "Metacard with ID {} hasThumbail={} with thumbnailActionProvider={}", metacard.getId(), metacard.hasThumbnail(), thumbnailActionProvider );
         if ( metacard.hasThumbnail() ) {
-
             if ( thumbnailActionProvider != null ) {
                 Action action = thumbnailActionProvider.getAction( metacard );
+                LOGGER.debug( "Thumbnail action={}", action );
                 if ( action != null && action.getUrl() != null ) {
-                    entry.addLink( action.getUrl().toString(), CDRMetacard.LINK_REL_PREVIEW, thumbnailMimeType.getBaseType(), action.getTitle(), null, metacard.getThumbnailLength() );
+                    entry.addLink( action.getUrl().toString(), SearchConstants.LINK_REL_PREVIEW, thumbnailMimeType.getBaseType(), action.getTitle(), null, metacard.getThumbnailLength() );
                 }
             }
         }
