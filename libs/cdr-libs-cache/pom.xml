@@ -72,13 +72,13 @@
                             cache-api
                         </Embed-Dependency>
                         <Import-Package>
+                            !org.joda.convert,
+                            !javax.enterprise.util,
+                            org.apache.logging.log4j.*;resolution:=optional,
                             *
                         </Import-Package>
-                        <Private-Package>
-                            net.di2e.ecdr.libs.cache.impl,
-                        </Private-Package>
                         <Export-Package>
-                            net.di2e.ecdr.libs.cache,
+                            net.di2e.ecdr.libs.cache.impl,
                         </Export-Package>
                     </instructions>
                 </configuration>

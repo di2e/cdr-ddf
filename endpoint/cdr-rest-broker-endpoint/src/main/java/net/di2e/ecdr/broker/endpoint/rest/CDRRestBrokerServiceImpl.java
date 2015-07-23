@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import net.di2e.ecdr.api.auditor.SearchAuditor;
+import net.di2e.ecdr.api.cache.QueryRequestCache;
 import net.di2e.ecdr.api.federation.NormalizingFederationStrategy;
 import net.di2e.ecdr.api.query.QueryConfiguration;
 import net.di2e.ecdr.api.query.QueryLanguage;
@@ -88,8 +89,8 @@ public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
      *            String. Query parsers are tied to different versions of a query profile
      */
     public CDRRestBrokerServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, NormalizingFederationStrategy sortedFedStrategy, FederationStrategy defaultFedStrategy ) {
-        super( framework, config, queryLangs, mapper, auditorList, queryConfig );
+            QueryConfiguration queryConfig, QueryRequestCache queryCache, NormalizingFederationStrategy sortedFedStrategy, FederationStrategy defaultFedStrategy ) {
+        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache );
         this.sortedFedStrategy = sortedFedStrategy;
         this.defaultFederationStrategy = defaultFedStrategy;
     }

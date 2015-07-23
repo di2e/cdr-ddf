@@ -17,6 +17,7 @@ package net.di2e.ecdr.search.transform.atom.security.impl;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -78,10 +79,10 @@ public class DefaultAtomFeedConfig {
             for ( DefaultConfig config : DefaultConfig.values() ) {
                 LOGGER.debug( "Adding configuration with format {}", config.getFormats() );
                 Configuration configuration = configAdmin.createFactoryConfiguration( CONFIG_PID );
-                Dictionary<String, String> properties = new Hashtable<>();
-                properties.put( "configFormats", config.getFormats() );
+                Dictionary<String, Object> properties = new Hashtable<>();
+                properties.put( "configFormats", Arrays.asList( config.getFormats().split( "," ) ) );
                 properties.put( "namespace", config.getNamespace() );
-                properties.put( "attributeList", config.getAttributes() );
+                properties.put( "attributeList", Arrays.asList( config.getAttributes().split( "," ) ) );
                 configuration.update( properties );
                 configurationList.add( configuration );
             }

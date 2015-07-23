@@ -28,8 +28,8 @@
 
     <osgi:reference id="filterAdapter" interface="ddf.catalog.filter.FilterAdapter" />
     
-    <osgix:managed-service-factory id="ecdr-opensearch-source"
-        factory-pid="ecdr-opensearch-source" update-strategy="container-managed">
+    <osgix:managed-service-factory id="cdr-opensearch-source"
+        factory-pid="cdr-opensearch-source" update-strategy="container-managed">
 
         <osgix:interfaces>
             <beans:value>ddf.catalog.source.FederatedSource</beans:value>
@@ -49,8 +49,8 @@
 
     </osgix:managed-service-factory>
     
-    <osgix:managed-service-factory id="ecdr-opensearch-connected-source"
-        factory-pid="ecdr-opensearch-connected-source" update-strategy="container-managed">
+    <osgix:managed-service-factory id="cdr-opensearch-connected-source"
+        factory-pid="cdr-opensearch-connected-source" update-strategy="container-managed">
 
         <osgix:interfaces>
             <beans:value>ddf.catalog.source.ConnectedSource</beans:value>
@@ -75,7 +75,7 @@
 
     <beans:bean id="cdr-os-identifier" class="net.di2e.ecdr.source.rest.SimpleDynamicServiceIdentifier">
         <beans:constructor-arg>
-            <beans:value>ecdr-opensearch-source</beans:value>
+            <beans:value>cdr-opensearch-source</beans:value>
         </beans:constructor-arg>
         <beans:constructor-arg>
             <beans:value>CDR REST Search Service</beans:value>

@@ -15,11 +15,6 @@
  */
 package net.di2e.ecdr.search.transform.atom.security.impl;
 
-import net.di2e.ecdr.api.security.SecurityConfiguration;
-
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,30 +22,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import net.di2e.ecdr.api.security.SecurityConfiguration;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class SecurityConfigurationImpl implements SecurityConfiguration {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger( SecurityConfigurationImpl.class );
 
     private Set<String> formats = Collections.emptySet();
     private String namespace = "urn:us:gov:ic:ism:v2";
     private Map<String, String> attributes = null;
 
-    public void setConfigFormats( String newFormats ) {
-        if ( StringUtils.isNotBlank( newFormats ) ) {
-            formats = new HashSet<>( (Arrays.asList( newFormats.split( "," ) )) );
-        }
+    public void setConfigFormats( List<String> newFormats ) {
+        LOGGER.debug( "ConfigUpdate: Updating the Security formats from {} to {}", formats, newFormats );
+        formats = new HashSet<>( newFormats );
     }
 
     public void setNamespace( String newNamespace ) {
+        LOGGER.debug( "ConfigUpdate: Updating the Security namespace from [{}] to [{}]", namespace, newNamespace );
         namespace = newNamespace;
     }
 
-    public void setAttributeList( String newAttributes ) {
-        if ( newAttributes != null ) {
-            List<String> attrList = Arrays.asList( newAttributes.split( "," ) );
-            setAttributesList( attrList );
-        }
-    }
-
-    public void setAttributesList( List<String> attrList ) {
+    public void setAttributeList( List<String> attrList ) {
+        LOGGER.debug( "ConfigUpdate: Updating the Security attribute list from {} to {}", attributes, attrList );
         attributes = new HashMap<String, String>();
         if ( attrList != null ) {
             for ( String attribute : attrList ) {

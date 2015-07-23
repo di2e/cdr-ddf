@@ -30,6 +30,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import net.di2e.ecdr.api.auditor.SearchAuditor;
+import net.di2e.ecdr.api.cache.QueryRequestCache;
 import net.di2e.ecdr.api.query.QueryConfiguration;
 import net.di2e.ecdr.api.query.QueryLanguage;
 import net.di2e.ecdr.api.transform.TransformIdMapper;
@@ -94,8 +95,8 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
      *            transform name
      */
     public CDRRestSearchServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, FifoFederationStrategy fedStrategy ) {
-        super( framework, config, queryLangs, mapper, auditorList, queryConfig );
+            QueryConfiguration queryConfig, QueryRequestCache queryCache, FifoFederationStrategy fedStrategy ) {
+        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache );
         fifoFederationStratgey = fedStrategy;
     }
 
