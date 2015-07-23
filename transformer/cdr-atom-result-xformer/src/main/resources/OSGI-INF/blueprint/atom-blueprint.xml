@@ -123,8 +123,8 @@
 
     <service ref="atomOGCTransformer" auto-export="interfaces" ranking="5">
         <service-properties>
-            <entry key="id" value="atom-ogc" />
-            <entry key="shortname" value="atom-ogc" />
+            <entry key="id" value="ogc-atom" />
+            <entry key="shortname" value="ogc-atom" />
             <entry key="mime-type" value="application/atom+xml" />
         </service-properties>
     </service>
