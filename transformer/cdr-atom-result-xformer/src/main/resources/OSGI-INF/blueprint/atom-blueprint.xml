@@ -108,5 +108,25 @@
             <entry key="mime-type" value="application/atom+xml" />
         </service-properties>
     </service>
+    
+    <bean id="atomOGCTransformer" class="net.di2e.ecdr.search.transform.atom.AtomOGCTransformer">
+        <cm:managed-properties persistent-id="cdr-atom-result-xformer" update-strategy="container-managed" />
+        <argument ref="configurationWatcherAtom" />
+        <argument ref="viewMetacardActionProvider" />
+        <argument ref="metadataActionProvider" />
+        <argument ref="resourceActionProvider" />
+        <argument ref="thumbnailActionProvider" />
+        <argument ref="jpegMimeType" />
+        <argument ref="htmlMimeType" />
+        <argument ref="feedSecurityConfigList"/>
+    </bean>
+
+    <service ref="atomOGCTransformer" auto-export="interfaces" ranking="5">
+        <service-properties>
+            <entry key="id" value="atom-ogc" />
+            <entry key="shortname" value="atom-ogc" />
+            <entry key="mime-type" value="application/atom+xml" />
+        </service-properties>
+    </service>
 
 </blueprint>

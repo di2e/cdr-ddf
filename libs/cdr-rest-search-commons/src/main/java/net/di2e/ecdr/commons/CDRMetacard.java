@@ -55,8 +55,6 @@ public class CDRMetacard implements Metacard, Serializable {
 
     public static final String METACARD_CONTENT_COLLECTION_ATTRIBUTE = "content-collections";
 
-    public static final String LINK_REL_PREVIEW = "preview";
-
     public static final String RESOURCE_MIME_TYPE = "resource-mime-type";
     public static final String RESOURCE_TITLE = "resource-title";
 
@@ -153,7 +151,7 @@ public class CDRMetacard implements Metacard, Serializable {
     }
 
     public boolean hasThumbnail() {
-        // Order is import here especially if the original Metacard is using
+        // Order is important here especially if the original Metacard is using
         // Thumbnail links and doesn't pull the thumbnail until the getThumbnail
         // method is called
         return getAttribute( THUMBNAIL_LINK ) != null || getThumbnail() != null;
@@ -281,6 +279,8 @@ public class CDRMetacard implements Metacard, Serializable {
                     LOGGER.warn( "Could not read thumbnail from remote URL[" + thumbnailURI + "] due to: " + e.getMessage(), e );
                 }
             }
+        } else {
+            thumbnail = getAttributeValue( thumbnailAttribute, byte[].class );
         }
         return thumbnail;
     }
