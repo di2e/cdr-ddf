@@ -20,9 +20,12 @@
     xsi:schemaLocation="http://www.osgi.org/xmlns/metatype/v1.2.0 http://www.osgi.org/xmlns/metatype/v1.2.0"
     xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.2.0">
 
-    <OCD description="ECDR OpenSearch Federated Source Configuration. If federating to another ECDR site, most of the defaults will work." name="CDR OpenSearch Federated Source" id="cdr-opensearch-source">
-        
-        <AD name="Source Name" id="id" required="true" type="String" default="cdr-source" description="The sitename for the remote opensearch or CDR datasource"/>
+    <OCD
+        description="ECDR OpenSearch Federated Source Configuration. If federating to another ECDR site, most of the defaults will work."
+        name="CDR OpenSearch Federated Source" id="cdr-opensearch-source">
+
+        <AD name="Source Name" id="id" required="true" type="String" default="cdr-source"
+            description="The sitename for the remote opensearch or CDR datasource" />
 
         <AD name="Search Endpoint URL" id="url" required="true" type="String" default="http://localhost:8181/services/cdr/search/rest"
             description="OpenSearch base endpoint URL, should include everything up to (and not including) the '?'" />
@@ -50,7 +53,7 @@
 
         <AD name="Minimum Source Ping Interval" id="availableCheckCacheTime" required="true" type="Integer" default="120"
             description="The minimum time interval (in seconds) between source availability checks.  Source status will be pulled from cache if the minimum time has not passed." />
-            
+
         <AD name="Response Transformer Override" id="responseTransformer" type="String" default=""
             description="The 'id' of the response transformer (SearchResponseTransformer) to use when returning results.  If left blank the default CDR Atom Transformer (used for handling most atom results) will be used along with
             the configuration values that are set for Atom specific results on this page.">
@@ -77,25 +80,27 @@
             description="Check the box if you want all product URLs to be returned as local URLs referencing the existing server.  This should be checked if it is expected
             that the client would not be able to directly access URLs that are pointing to the remote data source (e.g. if there were firewalls inplace that would prohibit the access from 
             the client machine web browser)" />
-            
+
         <AD name="Start Index Numbering" id="startIndexStartNumber" required="true" type="String" default="1"
             description="The method to lookup the single metacard entry for ID searches">
             <Option label="1-Based (Starts at 1)" value="1" />
             <Option label="0-Based (Starts at 0)" value="0" />
         </AD>
-            
-        <AD name="Hard Coded Query Parameters" id="hardCodedParameters" required="false" type="String" default="format=atom-ddms,queryLanguage=cdr-kw-basic-2.0" cardinality="100"
+
+        <AD name="Hard Coded Query Parameters" id="hardCodedParameters" required="false" type="String"
+            default="format=atom-ddms,queryLanguage=cdr-kw-basic-2.0" cardinality="100"
             description="Query parameter and value pairs (e.g. format=atom or timeout=300000) that will appear in every search request that gets sent out" />
 
-        <AD name="Parameter Mapping" id="parameterMap" required="false" type="String" 
+        <AD name="Parameter Mapping" id="parameterMap" required="false" type="String"
             default="os:searchTerms=q,os:count=count,os:startIndex=startIndex,cdrs:timeout=timeout,cdrsx:originQueryID=oid,cdrb:path=path,cdrsx:strictMode=strictMode,
                      ddf:resource-uri=resource-uri,cdrsx:caseSensitive=caseSensitive,ecdr:fuzzy=fuzzy,ecdr:collections=collections,ddf:metadata-content-type=metadata-content-type,ecdr:textPath=textPath,
                      time:start=dtStart,time:end=dtEnd,cdrsx:dateType=dtType,time:relation=dtRelation,
                      geo:uid=uid,geo:box=box,geo:lat=lat,geo:lon=lon,geo:radius=radius,geo:geometry=geometry,geo:polygon=polygon,geo:relation=spatialOp,
-                     sru:sortKeys=sortKeys" cardinality="100"
+                     sru:sortKeys=sortKeys"
+            cardinality="100"
             description="Mapping for this source that converts the query request into opensearch parameters. The mapping should be done by using &lt;opensearch parameter definition&gt;=&lt;URL parameter&gt; format.">
         </AD>
-        
+
         <AD name="Convert unsupported Geometries" id="supportedGeoOption" required="true" type="String" default="ALL"
             description="If the source only supports bbox or other options, set the option below to convert other geometries to the supported format">
             <Option label="Don't do any Geometry Conversions" value="ALL" />
@@ -103,24 +108,28 @@
             <Option label="Convert Polygons to Bounding Box" value="POINT_RADUIS_AND_BBOX" />
             <Option label="Convert Point Radius to Bounding Box" value="GEOMETRY_ONLY" />
         </AD>
-            
-        
+
+
         <AD name="Custom HTTP Headers" id="httpHeaders" required="false" type="String" default="EMID" cardinality="100"
             description="Custom HTTP Header name/value pairs that should be sent in the request if the name exists in the queryParameters or properties and has a non null/empty value.  To set a hardcoded value
             use name=value, and it will automatically include that name/value pair in the HTTP Header." />
-        
+
         <AD name="Result Cache Expires" id="cacheExpirationMinutes" type="Long" default="60"
             description="If the geo:uid parameter is not populated/supported, the results will be cached which will enable lookups by ID.  This specifies the number of minutes before the results are removed from the cache" />
-        
-        <AD name="Metacard Properties to HTTP Parameter Mapping" id="propertyParameterMap" required="false" type="String" default="id=uid" cardinality="100"
+
+        <AD name="Metacard Properties to HTTP Parameter Mapping" id="propertyParameterMap" required="false" type="String"
+            default="id=uid" cardinality="100"
             description="Mapping for this source that converts the Metacard query property to an HTTP property parameter. The mapping should be done by using &lt;metacard attribute&gt;=&lt;HTTP parameter&gt; format.">
         </AD>
-        
-        <AD name="Date Type Mappings" id="dateParameterMap" required="false" type="String" default="effective=published,modified=updated,created=created" cardinality="100"
+
+        <AD name="Date Type Mappings" id="dateParameterMap" required="false" type="String"
+            default="effective=published,modified=updated,created=created" cardinality="100"
             description="Mapping for this source that converts the Date Type query property to an HTTP property parameter. The mapping should be done by using &lt;Daet Type query property&gt;=&lt;HTTP parameter&gt; format.">
         </AD>
-        
-        <AD name="Sort Mapping" id="sortMap" required="false" type="String" default="title=title,modified=updated,effective=published,created=created,RELEVANCE=score,DISTANCE=distance" cardinality="100"
+
+        <AD name="Sort Mapping" id="sortMap" required="false" type="String"
+            default="title=title,modified=updated,effective=published,created=created,RELEVANCE=score,DISTANCE=distance"
+            cardinality="100"
             description="Mapping for this source that converts the metacard attribute to a sort type for the outgoing request. The mapping should be done by using &lt;metacard attribute&gt;=&lt;cdr
             type&gt; format.">
         </AD>
@@ -135,9 +144,14 @@
         </AD>
 
     </OCD>
-    
-    <OCD description="CDR OpenSearch Connected Source (will not appear as a federated site, instead will get queried anytime local catalog is queried)" name="CDR OpenSearch Connected Source" id="cdr-opensearch-connected-source">
-        
+
+    <OCD
+        description="CDR OpenSearch Connected Source (will not appear as a federated site, instead will get queried anytime local catalog is queried)"
+        name="CDR OpenSearch Connected Source" id="cdr-opensearch-connected-source">
+
+        <AD name="Source Name (Will be Hidden)" id="id" required="true" type="String" default="cdr-source"
+            description="Since this is a Connected Source, all Metacards will inherit the Platform Source ID.  This source name value will be used for logging and for identification purposes in the Admin Console" />
+
         <AD name="Search Endpoint URL" id="url" required="true" type="String" default="http://localhost:8181/services/cdr/search/rest"
             description="OpenSearch base endpoint URL, should include everything up to (and not including) the '?'" />
 
@@ -164,7 +178,7 @@
 
         <AD name="Minimum Source Ping Interval" id="availableCheckCacheTime" required="true" type="Integer" default="120"
             description="The minimum time interval (in seconds) between source availability checks.  Source status will be pulled from cache if the minimum time has not passed." />
-            
+
         <AD name="Response Transformer Override" id="responseTransformer" type="String" default=""
             description="The 'id' of the response transformer (SearchResponseTransformer) to use when returning results.  If left blank the default CDR Atom Transformer (used for handling most atom results) will be used along with
             the configuration values that are set for Atom specific results on this page.">
@@ -191,49 +205,55 @@
             description="Check the box if you want all product URLs to be returned as local URLs referencing the existing server.  This should be checked if it is expected
             that the client would not be able to directly access URLs that are pointing to the remote data source (e.g. if there were firewalls inplace that would prohibit the access from 
             the client machine web browser)" />
-            
+
         <AD name="Start Index Numbering" id="startIndexStartNumber" required="true" type="String" default="1"
             description="The method to lookup the single metacard entry for ID searches">
             <Option label="1-Based (Starts at 1)" value="1" />
             <Option label="0-Based (Starts at 0)" value="0" />
         </AD>
-            
-        <AD name="Hard Coded Query Parameters" id="hardCodedParameters" required="false" type="String" default="format=atom-ddms,queryLanguage=cdr-kw-basic-2.0" cardinality="100"
+
+        <AD name="Hard Coded Query Parameters" id="hardCodedParameters" required="false" type="String"
+            default="format=atom-ddms,queryLanguage=cdr-kw-basic-2.0" cardinality="100"
             description="Query parameter and value pairs (e.g. format=atom or timeout=300000) that will appear in every search request that gets sent out" />
 
-        <AD name="Parameter Mapping" id="parameterMap" required="false" type="String" 
+        <AD name="Parameter Mapping" id="parameterMap" required="false" type="String"
             default="os:searchTerms=q,os:count=count,os:startIndex=startIndex,cdrs:timeout=timeout,cdrsx:originQueryID=oid,cdrb:path=path,cdrsx:strictMode=strictMode,
                      ddf:resource-uri=resource-uri,cdrsx:caseSensitive=caseSensitive,ecdr:fuzzy=fuzzy,ddf:metadata-content-type=metadata-content-type,ecdr:textPath=textPath,
                      time:start=dtStart,time:end=dtEnd,cdrsx:dateType=dtType,time:relation=dtRelation,
                      geo:uid=uid,geo:box=box,geo:lat=lat,geo:lon=lon,geo:radius=radius,geo:geometry=geometry,geo:polygon=polygon,geo:relation=spatialOp,
-                     sru:sortKeys=sortKeys" cardinality="100"
+                     sru:sortKeys=sortKeys"
+            cardinality="100"
             description="Mapping for this source that converts the query request into opensearch parameters. The mapping should be done by using &lt;opensearch parameter definition&gt;=&lt;URL parameter&gt; format.">
         </AD>
-        
-         <AD name="Convert unsupported Geometries" id="supportedGeoOption" required="true" type="String" default="ALL"
+
+        <AD name="Convert unsupported Geometries" id="supportedGeoOption" required="true" type="String" default="ALL"
             description="If the source only supports bbox or other options, set the option below to convert other geometries to the supported format">
             <Option label="Don't do any Geometry Conversions" value="ALL" />
             <Option label="Convert All Geos to Bounding Box" value="BBOX_ONLY" />
             <Option label="Convert Polygons to Bounding Box" value="POINT_RADUIS_AND_BBOX" />
             <Option label="Convert Point Radius to Bounding Box" value="GEOMETRY_ONLY" />
         </AD>
-            
-        
+
+
         <AD name="Custom HTTP Headers" id="httpHeaders" required="false" type="String" default="EMID" cardinality="100"
             description="Custom HTTP Header name/value pairs that should be sent in the request if the name exists in the queryParameters or properties and has a non null/empty value.  To set a hardcoded value
             use name=value, and it will automatically include that name/value pair in the HTTP Header." />
-        
+
         <AD name="Result Cache Expires" id="cacheExpirationMinutes" type="Long" default="60"
             description="If the geo:uid parameter is not populated/supported, the results will be cached which will enable lookups by ID.  This specifies the number of minutes before the results are removed from the cache" />
-        
-        <AD name="Metacard Properties to HTTP Parameter Mapping" id="propertyParameterMap" required="false" type="String" default="id=uid" cardinality="100"
+
+        <AD name="Metacard Properties to HTTP Parameter Mapping" id="propertyParameterMap" required="false" type="String"
+            default="id=uid" cardinality="100"
             description="Mapping for this source that converts the Metacard query property to an HTTP property parameter. The mapping should be done by using &lt;metacard attribute&gt;=&lt;HTTP parameter&gt; format.">
         </AD>
-        
-        <AD name="Date Type Mappings" id="dateParameterMap" required="false" type="String" default="effective=published,modified=updated,created=created" cardinality="100"
+
+        <AD name="Date Type Mappings" id="dateParameterMap" required="false" type="String"
+            default="effective=published,modified=updated,created=created" cardinality="100"
             description="Mapping for this source that converts the Date Type query property to an HTTP property parameter. The mapping should be done by using &lt;Daet Type query property&gt;=&lt;HTTP parameter&gt; format.">
         </AD>
-        <AD name="Sort Mapping" id="sortMap" required="false" type="String" default="title=title,modified=updated,effective=published,created=created,RELEVANCE=score,DISTANCE=distance" cardinality="100"
+        <AD name="Sort Mapping" id="sortMap" required="false" type="String"
+            default="title=title,modified=updated,effective=published,created=created,RELEVANCE=score,DISTANCE=distance"
+            cardinality="100"
             description="Mapping for this source that converts the metacard attribute to a sort type for the outgoing request. The mapping should be done by using &lt;metacard attribute&gt;=&lt;cdr
             type&gt; format.">
         </AD>
@@ -252,7 +272,7 @@
     <Designate pid="cdr-opensearch-source" factoryPid="cdr-opensearch-source">
         <Object ocdref="cdr-opensearch-source" />
     </Designate>
-    
+
     <Designate pid="cdr-opensearch-connected-source" factoryPid="cdr-opensearch-connected-source">
         <Object ocdref="cdr-opensearch-connected-source" />
     </Designate>

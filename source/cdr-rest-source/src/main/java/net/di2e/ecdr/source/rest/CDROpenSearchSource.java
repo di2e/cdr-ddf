@@ -97,6 +97,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
     private Date lastAvailableCheckDate = null;
     private boolean isCurrentlyAvailable = false;
+    private String localId = null;
 
     private WebClient cdrRestClient = null;
     private WebClient cdrAvailabilityCheckClient = null;
@@ -130,7 +131,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
         } catch ( Exception e ) {
             LOGGER.error( e.getMessage(), e );
-            throw new UnsupportedQueryException( "Could not complete query to site [" + getId() + "] due to: " + e.getMessage(), e );
+            throw new UnsupportedQueryException( "Could not complete query to site [" + localId + "] due to: " + e.getMessage(), e );
         }
     }
 
@@ -142,11 +143,13 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         filterParameters.putAll( getInitialFilterParameters( queryRequest ) );
         setURLQueryString( filterParameters );
         setHttpHeaders( filterParameters, cdrRestClient );
-        LOGGER.debug( "Executing http GET query to source [{}] with url [{}]", getId(), cdrRestClient.getCurrentURI().toString() );
+        LOGGER.debug( "Executing http GET query to source [{}] with url [{}]", localId, cdrRestClient.getCurrentURI().toString() );
         Response response = cdrRestClient.get();
-        LOGGER.debug( "Query to source [{}] returned http status code [{}] and media type [{}]", getId(), response.getStatus(), response.getMediaType() );
+        LOGGER.debug( "Query to source [{}] returned http status code [{}] and media type [{}]", localId, response.getStatus(), response.getMediaType() );
 
         if ( response.getStatus() == Status.OK.getStatusCode() ) {
+            // Be sure to pass in the getId() instead of the localId so Connected sources populate the Metacard with the
+            // right Id
             sourceResponse = transformer.processSearchResponse( (InputStream) response.getEntity(), queryRequest, getId() );
             if ( !supportsQueryById() ) {
                 sourceResponse = cacheResults( sourceResponse );
@@ -155,12 +158,12 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             Object entity = response.getEntity();
             if ( entity != null ) {
                 try {
-                    LOGGER.warn( "Error status code received [{}] when querying site [{}]:{}[{}]", response.getStatus(), getId(), System.lineSeparator(), IOUtils.toString( (InputStream) entity ) );
+                    LOGGER.warn( "Error status code received [{}] when querying site [{}]:{}[{}]", response.getStatus(), localId, System.lineSeparator(), IOUtils.toString( (InputStream) entity ) );
                 } catch ( IOException e ) {
-                    LOGGER.warn( "Error status code received [{}] when querying site [{}]", response.getStatus(), getId() );
+                    LOGGER.warn( "Error status code received [{}] when querying site [{}]", response.getStatus(), localId );
                 }
             } else {
-                LOGGER.warn( "Error status code received [{}] when querying site [{}]", response.getStatus(), getId() );
+                LOGGER.warn( "Error status code received [{}] when querying site [{}]", response.getStatus(), localId );
             }
             throw new UnsupportedQueryException( "Query to remote source returned http status code " + response.getStatus() );
         }
@@ -169,10 +172,10 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
     @Override
     public boolean isAvailable() {
-        LOGGER.debug( "isAvailable method called on CDR Rest Source named [{}], determining whether to check availability or pull from cache", getId() );
+        LOGGER.debug( "isAvailable method called on CDR Rest Source named [{}], determining whether to check availability or pull from cache", localId );
         if ( getPingMethod() != null && !PingMethod.NONE.equals( getPingMethod() ) && cdrAvailabilityCheckClient != null ) {
             if ( !isCurrentlyAvailable || (lastAvailableCheckDate.getTime() < System.currentTimeMillis() - getAvailableCheckCacheTime()) ) {
-                LOGGER.debug( "Checking availability on CDR Rest Source named [{}] in real time by calling endpoint [{}]", getId(), cdrAvailabilityCheckClient.getBaseURI() );
+                LOGGER.debug( "Checking availability on CDR Rest Source named [{}] in real time by calling endpoint [{}]", localId, cdrAvailabilityCheckClient.getBaseURI() );
                 try {
                     Response response = PingMethod.HEAD.equals( getPingMethod() ) ? cdrAvailabilityCheckClient.head() : cdrAvailabilityCheckClient.get();
                     if ( response.getStatus() == Status.OK.getStatusCode() || response.getStatus() == Status.ACCEPTED.getStatusCode() ) {
@@ -182,12 +185,12 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
                         isCurrentlyAvailable = false;
                     }
                 } catch ( RuntimeException e ) {
-                    LOGGER.warn( "CDR Rest Source named [" + getId() + "] encountered an unexpected error while executing HTTP Head at URL [" + cdrAvailabilityCheckClient.getBaseURI() + "]:"
+                    LOGGER.warn( "CDR Rest Source named [" + localId + "] encountered an unexpected error while executing HTTP Head at URL [" + cdrAvailabilityCheckClient.getBaseURI() + "]:"
                             + e.getMessage() );
                 }
 
             } else {
-                LOGGER.debug( "Pulling availability of CDR Rest Federated Source named [{}] from cache, isAvailable=[{}]", getId(), isCurrentlyAvailable );
+                LOGGER.debug( "Pulling availability of CDR Rest Federated Source named [{}] from cache, isAvailable=[{}]", localId, isCurrentlyAvailable );
             }
             if ( siteAvailabilityCallback != null ) {
                 if ( isCurrentlyAvailable ) {
@@ -204,6 +207,12 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             }
         }
         return isCurrentlyAvailable;
+    }
+
+    @Override
+    public void setId( String id ) {
+        super.setId( id );
+        localId = id;
     }
 
     @Override
@@ -229,7 +238,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
     @Override
     public ResourceResponse retrieveResource( URI uri, Map<String, Serializable> requestProperties ) throws ResourceNotFoundException, ResourceNotSupportedException, IOException {
-        LOGGER.debug( "Retrieving Resource from remote CDR Source named [{}] using URI [{}]", getId(), uri );
+        LOGGER.debug( "Retrieving Resource from remote CDR Source named [{}] using URI [{}]", localId, uri );
 
         // Check to see if the resource-uri value was passed through which is
         // the original metacard uri which
@@ -259,8 +268,8 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         }
 
         if ( resourceResponse == null ) {
-            LOGGER.warn( "Could not retrieve resource from CDR Source named [{}] using uri [{}]", getId(), uri );
-            throw new ResourceNotFoundException( "Could not retrieve resource from source [" + getId() + "] and uri [" + uri + "]" );
+            LOGGER.warn( "Could not retrieve resource from CDR Source named [{}] using uri [{}]", localId, uri );
+            throw new ResourceNotFoundException( "Could not retrieve resource from source [" + localId + "] and uri [" + uri + "]" );
         }
         return resourceResponse;
     }
@@ -276,7 +285,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             if ( requestProperties != null && requestProperties.containsKey( BYTES_TO_SKIP ) ) {
                 bytesToSkip = (Long) requestProperties.get( BYTES_TO_SKIP );
                 if ( bytesToSkip != null ) {
-                    LOGGER.debug( "Setting Range header on retrieve request from remote CDR Source [{}] with bytes to skip [{}]", getId(), bytesToSkip );
+                    LOGGER.debug( "Setting Range header on retrieve request from remote CDR Source [{}] with bytes to skip [{}]", localId, bytesToSkip );
                     // This creates a Range header in the following manner if
                     // 100 bytes were to be skipped. The end - means its open
                     // ended
@@ -291,11 +300,11 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             MimeType mimeType = null;
             try {
                 mimeType = (mediaType == null) ? new MimeType( "application/octet-stream" ) : new MimeType( mediaType.toString() );
-                LOGGER.debug( "Creating mime type from CDR Source named [{}] using uri [{}] with value [{}] defaulting to [{}]", getId(), uri, mediaType );
+                LOGGER.debug( "Creating mime type from CDR Source named [{}] using uri [{}] with value [{}] defaulting to [{}]", localId, uri, mediaType );
             } catch ( MimeTypeParseException e ) {
                 try {
                     mimeType = new MimeType( "application/octet-stream" );
-                    LOGGER.warn( "Creating mime type from CDR Source named [{}] using uri [{}] with value [{}] defaulting to [{}]", getId(), uri, "application/octet-stream" );
+                    LOGGER.warn( "Creating mime type from CDR Source named [{}] using uri [{}] with value [{}] defaulting to [{}]", localId, uri, "application/octet-stream" );
                 } catch ( MimeTypeParseException e1 ) {
                     LOGGER.error( "Could not create MIMEType for resource being retrieved", e1 );
                 }
@@ -357,7 +366,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
                 resourceResponse = new ResourceResponseImpl( new ResourceRequestByProductUri( uri, requestProperties ), responseProperties, new ResourceImpl( binaryStream, mimeType, fileName ) );
             }
         } catch ( RuntimeException e ) {
-            LOGGER.warn( "Expected exception encountered when trying to retrieve resource with URI [{}] from source [{}}", uri, getId() );
+            LOGGER.warn( "Expected exception encountered when trying to retrieve resource with URI [{}] from source [{}]", uri, localId );
         }
         return resourceResponse;
     }
@@ -366,12 +375,12 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         SearchResponseTransformer transformer;
         if ( StringUtils.isBlank( getResponseTransformerName() ) ) {
             transformer = new AtomResponseTransformer( getAtomResponseTransformerConfig() );
-            LOGGER.debug( "Using the default Atom Response Transformer to transform response from site [{}]", getId() );
+            LOGGER.debug( "Using the default Atom Response Transformer to transform response from site [{}]", localId );
         } else {
             transformer = getSearchResponseTransformer( getResponseTransformerName() );
         }
         if ( transformer == null ) {
-            throw new UnsupportedQueryException( "The query was not executed on the source " + getId() + " because the response transformer was not a valid value [" + getResponseTransformerName()
+            throw new UnsupportedQueryException( "The query was not executed on the source " + localId + " because the response transformer was not a valid value [" + getResponseTransformerName()
                     + "]. Please check the source configuration value for 'Response Transformer Override'" );
         }
         return transformer;
@@ -519,7 +528,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             sourceResponse = new SourceResponseImpl( queryRequest, Arrays.asList( (Result) new ResultImpl( metacard ) ), 1L );
         } else {
             LOGGER.debug( "Could not find result id [{}] in cache", id );
-            throw new UnsupportedQueryException( "Queries for parameter uid are not supported by source [" + getId() + "]" );
+            throw new UnsupportedQueryException( "Queries for parameter uid are not supported by source [" + localId + "]" );
         }
         return sourceResponse;
     }
