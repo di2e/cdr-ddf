@@ -211,6 +211,14 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
     @Override
     public void setId( String id ) {
+        LOGGER.debug( "ConfigUpdate: Updating site name to [{}] by setId method", id );
+        super.setId( id );
+        localId = id;
+    }
+
+    @Override
+    public void setShortname( String id ) {
+        LOGGER.debug( "ConfigUpdate: Updating site name to [{}] by setShortname method", id );
         super.setId( id );
         localId = id;
     }
