@@ -24,7 +24,6 @@ import static org.mockito.Mockito.mock;
 import java.net.SocketException;
 
 import javax.net.ssl.SSLHandshakeException;
-import javax.ws.rs.client.ClientException;
 
 import net.di2e.ecdr.libs.cache.impl.MetacardMemoryCacheManager;
 
@@ -129,7 +128,7 @@ public class CDRRestSourceSecureTest {
             if ( restSource.isAvailable() ) {
                 fail( "Server should have errored out with bad certificate but request passed instead." );
             }
-        } catch ( ClientException e ) {
+        } catch ( Exception e ) {
             assertThat( e.getCause(), anyOf( is( SSLHandshakeException.class ), is( SocketException.class ) ) );
         }
 
@@ -147,7 +146,7 @@ public class CDRRestSourceSecureTest {
             if ( restSource.isAvailable() ) {
                 fail( "Client should have errored out with no valid certification path found, but request passed instead." );
             }
-        } catch ( ClientException e ) {
+        } catch ( Exception e ) {
             assertThat( e.getCause(), is( SSLHandshakeException.class ) );
         }
 
