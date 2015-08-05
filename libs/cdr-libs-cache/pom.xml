@@ -75,6 +75,7 @@
                             !org.joda.convert,
                             !javax.enterprise.util,
                             org.apache.logging.log4j.*;resolution:=optional,
+                            net.di2e.ecdr.commons,
                             *
                         </Import-Package>
                         <Export-Package>
