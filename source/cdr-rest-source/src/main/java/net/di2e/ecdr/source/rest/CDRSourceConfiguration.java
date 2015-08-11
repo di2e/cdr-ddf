@@ -15,17 +15,12 @@
  */
 package net.di2e.ecdr.source.rest;
 
-import java.io.File;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-
-import javax.net.ssl.KeyManager;
 
 import net.di2e.ecdr.api.cache.Cache;
 import net.di2e.ecdr.api.cache.CacheManager;
@@ -37,8 +32,6 @@ import net.di2e.ecdr.commons.util.SearchUtils;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.net.util.KeyManagerUtils;
-import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.opengis.filter.sort.SortBy;
@@ -53,8 +46,7 @@ import ddf.catalog.util.impl.MaskableImpl;
 public abstract class CDRSourceConfiguration extends MaskableImpl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CDRSourceConfiguration.class );
-    private static final String SSL_KEYSTORE_JAVA_PROPERTY = "javax.net.ssl.keyStore";
-    private static final String SSL_KEYSTORE_PASSWORD_JAVA_PROPERTY = "javax.net.ssl.keyStorePassword";
+
 
     public enum PingMethod {
         GET, HEAD, NONE
@@ -160,17 +152,18 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
     }
 
     public synchronized void setUrl( String endpointUrl ) {
-        String existingUrl = getRestClient() == null ? null : getRestClient().getCurrentURI().toString();
-        if ( StringUtils.isNotBlank( endpointUrl ) && !endpointUrl.equals( existingUrl ) ) {
-            LOGGER.debug( "ConfigUpdate: Updating the source endpoint url value from [{}] to [{}] for sourceId [{}]", existingUrl, endpointUrl, getId() );
+        if ( StringUtils.isNotBlank( endpointUrl ) ) {
+            WebClient client = getRestClient();
+            LOGGER.debug( "ConfigUpdate: Updating the source endpoint url value from [{}] to [{}] for sourceId [{}]", client == null ? null : client.getCurrentURI(), endpointUrl, getId() );
             setRestClient( WebClient.create( endpointUrl, true ) );
 
             HTTPConduit conduit = WebClient.getConfig( getRestClient() ).getHttpConduit();
             conduit.getClient().setReceiveTimeout( receiveTimeout );
             conduit.getClient().setConnectionTimeout( connectionTimeout );
-            conduit.setTlsClientParameters( getTlsClientParameters() );
+            // conduit.setTlsClientParameters( TLSUtil.getTlsClientParameters( disableCNCheck ) );
+            TLSUtil.setTLSOptions( getRestClient(), getDisableCNCheck() );
         } else {
-            LOGGER.warn( "OpenSearch Source Endpoint URL is not a valid value (either blank or same as previous value), so cannot update [{}]", endpointUrl );
+            LOGGER.warn( "OpenSearch Source Endpoint URL is not a valid value, so cannot update it [{}]", endpointUrl );
         }
     }
 
@@ -204,7 +197,9 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
             HTTPConduit conduit = WebClient.getConfig( getPingClient() ).getHttpConduit();
             conduit.getClient().setReceiveTimeout( receiveTimeout );
             conduit.getClient().setConnectionTimeout( connectionTimeout );
-            conduit.setTlsClientParameters( getTlsClientParameters() );
+            TLSUtil.setTLSOptions( getPingClient(), getDisableCNCheck() );
+            // conduit.setTlsClientParameters( TLSUtil.getTlsClientParameters( disableCNCheck ) );
+            
         } else {
             LOGGER.debug( "ConfigUpdate: Updating the ping (site availability check) endpoint url to [null], will not be performing ping checks" );
         }
@@ -362,8 +357,16 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
     }
 
     public void setDisableCNCheck( boolean disableCheck ) {
-        LOGGER.debug( "ConfigUpdate: Updating the Disable CN Check (for certificates) boolean value from [{}] to [{}]", disableCNCheck, disableCheck );
-        this.disableCNCheck = disableCheck;
+        if ( disableCNCheck != disableCheck ) {
+            LOGGER.debug( "ConfigUpdate: Updating the Disable CN Check (for certificates) boolean value from [{}] to [{}]", disableCNCheck, disableCheck );
+            disableCNCheck = disableCheck;
+            setPingUrl( getPingClient().getCurrentURI().toString() );
+            setUrl( getRestClient().getCurrentURI().toString() );
+        }
+    }
+
+    public boolean getDisableCNCheck() {
+        return disableCNCheck;
     }
 
     public void setSendSecurityCookie( boolean sendCookie ) {
@@ -460,33 +463,6 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         }
     }
 
-    /*
-     * This method is needed because of a CXF deficiency of not using the keystore values from the java system
-     * properties. So this specifically pulls the values from the system properties then sets them to a KeyManager being
-     * used
-     */
-    protected TLSClientParameters getTlsClientParameters() {
-        TLSClientParameters tlsClientParameters = new TLSClientParameters();
-        tlsClientParameters.setDisableCNCheck( disableCNCheck );
-        String keystore = System.getProperty( SSL_KEYSTORE_JAVA_PROPERTY );
-        String keystorePassword = System.getProperty( SSL_KEYSTORE_PASSWORD_JAVA_PROPERTY );
 
-        KeyManager[] keyManagers = null;
-        if ( StringUtils.isNotBlank( keystore ) && keystorePassword != null ) {
-            try {
-                KeyManager manager = KeyManagerUtils.createClientKeyManager( new File( keystore ), keystorePassword );
-                keyManagers = new KeyManager[1];
-                keyManagers[0] = manager;
-
-            } catch ( IOException | GeneralSecurityException ex ) {
-                LOGGER.debug( "Could not access keystore {}, using default java keystore.", keystore );
-            }
-        }
-
-        LOGGER.debug( "Setting the CXF KeyManager and TrustManager based on the Platform Global Configuration values" );
-        tlsClientParameters.setKeyManagers( keyManagers );
-        return tlsClientParameters;
-
-    }
 
 }
