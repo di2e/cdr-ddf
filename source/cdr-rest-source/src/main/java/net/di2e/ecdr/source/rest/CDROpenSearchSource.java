@@ -144,6 +144,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         setURLQueryString( filterParameters );
         setHttpHeaders( filterParameters, cdrRestClient );
         LOGGER.debug( "Executing http GET query to source [{}] with url [{}]", localId, cdrRestClient.getCurrentURI().toString() );
+        // TLSUtil.setTLSOptions( cdrRestClient );
         Response response = cdrRestClient.get();
         LOGGER.debug( "Query to source [{}] returned http status code [{}] and media type [{}]", localId, response.getStatus(), response.getMediaType() );
 
@@ -177,7 +178,8 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             if ( !isCurrentlyAvailable || (lastAvailableCheckDate.getTime() < System.currentTimeMillis() - getAvailableCheckCacheTime()) ) {
                 LOGGER.debug( "Checking availability on CDR Rest Source named [{}] in real time by calling endpoint [{}]", localId, cdrAvailabilityCheckClient.getBaseURI() );
                 try {
-                    Response response = PingMethod.HEAD.equals( getPingMethod() ) ? cdrAvailabilityCheckClient.head() : cdrAvailabilityCheckClient.get();
+
+                    Response response = PingMethod.HEAD.equals( getPingMethod() ) ? getPingClient().head() : getPingClient().get();
                     if ( response.getStatus() == Status.OK.getStatusCode() || response.getStatus() == Status.ACCEPTED.getStatusCode() ) {
                         isCurrentlyAvailable = true;
                         lastAvailableCheckDate = new Date();
@@ -187,6 +189,8 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
                 } catch ( RuntimeException e ) {
                     LOGGER.warn( "CDR Rest Source named [" + localId + "] encountered an unexpected error while executing HTTP Head at URL [" + cdrAvailabilityCheckClient.getBaseURI() + "]:"
                             + e.getMessage() );
+                    LOGGER.debug( "Exception while trying to check avilability of site {}", localId, e );
+                    isCurrentlyAvailable = false;
                 }
 
             } else {
@@ -271,7 +275,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             LOGGER.debug( "Retrieving the remote resource using the uri [{}]", uri );
             WebClient retrieveWebClient = WebClient.create( uri );
             HTTPConduit conduit = WebClient.getConfig( retrieveWebClient ).getHttpConduit();
-            conduit.setTlsClientParameters( getTlsClientParameters() );
+            TLSUtil.setTLSOptions( retrieveWebClient, getDisableCNCheck() );
             resourceResponse = doRetrieval( retrieveWebClient, requestProperties );
         }
 
