@@ -103,6 +103,7 @@
         <ddf.compression.version>2.6.0</ddf.compression.version>
         <ddf.registry.version>0.1.0</ddf.registry.version>
         <joda.time.version>2.2</joda.time.version>
+        <joda.convert.version>1.7</joda.convert.version>
     </properties>
 
     <scm>
