@@ -501,7 +501,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
                 Serializable property = requestProperties.get( SecurityConstants.SECURITY_SUBJECT );
                 if ( property instanceof Subject ) {
                     Subject subject = (Subject) property;
-                    RestSecurity.setSubjectOnClient( subject, client );
+                    RestSecurity.setUnsecuredSubjectOnClient( subject, client );
                 }
             }
         }

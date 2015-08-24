@@ -16,7 +16,8 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -31,6 +32,16 @@
     <packaging>bundle</packaging>
 
     <dependencies>
+    
+        <!-- Version is to align with the ddf-security-common 2.7.x which depends 
+        on CXF 3.0.4 (however we want to remain compatible at compile and runtime to CXF 2.7.x)-->
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-rs-client</artifactId>
+            <version>3.0.4</version>
+            <scope>provided</scope>
+        </dependency>
+        
         <dependency>
             <groupId>net.di2e.ecdr.libs</groupId>
             <artifactId>cdr-rest-search-commons</artifactId>
@@ -41,6 +52,14 @@
             <groupId>net.di2e.ecdr.transformer</groupId>
             <artifactId>cdr-atom-result-xformer</artifactId>
             <version>${project.version}</version>
+          <!-- Need to exclude this so it doesn't conflict with Jetty.  If we don't we get the following error
+          java.lang.SecurityException: class "javax.servlet.ServletRegistration"'s signer information does not match  -->
+            <exclusions>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -57,6 +76,13 @@
             <groupId>ddf.security</groupId>
             <artifactId>ddf-security-common</artifactId>
             <version>2.7.1</version>
+            <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>servlet-api</artifactId>
+                    <groupId>javax.servlet</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -66,10 +92,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-bundle</artifactId>
+            <artifactId>commons-collections</artifactId>
+            <groupId>commons-collections</groupId>
+            <version>3.2.1</version>
         </dependency>
-
+        
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
@@ -85,20 +112,6 @@
         </dependency>
 
         <!-- Two-way SSL Testing -->
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.5</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-server</artifactId>
-            <version>8.1.14.v20131031</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
@@ -135,6 +148,8 @@
                             net.di2e.ecdr.commons,
                             org.apache.cxf.*;version="[2.7.0, 4.0)",
                             org.apache.ws.security.*;resolution:=optional,
+                            org.apache.wss4j.common.ext.*;resolution:=optional,
+                            org.apache.wss4j.*;resolution:=optional,
                             *
                         </Import-Package>
                         <Private-Package>
