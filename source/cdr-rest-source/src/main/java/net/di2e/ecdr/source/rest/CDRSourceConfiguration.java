@@ -15,6 +15,7 @@
  */
 package net.di2e.ecdr.source.rest;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,7 +47,6 @@ import ddf.catalog.util.impl.MaskableImpl;
 public abstract class CDRSourceConfiguration extends MaskableImpl {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CDRSourceConfiguration.class );
-
 
     public enum PingMethod {
         GET, HEAD, NONE
@@ -116,8 +116,8 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         hardcodedParamMap.put( SearchConstants.QUERYLANGUAGE_PARAMETER, SearchConstants.CDR_CQL_QUERY_LANGUAGE );
 
         sortMap = new HashMap<>();
-        sortMap = SearchUtils.convertToMap( Metacard.TITLE + "=title," + Metacard.MODIFIED + "=updated," + Metacard.EFFECTIVE + "=published," + Metacard.CREATED + "=created,"
-                + Result.RELEVANCE + "=score," + Result.DISTANCE + "=distance" );
+        sortMap = SearchUtils.convertToMap( Metacard.TITLE + "=title," + Metacard.MODIFIED + "=updated," + Metacard.EFFECTIVE + "=published," + Metacard.CREATED + "=created," + Result.RELEVANCE
+                + "=score," + Result.DISTANCE + "=distance" );
 
         parameterMap = new HashMap<>();
         parameterMap.putAll( parameterMatchMap );
@@ -199,7 +199,7 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
             conduit.getClient().setConnectionTimeout( connectionTimeout );
             TLSUtil.setTLSOptions( getPingClient(), getDisableCNCheck() );
             // conduit.setTlsClientParameters( TLSUtil.getTlsClientParameters( disableCNCheck ) );
-            
+
         } else {
             LOGGER.debug( "ConfigUpdate: Updating the ping (site availability check) endpoint url to [null], will not be performing ping checks" );
         }
@@ -360,8 +360,20 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
         if ( disableCNCheck != disableCheck ) {
             LOGGER.debug( "ConfigUpdate: Updating the Disable CN Check (for certificates) boolean value from [{}] to [{}]", disableCNCheck, disableCheck );
             disableCNCheck = disableCheck;
-            setPingUrl( getPingClient().getCurrentURI().toString() );
-            setUrl( getRestClient().getCurrentURI().toString() );
+            WebClient client = getPingClient();
+            if ( client != null ) {
+                URI pingUri = client.getCurrentURI();
+                if ( pingUri != null ) {
+                    setPingUrl( pingUri.toString() );
+                }
+            }
+            client = getRestClient();
+            if ( client != null ) {
+                URI pingUri = client.getCurrentURI();
+                if ( pingUri != null ) {
+                    setUrl( pingUri.toString() );
+                }
+            }
         }
     }
 
@@ -462,7 +474,5 @@ public abstract class CDRSourceConfiguration extends MaskableImpl {
             metacardCache.destroy();
         }
     }
-
-
 
 }
