@@ -106,6 +106,7 @@ public class MetacardJCacheManager implements net.di2e.ecdr.api.cache.CacheManag
         }
         cacheManager.close();
         cachingProvider.close();
+        Hazelcast.shutdownAll();
     }
 
     @Override
