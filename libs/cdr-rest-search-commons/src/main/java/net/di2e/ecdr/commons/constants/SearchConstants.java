@@ -59,6 +59,7 @@ public final class SearchConstants {
     public static final String POLYGON_PARAMETER = "polygon";
     public static final String UID_PARAMETER = "uid";
     public static final String GEO_RELATION_PARAMETER = "spatialOp";
+    public static final String GEO_NAME_PARAMETER = "locName";
     
     // TEMPORAL Parameters
     public static final String STARTDATE_PARAMETER = "dtStart";

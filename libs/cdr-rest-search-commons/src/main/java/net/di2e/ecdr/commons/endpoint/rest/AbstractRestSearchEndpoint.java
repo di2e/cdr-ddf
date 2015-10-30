@@ -60,6 +60,7 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
+import org.codice.ddf.spatial.geocoder.GeoCoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,6 +89,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
     private QueryConfiguration queryConfiguration = null;
 
     private TransformIdMapper transformMapper = null;
+    private List<GeoCoder> geoCoderList;
 
     /**
      * Constructor for JAX RS CDR Search Service. Values should ideally be passed into the constructor using a
@@ -104,7 +106,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
      *            String. Query parsers are tied to different versions of a query profile
      */
     public AbstractRestSearchEndpoint( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, QueryRequestCache queryReqCache ) {
+            QueryConfiguration queryConfig, QueryRequestCache queryReqCache, List<GeoCoder> geoCoderList ) {
         this.catalogFramework = framework;
         this.platformConfig = config;
         // this.queryLanguageMap = queryLangs;
@@ -113,6 +115,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         this.auditors = auditorList;
         this.queryConfiguration = queryConfig;
         this.queryRequestCache = queryReqCache;
+        this.geoCoderList = geoCoderList;
     }
 
     public Response executePing( UriInfo uriInfo, String encodingHeader, String authHeader ) {
@@ -166,7 +169,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
             QueryLanguage queryLanguage = getQueryLanguage( queryParameters );
             if ( queryLanguage == null ) {
                 throw new UnsupportedQueryException(
-                        "A Query language could not be determined, please check the default query langauge in the Admin Console ECDR Applicaiton Search Endpoint settings" );
+                        "A Query language could not be determined, please check the default query language in the Admin Console ECDR Application Search Endpoint settings" );
             }
             QueryCriteria queryCriteria = queryLanguage.getQueryCriteria( queryParameters, queryConfiguration );
             CDRQueryImpl query = new CDRQueryImpl( queryCriteria, localSourceId );

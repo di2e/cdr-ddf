@@ -40,6 +40,7 @@ import net.di2e.ecdr.commons.query.CDRQueryImpl;
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
+import org.codice.ddf.spatial.geocoder.GeoCoder;
 import org.opengis.filter.sort.SortBy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,8 +90,8 @@ public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
      *            String. Query parsers are tied to different versions of a query profile
      */
     public CDRRestBrokerServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, QueryRequestCache queryCache, NormalizingFederationStrategy sortedFedStrategy, FederationStrategy defaultFedStrategy ) {
-        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache );
+            QueryConfiguration queryConfig, QueryRequestCache queryCache, NormalizingFederationStrategy sortedFedStrategy, FederationStrategy defaultFedStrategy, List<GeoCoder> geoCoderList ) {
+        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache, geoCoderList );
         this.sortedFedStrategy = sortedFedStrategy;
         this.defaultFederationStrategy = defaultFedStrategy;
     }

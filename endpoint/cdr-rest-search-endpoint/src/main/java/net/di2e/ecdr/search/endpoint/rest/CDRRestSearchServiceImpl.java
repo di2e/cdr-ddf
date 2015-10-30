@@ -42,6 +42,7 @@ import net.di2e.ecdr.federation.FifoFederationStrategy;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
+import org.codice.ddf.spatial.geocoder.GeoCoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,8 +96,8 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
      *            transform name
      */
     public CDRRestSearchServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, QueryRequestCache queryCache, FifoFederationStrategy fedStrategy ) {
-        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache );
+            QueryConfiguration queryConfig, QueryRequestCache queryCache, FifoFederationStrategy fedStrategy, List<GeoCoder> geoCoderList ) {
+        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache, geoCoderList );
         fifoFederationStratgey = fedStrategy;
     }
 
