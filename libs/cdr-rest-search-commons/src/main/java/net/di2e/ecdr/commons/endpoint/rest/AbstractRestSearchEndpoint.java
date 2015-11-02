@@ -79,8 +79,6 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AbstractRestSearchEndpoint.class );
 
-    private static final int DEFAULT_QUERYID_CACHE_SIZE = 1000;
-
     private QueryRequestCache queryRequestCache = null;
 
     private CatalogFramework catalogFramework = null;
@@ -91,24 +89,23 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
     private QueryConfiguration queryConfiguration = null;
 
     private TransformIdMapper transformMapper = null;
-    private List<GeoCoder> geoCoderList;
+    private List<Object> geoCoderList;
 
     /**
      * Constructor for JAX RS CDR Search Service. Values should ideally be passed into the constructor using a
      * dependency injection framework like blueprint
      *
-     * @param framework
-     *            Catalog Framework which will be used for search
-     * @param config
-     *            ConfigurationWatcherImpl used to get the platform configuration values
-     * @param builder
-     *            FilterBuilder implementation
-     * @param parser
-     *            The instance of the QueryParser to use which will determine how to parse the parameters from the query
-     *            String. Query parsers are tied to different versions of a query profile
+     * @param framework Catalog Framework which will be used for search
+     * @param config ConfigurationWatcherImpl used to get the platform configuration values
+     * @param queryLangs
+     * @param mapper
+     * @param auditorList
+     * @param queryConfig
+     * @param queryReqCache
+     * @param geoCoderList
      */
     public AbstractRestSearchEndpoint( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, QueryRequestCache queryReqCache, List<GeoCoder> geoCoderList ) {
+            QueryConfiguration queryConfig, QueryRequestCache queryReqCache, List<Object> geoCoderList ) {
         this.catalogFramework = framework;
         this.platformConfig = config;
         // this.queryLanguageMap = queryLangs;
@@ -148,7 +145,8 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
 
         String geoName = queryParameters.getFirst( SearchConstants.GEO_NAME_PARAMETER );
         if ( StringUtils.isNotBlank( geoName )) {
-            for (GeoCoder geoCoder : geoCoderList) {
+            for (Object curObject : geoCoderList) {
+                GeoCoder geoCoder = (GeoCoder) curObject;
                 GeoResult result = geoCoder.getLocation( geoName );
                 if (result != null) {
                     if (result.getBbox() != null) {
@@ -443,7 +441,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
     }
 
     protected boolean isValidQuery( MultivaluedMap<String, String> queryParameters, String sourceId ) {
-        boolean isValidQuery = true;
+        boolean isValidQuery;
         String queryLang = queryParameters.getFirst( SearchConstants.QUERYLANGUAGE_PARAMETER );
         // if ( StringUtils.isNotBlank( queryLang ) && !queryLanguageMap.containsKey( queryLang ) ) {
         if ( getQueryLanguage( queryParameters ) == null ) {

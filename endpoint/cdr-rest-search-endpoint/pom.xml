@@ -72,11 +72,12 @@
                             META-INF.cxf.osgi;version="[2.7.0, 4.0)";resolution:=optional,
                             templates;resolution:=optional,
                             javax.servlet.http;version="[2.5,4)",
+                            org.codice.ddf.spatial.geocoder;resolution:=optional,
                             *,
                         </Import-Package>
                         <Export-Package />
                         <Private-Package>
-                            net.di2e.ecdr.search.endpoint.rest,
+                            net.di2e.ecdr.search.endpoint.rest
                         </Private-Package>
                     </instructions>
                 </configuration>

@@ -82,9 +82,9 @@
     <feature name="cdr-common" install="manual" version="${project.version}" description="CDR Common bundles.">
         <bundle>mvn:joda-time/joda-time/${joda.time.version}</bundle>
         <bundle>mvn:org.joda/joda-convert/${joda.convert.version}</bundle>
+        <bundle>mvn:net.di2e.ecdr.libs/cdr-rest-search-commons/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.api/cdr-api/${project.version}</bundle>
         <bundle>mvn:net.di2e.ecdr.libs/cdr-libs-cache/${project.version}</bundle>
-        <bundle>mvn:net.di2e.ecdr.libs/cdr-rest-search-commons/${project.version}</bundle>
     </feature>
     
     

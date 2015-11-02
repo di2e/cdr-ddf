@@ -132,6 +132,7 @@
                         <Import-Package>
                             !org.apache.commons.codec.*,
                             javax.servlet.http;version="[2.5,4)",
+                            org.codice.ddf.spatial.geocoder;resolution:=optional,
                             *
                         </Import-Package>
                         <Export-Package>
@@ -139,9 +140,6 @@
                             org.codice.ddf.configuration.impl,
                             templates,
                         </Export-Package>
-                        <Private-Package>
-                            
-                        </Private-Package>
                     </instructions>
                 </configuration>
             </plugin>
