@@ -74,6 +74,7 @@
         <argument ref="queryConfiguration" />
         <argument ref="queryRequestCache" />
         <argument ref="fifoFederationStrategyBean" />
+        <argument ref="geoCoders" />
     </bean>
     <service ref="cdrRestSearchService" auto-export="interfaces" />
 

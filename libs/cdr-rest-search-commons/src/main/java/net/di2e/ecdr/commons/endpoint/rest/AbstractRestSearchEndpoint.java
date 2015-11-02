@@ -61,6 +61,8 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
 import org.codice.ddf.spatial.geocoder.GeoCoder;
+import org.codice.ddf.spatial.geocoder.GeoResult;
+import org.opengis.geometry.primitive.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,6 +144,39 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         return null;
     }
 
+    private void translateGeoNames( MultivaluedMap<String, String> queryParameters ) {
+
+        String geoName = queryParameters.getFirst( SearchConstants.GEO_NAME_PARAMETER );
+        if ( StringUtils.isNotBlank( geoName )) {
+            for (GeoCoder geoCoder : geoCoderList) {
+                GeoResult result = geoCoder.getLocation( geoName );
+                if (result != null) {
+                    if (result.getBbox() != null) {
+                        List<Point> bbox = result.getBbox();
+                        if (!bbox.isEmpty()) {
+                            Point upperLeft = bbox.get( 0 );
+                            Point lowerRight = bbox.get( 1 );
+                            // box is in the format west, south, east, north
+                            // if upperLeft is (x1,y1) and lowerRight is (x2,y2) this translates to x1, y2, x2, y1
+                            String boxStr = upperLeft.getDirectPosition().getCoordinate()[0] + "," + lowerRight.getDirectPosition().getCoordinate()[1] + ","
+                                + lowerRight.getDirectPosition().getCoordinate()[0] + "," + upperLeft.getDirectPosition().getCoordinate()[1];
+                            queryParameters.add( SearchConstants.BOX_PARAMETER, boxStr );
+                        }
+                    } else if (result.getPoint() != null) {
+                        Point point = result.getPoint();
+                        queryParameters.add( SearchConstants.LONGITUDE_PARAMETER, Double.toString( point.getDirectPosition().getCoordinate()[0] ) );
+                        queryParameters.add( SearchConstants.LATITUDE_PARAMETER, Double.toString( point.getDirectPosition().getCoordinate()[1] ) );
+                    } else {
+                        // issue within the geocoder, it had a result but nothing converted in it
+                        continue;
+                    }
+                    return;
+                }
+            }
+        }
+
+    }
+
     /**
      * Search method that gets called when issuing an HTTP GET to the corresponding URL. HTTP GET URL query parameters
      * contain the query criteria values
@@ -171,6 +206,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
                 throw new UnsupportedQueryException(
                         "A Query language could not be determined, please check the default query language in the Admin Console ECDR Application Search Endpoint settings" );
             }
+            translateGeoNames( queryParameters );
             QueryCriteria queryCriteria = queryLanguage.getQueryCriteria( queryParameters, queryConfiguration );
             CDRQueryImpl query = new CDRQueryImpl( queryCriteria, localSourceId );
 
