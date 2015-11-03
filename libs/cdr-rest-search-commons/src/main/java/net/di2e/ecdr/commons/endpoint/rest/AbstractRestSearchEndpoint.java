@@ -89,6 +89,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
     private QueryConfiguration queryConfiguration = null;
 
     private TransformIdMapper transformMapper = null;
+    // using an object reference here so that this will be deployable on older DDF systems that do not have the class
     private List<Object> geoCoderList;
 
     /**
@@ -162,8 +163,13 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
                         }
                     } else if (result.getPoint() != null) {
                         Point point = result.getPoint();
-                        queryParameters.add( SearchConstants.LONGITUDE_PARAMETER, Double.toString( point.getDirectPosition().getCoordinate()[0] ) );
-                        queryParameters.add( SearchConstants.LATITUDE_PARAMETER, Double.toString( point.getDirectPosition().getCoordinate()[1] ) );
+                        StringWriter wktStr = new StringWriter();
+                        wktStr.append("POINT (");
+                        wktStr.append(Double.toString( point.getDirectPosition().getCoordinate()[0]) );
+                        wktStr.append(" ");
+                        wktStr.append(Double.toString( point.getDirectPosition().getCoordinate()[1]) );
+                        wktStr.append(")");
+                        queryParameters.add( SearchConstants.GEOMETRY_PARAMETER, wktStr.toString() );
                     } else {
                         // issue within the geocoder, it had a result but nothing converted in it
                         continue;
