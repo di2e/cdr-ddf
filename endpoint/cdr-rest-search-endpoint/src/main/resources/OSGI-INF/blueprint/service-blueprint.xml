@@ -52,6 +52,7 @@
     <reference id="catalogFramework" interface="ddf.catalog.CatalogFramework" />
     <reference id="transformIdMapper" interface="net.di2e.ecdr.api.transform.TransformIdMapper" />
     <reference-list id="queryLanguages" interface="net.di2e.ecdr.api.query.QueryLanguage" availability="mandatory" />
+    <reference-list id="geoCoders" interface="org.codice.ddf.spatial.geocoder.GeoCoder" availability="optional" />
 
     <service id="cdrRestConfigWatcher" ref="configurationWatcher" interface="org.codice.ddf.configuration.ConfigurationWatcher" />
     <bean id="configurationWatcher" class="org.codice.ddf.configuration.impl.ConfigurationWatcherImpl" />
@@ -73,6 +74,7 @@
         <argument ref="queryConfiguration" />
         <argument ref="queryRequestCache" />
         <argument ref="fifoFederationStrategyBean" />
+        <argument ref="geoCoders" />
     </bean>
     <service ref="cdrRestSearchService" auto-export="interfaces" />
 

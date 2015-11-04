@@ -47,6 +47,7 @@ import net.di2e.ecdr.api.query.QueryLanguage;
 import net.di2e.ecdr.api.transform.TransformIdMapper;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.query.CDRQueryImpl;
+import net.di2e.ecdr.commons.util.GeospatialUtils;
 import net.di2e.ecdr.commons.util.SearchUtils;
 import net.di2e.ecdr.commons.xml.fs.SourceDescription;
 import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
@@ -60,6 +61,9 @@ import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
+import org.codice.ddf.spatial.geocoder.GeoCoder;
+import org.codice.ddf.spatial.geocoder.GeoResult;
+import org.opengis.geometry.BoundingBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,8 +80,6 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AbstractRestSearchEndpoint.class );
 
-    private static final int DEFAULT_QUERYID_CACHE_SIZE = 1000;
-
     private QueryRequestCache queryRequestCache = null;
 
     private CatalogFramework catalogFramework = null;
@@ -88,23 +90,24 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
     private QueryConfiguration queryConfiguration = null;
 
     private TransformIdMapper transformMapper = null;
+    // using an object reference here so that this will be deployable on older DDF systems that do not have the class
+    private List<Object> geoCoderList;
 
     /**
      * Constructor for JAX RS CDR Search Service. Values should ideally be passed into the constructor using a
      * dependency injection framework like blueprint
      *
-     * @param framework
-     *            Catalog Framework which will be used for search
-     * @param config
-     *            ConfigurationWatcherImpl used to get the platform configuration values
-     * @param builder
-     *            FilterBuilder implementation
-     * @param parser
-     *            The instance of the QueryParser to use which will determine how to parse the parameters from the query
-     *            String. Query parsers are tied to different versions of a query profile
+     * @param framework Catalog Framework which will be used for search
+     * @param config ConfigurationWatcherImpl used to get the platform configuration values
+     * @param queryLangs
+     * @param mapper
+     * @param auditorList
+     * @param queryConfig
+     * @param queryReqCache
+     * @param geoCoderList
      */
     public AbstractRestSearchEndpoint( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, QueryRequestCache queryReqCache ) {
+            QueryConfiguration queryConfig, QueryRequestCache queryReqCache, List<Object> geoCoderList ) {
         this.catalogFramework = framework;
         this.platformConfig = config;
         // this.queryLanguageMap = queryLangs;
@@ -113,6 +116,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         this.auditors = auditorList;
         this.queryConfiguration = queryConfig;
         this.queryRequestCache = queryReqCache;
+        this.geoCoderList = geoCoderList;
     }
 
     public Response executePing( UriInfo uriInfo, String encodingHeader, String authHeader ) {
@@ -137,6 +141,37 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
             }
         }
         return null;
+    }
+
+    private void translateGeoNames( MultivaluedMap<String, String> queryParameters ) {
+
+        String geoName = queryParameters.getFirst( SearchConstants.GEO_NAME_PARAMETER );
+        if ( StringUtils.isNotBlank( geoName )) {
+            for (Object curObject : geoCoderList) {
+                GeoCoder geoCoder = (GeoCoder) curObject;
+                GeoResult result = geoCoder.getLocation( geoName );
+                if (result != null) {
+                    if (result.getBbox() != null) {
+                        BoundingBox boundingBox = GeospatialUtils.pointsToBBox(result.getBbox());
+                        if (boundingBox != null) {
+                            String wktStr = GeospatialUtils.bboxToWKT(boundingBox);
+                            queryParameters.add( SearchConstants.GEOMETRY_PARAMETER, wktStr );
+                        } else {
+                            LOGGER.debug("Was not able to convert geoname result to boundingbox, checking next geocoder.");
+                            continue;
+                        }
+                    } else if (result.getPoint() != null) {
+                        String wktStr = GeospatialUtils.pointToWKT(result.getPoint());
+                        queryParameters.add( SearchConstants.GEOMETRY_PARAMETER, wktStr );
+                    } else {
+                        // issue within the geocoder, it had a result but nothing converted in it
+                        continue;
+                    }
+                    return;
+                }
+            }
+        }
+
     }
 
     /**
@@ -166,8 +201,9 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
             QueryLanguage queryLanguage = getQueryLanguage( queryParameters );
             if ( queryLanguage == null ) {
                 throw new UnsupportedQueryException(
-                        "A Query language could not be determined, please check the default query langauge in the Admin Console ECDR Applicaiton Search Endpoint settings" );
+                        "A Query language could not be determined, please check the default query language in the Admin Console ECDR Application Search Endpoint settings" );
             }
+            translateGeoNames( queryParameters );
             QueryCriteria queryCriteria = queryLanguage.getQueryCriteria( queryParameters, queryConfiguration );
             CDRQueryImpl query = new CDRQueryImpl( queryCriteria, localSourceId );
 
@@ -404,7 +440,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
     }
 
     protected boolean isValidQuery( MultivaluedMap<String, String> queryParameters, String sourceId ) {
-        boolean isValidQuery = true;
+        boolean isValidQuery;
         String queryLang = queryParameters.getFirst( SearchConstants.QUERYLANGUAGE_PARAMETER );
         // if ( StringUtils.isNotBlank( queryLang ) && !queryLanguageMap.containsKey( queryLang ) ) {
         if ( getQueryLanguage( queryParameters ) == null ) {

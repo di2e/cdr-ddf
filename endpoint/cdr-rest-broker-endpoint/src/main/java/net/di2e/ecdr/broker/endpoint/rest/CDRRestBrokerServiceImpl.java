@@ -89,8 +89,8 @@ public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
      *            String. Query parsers are tied to different versions of a query profile
      */
     public CDRRestBrokerServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, QueryRequestCache queryCache, NormalizingFederationStrategy sortedFedStrategy, FederationStrategy defaultFedStrategy ) {
-        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache );
+            QueryConfiguration queryConfig, QueryRequestCache queryCache, NormalizingFederationStrategy sortedFedStrategy, FederationStrategy defaultFedStrategy, List<Object> geoCoderList ) {
+        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache, geoCoderList );
         this.sortedFedStrategy = sortedFedStrategy;
         this.defaultFederationStrategy = defaultFedStrategy;
     }

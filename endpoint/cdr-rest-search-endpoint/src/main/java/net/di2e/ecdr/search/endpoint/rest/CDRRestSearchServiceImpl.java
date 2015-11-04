@@ -95,8 +95,8 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
      *            transform name
      */
     public CDRRestSearchServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, QueryRequestCache queryCache, FifoFederationStrategy fedStrategy ) {
-        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache );
+            QueryConfiguration queryConfig, QueryRequestCache queryCache, FifoFederationStrategy fedStrategy, List<Object> geoCoderList ) {
+        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache, geoCoderList );
         fifoFederationStratgey = fedStrategy;
     }
 

@@ -28,6 +28,7 @@
     <groupId>net.di2e.ecdr.app</groupId>
     <artifactId>cdr-app</artifactId>
     <name>Enterprise CDR :: Applications :: CDR REST Application</name>
+    <packaging>pom</packaging>
 
     <build>
         <plugins>

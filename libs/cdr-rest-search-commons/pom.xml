@@ -100,9 +100,15 @@
         </dependency>
 
         <dependency>
+            <groupId>org.codice.ddf.spatial</groupId>
+            <artifactId>spatial-geocoding-geocoder</artifactId>
+            <version>${ddf.geocoder.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>ddf.catalog.core</groupId>
             <artifactId>filter-proxy</artifactId>
-            <version>2.4.0</version>
+            <version>${ddf.catalog.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -126,6 +132,7 @@
                         <Import-Package>
                             !org.apache.commons.codec.*,
                             javax.servlet.http;version="[2.5,4)",
+                            org.codice.ddf.spatial.geocoder;resolution:=optional,
                             *
                         </Import-Package>
                         <Export-Package>
@@ -133,9 +140,6 @@
                             org.codice.ddf.configuration.impl,
                             templates,
                         </Export-Package>
-                        <Private-Package>
-                            
-                        </Private-Package>
                     </instructions>
                 </configuration>
             </plugin>
