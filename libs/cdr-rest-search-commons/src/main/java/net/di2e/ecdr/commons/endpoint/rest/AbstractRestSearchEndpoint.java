@@ -47,6 +47,7 @@ import net.di2e.ecdr.api.query.QueryLanguage;
 import net.di2e.ecdr.api.transform.TransformIdMapper;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.query.CDRQueryImpl;
+import net.di2e.ecdr.commons.util.GeospatialUtils;
 import net.di2e.ecdr.commons.util.SearchUtils;
 import net.di2e.ecdr.commons.xml.fs.SourceDescription;
 import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
@@ -62,7 +63,7 @@ import org.apache.commons.lang.StringUtils;
 import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
 import org.codice.ddf.spatial.geocoder.GeoCoder;
 import org.codice.ddf.spatial.geocoder.GeoResult;
-import org.opengis.geometry.primitive.Point;
+import org.opengis.geometry.BoundingBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,25 +152,17 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
                 GeoResult result = geoCoder.getLocation( geoName );
                 if (result != null) {
                     if (result.getBbox() != null) {
-                        List<Point> bbox = result.getBbox();
-                        if (!bbox.isEmpty()) {
-                            Point upperLeft = bbox.get( 0 );
-                            Point lowerRight = bbox.get( 1 );
-                            // box is in the format west, south, east, north
-                            // if upperLeft is (x1,y1) and lowerRight is (x2,y2) this translates to x1, y2, x2, y1
-                            String boxStr = upperLeft.getDirectPosition().getCoordinate()[0] + "," + lowerRight.getDirectPosition().getCoordinate()[1] + ","
-                                + lowerRight.getDirectPosition().getCoordinate()[0] + "," + upperLeft.getDirectPosition().getCoordinate()[1];
-                            queryParameters.add( SearchConstants.BOX_PARAMETER, boxStr );
+                        BoundingBox boundingBox = GeospatialUtils.pointsToBBox(result.getBbox());
+                        if (boundingBox != null) {
+                            String wktStr = GeospatialUtils.bboxToWKT(boundingBox);
+                            queryParameters.add( SearchConstants.GEOMETRY_PARAMETER, wktStr );
+                        } else {
+                            LOGGER.debug("Was not able to convert geoname result to boundingbox, checking next geocoder.");
+                            continue;
                         }
                     } else if (result.getPoint() != null) {
-                        Point point = result.getPoint();
-                        StringWriter wktStr = new StringWriter();
-                        wktStr.append("POINT (");
-                        wktStr.append(Double.toString( point.getDirectPosition().getCoordinate()[0]) );
-                        wktStr.append(" ");
-                        wktStr.append(Double.toString( point.getDirectPosition().getCoordinate()[1]) );
-                        wktStr.append(")");
-                        queryParameters.add( SearchConstants.GEOMETRY_PARAMETER, wktStr.toString() );
+                        String wktStr = GeospatialUtils.pointToWKT(result.getPoint());
+                        queryParameters.add( SearchConstants.GEOMETRY_PARAMETER, wktStr );
                     } else {
                         // issue within the geocoder, it had a result but nothing converted in it
                         continue;

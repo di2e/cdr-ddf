@@ -16,6 +16,10 @@
 package net.di2e.ecdr.commons.util;
 
 import org.apache.commons.lang.StringUtils;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.opengis.geometry.BoundingBox;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,6 +28,8 @@ import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.io.ParseException;
 import com.vividsolutions.jts.io.WKTReader;
 import com.vividsolutions.jts.io.WKTWriter;
+
+import java.util.List;
 
 /**
  * Utility Class for geospatial related functions
@@ -94,6 +100,45 @@ public final class GeospatialUtils {
                            + boxLocs[1].getLongitudeInDegrees() + " " + boxLocs[1].getLatitudeInDegrees() + ", " 
                            + boxLocs[0].getLongitudeInDegrees() + " " + boxLocs[1].getLatitudeInDegrees() + ", " 
                            + boxLocs[0].getLongitudeInDegrees() + " " + boxLocs[0].getLatitudeInDegrees() + "))";
+    }
+
+    /**
+     * Converts a point to a WKT-based string.
+     *
+     * @param point Point to convert to WKT.
+     * @return WKT String.
+     */
+    public static String pointToWKT(org.opengis.geometry.primitive.Point point) {
+        return JTS.toGeometry(point.getDirectPosition()).toText();
+    }
+
+    /**
+     * Converts a boundingbox to a WKT-based string.
+     *
+     * @param bbox BoundingBox to convert to WKT.
+     * @return WKT String.
+     */
+    public static String bboxToWKT(BoundingBox bbox) {
+        return JTS.toGeometry(bbox).toText();
+    }
+
+    /**
+     * Converts a list of points into a geotools-based bounding box.
+     *
+     * @param points List of points, should only include the 'upper-left' and 'lower-right' points in that order.
+     *               Code will not look at any other points that are passed in.
+     * @return BoundingBox if transformation works, null otherwise.
+     */
+    public static BoundingBox pointsToBBox(List<org.opengis.geometry.primitive.Point> points) {
+        BoundingBox bbox = null;
+        if (!points.isEmpty()) {
+            org.opengis.geometry.primitive.Point point1 = points.get( 0 );
+            org.opengis.geometry.primitive.Point point2 = points.get( 1 );
+            bbox = new ReferencedEnvelope(point1.getDirectPosition().getCoordinate()[0],
+                    point2.getDirectPosition().getCoordinate()[0], point1.getDirectPosition().getCoordinate()[1],
+                    point2.getDirectPosition().getCoordinate()[1], DefaultGeographicCRS.WGS84 );
+        }
+        return bbox;
     }
 
 
