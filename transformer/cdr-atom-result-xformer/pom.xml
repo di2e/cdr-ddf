@@ -16,105 +16,122 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>net.di2e.ecdr</groupId>
-        <artifactId>transformer</artifactId>
-        <version>1.1.5-SNAPSHOT</version>
-    </parent>
-    <name>Enterprise CDR :: Transformers :: Atom Result Transformer</name>
-    <groupId>net.di2e.ecdr.transformer</groupId>
-    <artifactId>cdr-atom-result-xformer</artifactId>
-    <packaging>bundle</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.di2e.ecdr</groupId>
+    <artifactId>transformer</artifactId>
+    <version>1.1.5-SNAPSHOT</version>
+  </parent>
+  <name>Enterprise CDR :: Transformers :: Atom Result Transformer</name>
+  <groupId>net.di2e.ecdr.transformer</groupId>
+  <artifactId>cdr-atom-result-xformer</artifactId>
+  <packaging>bundle</packaging>
 
-    <dependencies>
-        <dependency>
-            <groupId>net.di2e.ecdr.libs</groupId>
-            <artifactId>cdr-rest-search-commons</artifactId>
-            <version>${project.version}</version>
-        </dependency>
+  <dependencies>
+    <dependency>
+      <groupId>net.di2e.ecdr.libs</groupId>
+      <artifactId>cdr-rest-search-commons</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ddf.platform.util</groupId>
+      <artifactId>platform-util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ddf.lib</groupId>
+      <artifactId>common-system</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ddf.catalog.core</groupId>
+      <artifactId>catalog-core-api-impl</artifactId>
+    </dependency>
 
-        <dependency>
-            <groupId>org.codice.ddf</groupId>
-            <artifactId>platform-configuration-impl</artifactId>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.abdera</groupId>
+      <artifactId>abdera-extensions-geo</artifactId>
+      <version>1.1.3</version>
+    </dependency>
 
-        <dependency>
-            <groupId>org.apache.abdera</groupId>
-            <artifactId>abdera-extensions-geo</artifactId>
-            <version>1.1.3</version>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.abdera</groupId>
+      <artifactId>abdera-extensions-main</artifactId>
+      <version>1.1.3</version>
+    </dependency>
 
-        <dependency>
-            <groupId>org.apache.abdera</groupId>
-            <artifactId>abdera-extensions-main</artifactId>
-            <version>1.1.3</version>
-        </dependency>
+    <dependency>
+      <groupId>org.apache.abdera</groupId>
+      <artifactId>abdera-extensions-opensearch</artifactId>
+      <version>1.1.3</version>
+    </dependency>
 
-        <dependency>
-            <groupId>org.apache.abdera</groupId>
-            <artifactId>abdera-extensions-opensearch</artifactId>
-            <version>1.1.3</version>
-        </dependency>
 
-    </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Embed-Transitive>true</Embed-Transitive>
-                        <Embed-Dependency>
-                            catalog-core-api-impl,
-                            platform-configuration-impl,
-                            abdera*,
-                            axiom*,
-                        </Embed-Dependency>
-                        <Import-Package>
-                            !org.apache.commons.codec.*,
-                            !org.apache.james.*,
-                            !org.codice.ddf.configuration.impl,
-                            *,
-                        </Import-Package>
-                        <Export-Package>
-                            net.di2e.ecdr.search.transform.atom.response,
-                            net.di2e.ecdr.search.transform.geo.formatter,
-                        </Export-Package>
-                        <Private-Package>
-                            net.di2e.ecdr.search.transform.atom.*,
-                            net.di2e.ecdr.search.transform.atom.security.*,
-                            net.di2e.ecdr.search.transform.atom.response.security,                           
-                            org.objectweb.*,
-                            org.parboiled.*,
-                        </Private-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>com.mycila</groupId>
-                <artifactId>license-maven-plugin</artifactId>
-                <version>2.8</version>
-                <configuration>
-                    <excludes>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Embed-Transitive>true</Embed-Transitive>
+            <Embed-Dependency>
+              catalog-core-api-impl,
+              platform-util,
+              common-system,
+            </Embed-Dependency>
+            <Import-Package>
+              !org.apache.commons.codec.*,
+              !org.apache.james.*,
+              org.apache.axiom.om,
+              org.apache.axiom.om.impl.llom.factory,
+              org.apache.abdera.parser.stax;version="[1.1.3, 2.0)",
+              org.apache.abdera.parser.stax.util;version="[1.1.3, 2.0)",
+              org.apache.abdera.util,
+              org.apache.abdera.writer,
+              org.apache.abdera.factory,
+              org.apache.abdera.i18n.text.io, <!-- needed by AbstractWriter -->
+              org.apache.abdera.i18n.iri, <!-- Element -->
+              org.apache.abdera.i18n.rfc4646, <!-- Element -->
+              com.ctc.wstx.stax, <!-- needed by FOMWriter -->
+              *,
+            </Import-Package>
+            <Export-Package>
+              net.di2e.ecdr.search.transform.atom.response,
+              net.di2e.ecdr.search.transform.geo.formatter,
+            </Export-Package>
+            <Private-Package>
+              net.di2e.ecdr.search.transform.atom.*,
+              
+            </Private-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>2.8</version>
+        <configuration>
+          <excludes>
                         <!-- Contains LGPL licensed files and must stay LGPL -->
-                        <exclude>**/net/di2e/ecdr/search/transform/geo/formatter/**</exclude>
-                    </excludes>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
+            <exclude>**/net/di2e/ecdr/search/transform/geo/formatter/**</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 
 </project>

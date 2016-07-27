@@ -43,12 +43,7 @@
             <ref component-id="cors-filter" />
         </jaxrs:providers>
     </jaxrs:server>
-
-    <service id="cdrRestConfigWatcher" ref="configurationWatcher" interface="org.codice.ddf.configuration.ConfigurationWatcher" />
-    <bean id="configurationWatcher" class="org.codice.ddf.configuration.impl.ConfigurationWatcherImpl" />
-
     <bean id="cdrRestDescribeService" class="net.di2e.ecdr.describe.endpoint.rest.CDRRestDescribeService">
-        <argument ref="configurationWatcher" />
         <cm:managed-properties persistent-id="cdr-rest-describe-endpoint" update-strategy="container-managed"/>
     </bean>
 

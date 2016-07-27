@@ -1,5 +1,6 @@
 /**
  * Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+ * Copyright (C) 2016 Pink Summit, LLC (info@pinksummit.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,9 +21,11 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -32,6 +35,7 @@ import net.di2e.ecdr.api.query.QueryCriteria;
 import net.di2e.ecdr.api.query.QueryLanguage;
 import net.di2e.ecdr.commons.CDRMetacard;
 import net.di2e.ecdr.commons.constants.SearchConstants;
+import net.di2e.ecdr.commons.endpoint.rest.AbstractRestSearchEndpoint;
 import net.di2e.ecdr.commons.query.CDRQueryCriteriaImpl;
 import net.di2e.ecdr.commons.util.DateTypeMap;
 import net.di2e.ecdr.commons.util.GeospatialUtils;
@@ -68,14 +72,42 @@ import ddf.catalog.source.UnsupportedQueryException;
 public class CDRKeywordQueryLanguage implements QueryLanguage {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CDRKeywordQueryLanguage.class );
+    
+    private Map<String,String> QUERY_PARAMETERS_MAP = null;
+    
     private FilterBuilder filterBuilder = null;
     private List<SortTypeConfiguration> sortTypeConfigurationList = null;
     private DateTypeMap dateTypeMap = null;
+    
+    
 
     public CDRKeywordQueryLanguage( FilterBuilder builder, List<SortTypeConfiguration> sortTypeConfigurations, DateTypeMap dateMap ) {
         filterBuilder = builder;
         sortTypeConfigurationList = sortTypeConfigurations;
         dateTypeMap = dateMap;
+
+        QUERY_PARAMETERS_MAP = new HashMap<String,String>();
+        QUERY_PARAMETERS_MAP.put( SearchConstants.UID_PARAMETER, "geo:uid" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.RESOURCE_URI_PARAMETER, "ddf:resource-uri" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.CASESENSITIVE_PARAMETER, "cdrsx:caseSensitive" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.CONTENT_COLLECTIONS_PARAMETER, "ecdr:collections" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.FUZZY_PARAMETER, "ecdr:fuzzy" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.BOX_PARAMETER, "geo:box" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.LATITUDE_PARAMETER, "geo:lat" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.LONGITUDE_PARAMETER, "geo:lon" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.RADIUS_PARAMETER, "geo:radius" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.GEOMETRY_PARAMETER, "geo:geometry" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.POLYGON_PARAMETER, "polygon" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.GEO_RELATION_PARAMETER, "geo:relation" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.GEO_NAME_PARAMETER, "geo:name" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.STARTDATE_PARAMETER, "time:start" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.ENDDATE_PARAMETER, "time:end" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.DATETYPE_PARAMETER, "cdrsx:dateType" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.DATE_RELATION_PARAMETER, "time:relation" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.GEORSS_RESULT_FORMAT_PARAMETER, "ecdr:georssFormat" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.CONTENT_TYPE_PARAMETER, "ddf:metadata-content-type" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.TEXTPATH_PARAMETER, "ecdr:textPath" );
+        QUERY_PARAMETERS_MAP.put( SearchConstants.SORTKEYS_PARAMETER, "sru:sortKeys" );
     }
 
     @Override
@@ -85,28 +117,11 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
 
     @Override
     public String getUrlTemplateParameters() {
-        // @formatter:off
-        return "&uid={geo:uid?}"
-                + "&resource-uri={ddf:resource-uri?}"
-                + "&caseSensitive={cdrsx:caseSensitive?}"
-                + "&collections={ecdr:collections?}"
-                + "&fuzzy={ecdr:fuzzy?}"
-                + "&box={geo:box?}"
-                + "&lat={geo:lat?}"
-                + "&lon={geo:lon?}"
-                + "&radius={geo:radius?}"
-                + "&geometry={geo:geometry?}"
-                + "&polygon={polygon?}"
-                + "&spatialOp={geo:relation?}"
-                + "&dtStart={time:start?}"
-                + "&dtEnd={time:end?}"
-                + "&dtType={cdrsx:dateType?}"
-                + "&dtRelation={time:relation?}"
-                + "&georssFormat={ecdr:georssFormat?}"
-                + "&metadata-content-type={ddf:metadata-content-type?}"
-                + "&textPath={ecdr:textPath?}"
-                + "&sortKeys={sru:sortKeys?}";       
-     // @formatter:on
+        StringBuilder sb = new StringBuilder();
+        for( Entry<String,String> entry : QUERY_PARAMETERS_MAP.entrySet() ){
+            sb.append( "&" + entry.getKey() + "={" + entry.getValue() + "?}" );
+        }
+        return sb.toString();
     }
 
     @Override
@@ -122,7 +137,7 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
                + "additional parameters defined in the sections that follow.       " + System.lineSeparator()
                + "Examples:  ballpark" + System.lineSeparator()
                + "           ballpark AND goodyear" + System.lineSeparator()
-               + "           bacllpark AND (goodyear or peoria)" + System.lineSeparator()
+               + "           ballpark AND (goodyear or peoria)" + System.lineSeparator()
                + "           " + System.lineSeparator()
                + "           " + System.lineSeparator()
                + "**** ID/URI Search Parameters ****" + System.lineSeparator()
@@ -164,6 +179,10 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
                + "geo:relation - spatial operator for the relation to the result set " + System.lineSeparator()
                + "            default: intersects" + System.lineSeparator()
                + "            allowedValues: 'intersects', 'contains', 'disjoint'" + System.lineSeparator()
+               + System.lineSeparator()
+               + "geo:name - A string describing the location (place name) to perform the search " + System.lineSeparator()
+               + "            examples: Washington DC" + System.lineSeparator()
+               + "                      Baltimore, MD" + System.lineSeparator()
                + System.lineSeparator()
                + "**** Temporal Search Parameters ****" + System.lineSeparator()
                + System.lineSeparator()
@@ -223,78 +242,95 @@ public class CDRKeywordQueryLanguage implements QueryLanguage {
     }
 
     @Override
-    public boolean isValidQuery( MultivaluedMap<String, String> queryParameters ) {
-        return true;
+    public boolean isValidQuery( MultivaluedMap<String, String> queryParameters, boolean strict ) {
+        boolean isValid = true;
+        if ( strict ){
+            //TODO
+            //queryParameters.get
+        }
+        return isValid;
     }
 
     @Override
     public QueryCriteria getQueryCriteria( MultivaluedMap<String, String> queryParameters, QueryConfiguration queryConfig ) throws UnsupportedQueryException {
-        LOGGER.debug( "Parsing query using the CDRKeywordQueryLanguage" );
-        List<Filter> filters = new ArrayList<Filter>();
+        try {
+            LOGGER.debug( "Parsing query using the CDRKeywordQueryLanguage parser" );
+            List<Filter> filters = new ArrayList<Filter>();
 
-        SortBy sortBy = SearchUtils.getSortBy( queryParameters.getFirst( SearchConstants.SORTKEYS_PARAMETER ), sortTypeConfigurationList, true );
-        StringBuilder humanReadableQuery = new StringBuilder();
+            SortBy sortBy = SearchUtils.getSortBy( queryParameters.getFirst( SearchConstants.SORTKEYS_PARAMETER ), sortTypeConfigurationList, true );
+            StringBuilder humanReadableQuery = new StringBuilder();
 
-        boolean defaultFuzzySearch = queryConfig.isDefaultFuzzySearch();
-        double defaultRadius = queryConfig.getDefaultRadius();
-        String defaultDateType = queryConfig.getDefaultDateType();
+            boolean defaultFuzzySearch = queryConfig.isDefaultFuzzySearch();
+            double defaultRadius = queryConfig.getDefaultRadius();
+            String defaultDateType = queryConfig.getDefaultDateType();
 
-        // keyword parameters
-        TextualCriteria textualCriteria = getTextualCriteria( queryParameters, defaultFuzzySearch );
-        if ( textualCriteria != null ) {
-            boolean fuzzy = textualCriteria.isFuzzy();
-            LOGGER.debug( "Attempting to create a Contextual filter with params keywords=[{}], isCaseSensitive=[{}], fuzzy=[{}]", textualCriteria.getKeywords(), textualCriteria.isCaseSensitive(),
-                    fuzzy );
-            Filter filter = getContextualFilter( textualCriteria.getKeywords(), textualCriteria.isCaseSensitive(), fuzzy, humanReadableQuery );
-            SearchUtils.addFilter( filters, filter );
-            if ( sortBy == null ) {
-                sortBy = new SortByImpl( Result.RELEVANCE, SortOrder.DESCENDING );
+            // keyword parameters
+            TextualCriteria textualCriteria = getTextualCriteria( queryParameters, defaultFuzzySearch );
+            if ( textualCriteria != null ) {
+                boolean fuzzy = textualCriteria.isFuzzy();
+                LOGGER.debug( "Attempting to create a Contextual filter with params keywords=[{}], isCaseSensitive=[{}], fuzzy=[{}]",
+                        textualCriteria.getKeywords(), textualCriteria.isCaseSensitive(), fuzzy );
+                Filter filter = getContextualFilter( textualCriteria.getKeywords(), textualCriteria.isCaseSensitive(), fuzzy, humanReadableQuery );
+                SearchUtils.addFilter( filters, filter );
+                if ( sortBy == null ) {
+                    sortBy = new SortByImpl( Result.RELEVANCE, SortOrder.DESCENDING );
+                }
             }
-        }
 
-        // Geospatial query parameters
-        GeospatialCriteria geoCriteria = createGeospatialCriteria( queryParameters.getFirst( SearchConstants.RADIUS_PARAMETER ), queryParameters.getFirst( SearchConstants.LATITUDE_PARAMETER ),
-                queryParameters.getFirst( SearchConstants.LONGITUDE_PARAMETER ), queryParameters.getFirst( SearchConstants.BOX_PARAMETER ),
-                queryParameters.getFirst( SearchConstants.GEOMETRY_PARAMETER ), queryParameters.getFirst( SearchConstants.POLYGON_PARAMETER ),
-                queryParameters.getFirst( SearchConstants.GEO_RELATION_PARAMETER ), defaultRadius );
-        if ( geoCriteria != null ) {
-            LOGGER.debug( "Attempting to create a Geospatial filter with params radius=[{}], latitude=[{}], longitude=[{}], geometry=[{}]", geoCriteria.getRadius(), geoCriteria.getLatitude(),
-                    geoCriteria.getLongitude(), geoCriteria.getGeometryWKT() );
-            Filter filter = getGeoFilter( geoCriteria.getRadius(), geoCriteria.getLatitude(), geoCriteria.getLongitude(), geoCriteria.isBBox(), geoCriteria.getGeometryWKT(),
-                    geoCriteria.getSpatialOperator(), humanReadableQuery );
-            SearchUtils.addFilter( filters, filter );
-            if ( sortBy == null ) {
-                sortBy = new SortByImpl( Result.DISTANCE, SortOrder.ASCENDING );
+            // Geospatial query parameters
+            GeospatialCriteria geoCriteria = createGeospatialCriteria( queryParameters.getFirst( SearchConstants.RADIUS_PARAMETER ),
+                    queryParameters.getFirst( SearchConstants.LATITUDE_PARAMETER ), queryParameters.getFirst( SearchConstants.LONGITUDE_PARAMETER ),
+                    queryParameters.getFirst( SearchConstants.BOX_PARAMETER ), queryParameters.getFirst( SearchConstants.GEOMETRY_PARAMETER ),
+                    queryParameters.getFirst( SearchConstants.POLYGON_PARAMETER ), queryParameters.getFirst( SearchConstants.GEO_RELATION_PARAMETER ),
+                    defaultRadius );
+            if ( geoCriteria != null ) {
+                LOGGER.debug( "Attempting to create a Geospatial filter with params radius=[{}], latitude=[{}], longitude=[{}], geometry=[{}]",
+                        geoCriteria.getRadius(), geoCriteria.getLatitude(), geoCriteria.getLongitude(), geoCriteria.getGeometryWKT() );
+                Filter filter = getGeoFilter( geoCriteria.getRadius(), geoCriteria.getLatitude(), geoCriteria.getLongitude(), geoCriteria.isBBox(),
+                        geoCriteria.getGeometryWKT(), geoCriteria.getSpatialOperator(), humanReadableQuery );
+                SearchUtils.addFilter( filters, filter );
+                if ( sortBy == null ) {
+                    sortBy = new SortByImpl( Result.DISTANCE, SortOrder.ASCENDING );
+                }
             }
-        }
 
-        // Temporal Criteria
-        TemporalCriteria temporalCriteria = createTemporalCriteria( queryParameters.getFirst( SearchConstants.STARTDATE_PARAMETER ), queryParameters.getFirst( SearchConstants.ENDDATE_PARAMETER ),
-                queryParameters.getFirst( SearchConstants.DATETYPE_PARAMETER ), humanReadableQuery, defaultDateType );
-        if ( temporalCriteria != null ) {
-            LOGGER.debug( "Attempting to create a Temporal filter with params startDate=[{}], endDate=[{}], dateType=[{}]", temporalCriteria.getStartDate(), temporalCriteria.getEndDate(),
-                    temporalCriteria.getDateType() );
-            Filter filter = getTemporalFilter( temporalCriteria.getStartDate(), temporalCriteria.getEndDate(), temporalCriteria.getDateType(), humanReadableQuery );
-            SearchUtils.addFilter( filters, filter );
-        }
-
-        // Property Criteria
-        List<PropertyCriteria> propertyCriteriaList = getPropertyCriteria( queryParameters, queryConfig.getParameterExtensionMap() );
-        if ( propertyCriteriaList != null && !propertyCriteriaList.isEmpty() ) {
-            for ( PropertyCriteria propCriteria : propertyCriteriaList ) {
-                LOGGER.debug( "Attempting to create a Property filter with params property=[{}], value=[{}], operator=[{}]", propCriteria.getProperty(), propCriteria.getValue(),
-                        propCriteria.getOperator() );
-                Filter filter = getPropertyFilter( propCriteria.getProperty(), propCriteria.getValue(), propCriteria.getOperator(), humanReadableQuery );
+            // Temporal Criteria
+            TemporalCriteria temporalCriteria = createTemporalCriteria( queryParameters.getFirst( SearchConstants.STARTDATE_PARAMETER ),
+                    queryParameters.getFirst( SearchConstants.ENDDATE_PARAMETER ), queryParameters.getFirst( SearchConstants.DATETYPE_PARAMETER ),
+                    humanReadableQuery, defaultDateType );
+            if ( temporalCriteria != null ) {
+                LOGGER.debug( "Attempting to create a Temporal filter with params startDate=[{}], endDate=[{}], dateType=[{}]", temporalCriteria.getStartDate(),
+                        temporalCriteria.getEndDate(), temporalCriteria.getDateType() );
+                Filter filter = getTemporalFilter( temporalCriteria.getStartDate(), temporalCriteria.getEndDate(), temporalCriteria.getDateType(),
+                        humanReadableQuery );
                 SearchUtils.addFilter( filters, filter );
             }
-        }
 
-        if ( filters.isEmpty() ) {
-            throw new UnsupportedQueryException( "There was no valid search criteria presented from the user, cannot complete search" );
-        }
+            // Property Criteria
+            List<PropertyCriteria> propertyCriteriaList = getPropertyCriteria( queryParameters, queryConfig.getParameterExtensionMap() );
+            if ( propertyCriteriaList != null && !propertyCriteriaList.isEmpty() ) {
+                for ( PropertyCriteria propCriteria : propertyCriteriaList ) {
+                    LOGGER.debug( "Attempting to create a Property filter with params property=[{}], value=[{}], operator=[{}]", propCriteria.getProperty(),
+                            propCriteria.getValue(), propCriteria.getOperator() );
+                    Filter filter = getPropertyFilter( propCriteria.getProperty(), propCriteria.getValue(), propCriteria.getOperator(), humanReadableQuery );
+                    SearchUtils.addFilter( filters, filter );
+                }
+            }
 
-        SearchUtils.logSort( sortBy );
-        return new CDRQueryCriteriaImpl( filterBuilder.allOf( filters ), sortBy, humanReadableQuery.toString(), true, queryParameters, new HashMap<String, String>(), queryConfig );
+            if ( filters.isEmpty() ) {
+                throw new UnsupportedQueryException( "There was no valid search criteria presented from the user, cannot complete search" );
+            }
+
+            SearchUtils.logSort( sortBy );
+            return new CDRQueryCriteriaImpl( filterBuilder.allOf( filters ), sortBy, humanReadableQuery.toString(), true, queryParameters,
+                    new HashMap<String, String>(), queryConfig );
+        } catch ( Exception e ) {
+            LOGGER.warn( e.getMessage(), e );
+            if ( e instanceof UnsupportedQueryException ) {
+                throw ( UnsupportedQueryException ) e;
+            }
+            throw new UnsupportedQueryException( "Could not create query criteria from provided query parmaeters", e );
+        }
     }
 
     protected TextualCriteria getTextualCriteria( MultivaluedMap<String, String> queryParameters, boolean defaultFuzzySearch ) throws UnsupportedQueryException {

@@ -54,18 +54,9 @@
     <reference-list id="queryLanguages" interface="net.di2e.ecdr.api.query.QueryLanguage" availability="mandatory" />
     <reference-list id="geoCoders" interface="org.codice.ddf.spatial.geocoder.GeoCoder" availability="optional" />
 
-    <service id="cdrRestConfigWatcher" ref="configurationWatcher" interface="org.codice.ddf.configuration.ConfigurationWatcher" />
-    <bean id="configurationWatcher" class="org.codice.ddf.configuration.impl.ConfigurationWatcherImpl" />
-
     <reference-list id="auditorList" interface="net.di2e.ecdr.api.auditor.SearchAuditor" availability="optional" />
     <reference id="normalizingFedStrategy" interface="net.di2e.ecdr.api.federation.NormalizingFederationStrategy" />
     
-    <bean id="fifoFederationStrategyBean" class="net.di2e.ecdr.federation.FifoFederationStrategy">
-        <argument ref="pool" />
-        <argument ref="preFederatedQuerySortedList" />
-        <argument ref="postFederatedQuerySortedList" />
-    </bean>
-
     <bean id="queryConfiguration" class="net.di2e.ecdr.commons.query.QueryConfigurationImpl">
         <cm:managed-properties persistent-id="cdr-rest-broker-endpoint" update-strategy="container-managed" />
     </bean>
@@ -74,25 +65,21 @@
 
     <bean id="cdrRestSearchService" class="net.di2e.ecdr.broker.endpoint.rest.CDRRestBrokerServiceImpl">
         <argument ref="catalogFramework" />
-        <argument ref="configurationWatcher" />
         <argument ref="queryLanguages" />
         <argument ref="transformIdMapper" />
         <argument ref="auditorList" />
         <argument ref="queryConfiguration" />
         <argument ref="queryRequestCache" />
         <argument ref="normalizingFedStrategy" />
-        <argument ref="fifoFederationStrategyBean" />
         <argument ref="geoCoders" />
     </bean>
     <service ref="cdrRestSearchService" auto-export="interfaces" />
 
 
     <bean id="preFederatedQuerySortedList" class="ddf.catalog.util.impl.SortedServiceList">
-        <argument ref="blueprintBundleContext" />
     </bean>
 
     <bean id="postFederatedQuerySortedList" class="ddf.catalog.util.impl.SortedServiceList">
-        <argument ref="blueprintBundleContext" />
     </bean>
 
     <!-- PRE FEDERATED QUERY REFERENCE -->

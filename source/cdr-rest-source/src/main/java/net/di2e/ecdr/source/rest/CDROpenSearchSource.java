@@ -74,6 +74,7 @@ import ddf.catalog.operation.impl.SourceResponseImpl;
 import ddf.catalog.resource.ResourceNotFoundException;
 import ddf.catalog.resource.ResourceNotSupportedException;
 import ddf.catalog.resource.impl.ResourceImpl;
+import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.ConnectedSource;
 import ddf.catalog.source.FederatedSource;
 import ddf.catalog.source.SourceMonitor;
@@ -81,7 +82,7 @@ import ddf.catalog.source.UnsupportedQueryException;
 import ddf.security.SecurityConstants;
 import ddf.security.Subject;
 
-public class CDROpenSearchSource extends CDRSourceConfiguration implements FederatedSource, ConnectedSource {
+public class CDROpenSearchSource extends CDRSourceConfiguration implements FederatedSource, ConnectedSource, ConfiguredService{
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CDROpenSearchSource.class );
     private static final String HEADER_ACCEPT_RANGES = "Accept-Ranges";
@@ -92,7 +93,8 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
     private static final String BYTES = "bytes";
     private static final String BYTES_EQUAL = "bytes=";
 
-    private SourceMonitor siteAvailabilityCallback = null;
+    //private Set<SourceMonitor> sourceMonitors = null;
+    private SourceMonitor sourceMonitor = null;
     private FilterAdapter filterAdapter = null;
 
     private Date lastAvailableCheckDate = null;
@@ -101,6 +103,8 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
     private WebClient cdrRestClient = null;
     private WebClient cdrAvailabilityCheckClient = null;
+    
+    private String configurationPid = null;
 
     public CDROpenSearchSource( FilterAdapter adapter, CacheManager<Metacard> manager ) {
         super( manager );
@@ -196,18 +200,24 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             } else {
                 LOGGER.debug( "Pulling availability of CDR Rest Federated Source named [{}] from cache, isAvailable=[{}]", localId, isCurrentlyAvailable );
             }
-            if ( siteAvailabilityCallback != null ) {
-                if ( isCurrentlyAvailable ) {
-                    siteAvailabilityCallback.setAvailable();
-                } else {
-                    siteAvailabilityCallback.setUnavailable();
-                }
+            //if ( CollectionUtils.isNotEmpty( sourceMonitors ) ) {
+                if ( sourceMonitor != null ) {
+              //  for( SourceMonitor sourceMonitor : sourceMonitors ){
+                    if ( isCurrentlyAvailable ) {
+                        sourceMonitor.setAvailable();
+                    } else {
+                        sourceMonitor.setUnavailable();
+                    }
+              //  }
             }
         } else {
             LOGGER.debug( "HTTP Ping is set to false so not checking the sites availability, just setting to available" );
             isCurrentlyAvailable = true;
-            if ( siteAvailabilityCallback != null ) {
-                siteAvailabilityCallback.setAvailable();
+            //if ( CollectionUtils.isNotEmpty( sourceMonitors ) ) {
+            if ( sourceMonitor != null ) { 
+            //   for( SourceMonitor sourceMonitor : sourceMonitors ){
+                    sourceMonitor.setAvailable();
+             //   }
             }
         }
         return isCurrentlyAvailable;
@@ -229,7 +239,11 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
     @Override
     public boolean isAvailable( SourceMonitor callback ) {
-        this.siteAvailabilityCallback = callback;
+        if ( callback != null ){
+            //sourceMonitors.add( callback );
+            
+        }
+        sourceMonitor = callback;
         return isAvailable();
     }
 
@@ -590,6 +604,16 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
     @Override
     protected void setPingClient( WebClient webClient ) {
         cdrAvailabilityCheckClient = webClient;
+    }
+
+    @Override
+    public String getConfigurationPid() {
+        return configurationPid;
+    }
+
+    @Override
+    public void setConfigurationPid( String pid ) {
+        configurationPid = pid;
     }
 
 }

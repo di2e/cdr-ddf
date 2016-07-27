@@ -27,7 +27,7 @@ public interface QueryLanguage {
 
     QueryCriteria getQueryCriteria( MultivaluedMap<String, String> queryParameters, QueryConfiguration queryConfig ) throws UnsupportedQueryException;
 
-    boolean isValidQuery( MultivaluedMap<String, String> queryParameters );
+    boolean isValidQuery( MultivaluedMap<String, String> queryParameters, boolean strict );
 
     String getName();
 

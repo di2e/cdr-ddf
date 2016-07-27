@@ -33,7 +33,6 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Entry;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,10 +51,10 @@ public class AtomTransformerWithPayload extends AtomTransformer {
 
     private Map<String, MetacardTransformer> metacardTransformerMap = null;
 
-    public AtomTransformerWithPayload( ConfigurationWatcherImpl configWatcher, ActionProvider viewMetacardProvider, ActionProvider metadataProvider,
+    public AtomTransformerWithPayload( ActionProvider viewMetacardProvider, ActionProvider metadataProvider,
             ActionProvider resourceProvider, ActionProvider thumbnailProvider, MimeType thumbnailMime, MimeType viewMime,
             List<SecurityConfiguration> securityConfig ) {
-        super( configWatcher, viewMetacardProvider, metadataProvider, resourceProvider, thumbnailProvider, thumbnailMime, viewMime, securityConfig );
+        super( viewMetacardProvider, metadataProvider, resourceProvider, thumbnailProvider, thumbnailMime, viewMime, securityConfig );
         metacardTransformerMap = new HashMap<String, MetacardTransformer>();
     }
 

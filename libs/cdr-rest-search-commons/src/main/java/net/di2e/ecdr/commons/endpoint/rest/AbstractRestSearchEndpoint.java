@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+ * Copyright (C) 2016 Pink Summit, LLC (info@pinksummit.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -60,7 +61,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
+import org.codice.ddf.configuration.SystemBaseUrl;
+import org.codice.ddf.configuration.SystemInfo;
 import org.codice.ddf.spatial.geocoder.GeoCoder;
 import org.codice.ddf.spatial.geocoder.GeoResult;
 import org.opengis.geometry.BoundingBox;
@@ -79,11 +81,24 @@ import ddf.registry.api.RegistrableService;
 public abstract class AbstractRestSearchEndpoint implements RegistrableService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AbstractRestSearchEndpoint.class );
+    
+    public static Map<String,String> BASE_QUERY_PARAMS_MAP = null;
+    static{
+        BASE_QUERY_PARAMS_MAP = new HashMap<String,String>();
+        BASE_QUERY_PARAMS_MAP.put( SearchConstants.KEYWORD_PARAMETER, "os:searchTerms" );
+        BASE_QUERY_PARAMS_MAP.put( SearchConstants.COUNT_PARAMETER, "os:count" );
+        BASE_QUERY_PARAMS_MAP.put( SearchConstants.STARTINDEX_PARAMETER, "os:startIndex" );
+        BASE_QUERY_PARAMS_MAP.put( SearchConstants.FORMAT_PARAMETER, "cdrs:responseFormat" );
+        BASE_QUERY_PARAMS_MAP.put( SearchConstants.TIMEOUT_PARAMETER, "cdrs:timeout" );
+        BASE_QUERY_PARAMS_MAP.put( SearchConstants.STATUS_PARAMETER, "cdrb:includeStatus" );
+        BASE_QUERY_PARAMS_MAP.put( SearchConstants.OID_PARAMETER, "cdrsx:originQueryID" );
+        BASE_QUERY_PARAMS_MAP.put( SearchConstants.STRICTMODE_PARAMETER, "cdrsx:strictMode" );
+        BASE_QUERY_PARAMS_MAP.put( SearchConstants.PATH_PARAMETER, "cdrb:path" );
+    }
 
     private QueryRequestCache queryRequestCache = null;
 
     private CatalogFramework catalogFramework = null;
-    private ConfigurationWatcherImpl platformConfig = null;
     private List<SearchAuditor> auditors = null;
     // private Map<String, QueryLanguage> queryLanguageMap = null;
     private List<QueryLanguage> queryLanguageList = null;
@@ -98,7 +113,6 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
      * dependency injection framework like blueprint
      *
      * @param framework Catalog Framework which will be used for search
-     * @param config ConfigurationWatcherImpl used to get the platform configuration values
      * @param queryLangs
      * @param mapper
      * @param auditorList
@@ -106,10 +120,9 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
      * @param queryReqCache
      * @param geoCoderList
      */
-    public AbstractRestSearchEndpoint( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
+    public AbstractRestSearchEndpoint( CatalogFramework framework, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
             QueryConfiguration queryConfig, QueryRequestCache queryReqCache, List<Object> geoCoderList ) {
         this.catalogFramework = framework;
-        this.platformConfig = config;
         // this.queryLanguageMap = queryLangs;
         this.queryLanguageList = queryLangs;
         this.transformMapper = mapper;
@@ -117,61 +130,13 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         this.queryConfiguration = queryConfig;
         this.queryRequestCache = queryReqCache;
         this.geoCoderList = geoCoderList;
+
     }
 
     public Response executePing( UriInfo uriInfo, String encodingHeader, String authHeader ) {
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
-        boolean isValid = isValidQuery( queryParams, platformConfig.getSiteName() );
+        boolean isValid = isValidQuery( queryParams, SystemInfo.getSiteName() );
         return isValid ? Response.ok().build() : Response.status( Response.Status.BAD_REQUEST ).build();
-    }
-
-    /*
-     * protected QueryLanguage getQueryLanguage( MultivaluedMap<String, String> queryParams ) { String lang =
-     * StringUtils.defaultIfBlank( queryParams.getFirst( SearchConstants.QUERYLANGUAGE_PARAMETER ),
-     * queryConfiguration.getDefaultQueryLanguage() ); LOGGER.debug(
-     * "Using query language that is associated with the name [{}]", lang ); return queryLanguageMap.get( lang ); }
-     */
-
-    protected QueryLanguage getQueryLanguage( MultivaluedMap<String, String> queryParams ) {
-        String lang = StringUtils.defaultIfBlank( queryParams.getFirst( SearchConstants.QUERYLANGUAGE_PARAMETER ), queryConfiguration.getDefaultQueryLanguage() );
-        LOGGER.debug( "Using query language that is associated with the name [{}]", lang );
-        for ( QueryLanguage queryLang : queryLanguageList ) {
-            if ( StringUtils.equalsIgnoreCase( queryLang.getName(), lang ) ) {
-                return queryLang;
-            }
-        }
-        return null;
-    }
-
-    private void translateGeoNames( MultivaluedMap<String, String> queryParameters ) {
-
-        String geoName = queryParameters.getFirst( SearchConstants.GEO_NAME_PARAMETER );
-        if ( StringUtils.isNotBlank( geoName )) {
-            for (Object curObject : geoCoderList) {
-                GeoCoder geoCoder = (GeoCoder) curObject;
-                GeoResult result = geoCoder.getLocation( geoName );
-                if (result != null) {
-                    if (result.getBbox() != null) {
-                        BoundingBox boundingBox = GeospatialUtils.pointsToBBox(result.getBbox());
-                        if (boundingBox != null) {
-                            String wktStr = GeospatialUtils.bboxToWKT(boundingBox);
-                            queryParameters.add( SearchConstants.GEOMETRY_PARAMETER, wktStr );
-                        } else {
-                            LOGGER.debug("Was not able to convert geoname result to boundingbox, checking next geocoder.");
-                            continue;
-                        }
-                    } else if (result.getPoint() != null) {
-                        String wktStr = GeospatialUtils.pointToWKT(result.getPoint());
-                        queryParameters.add( SearchConstants.GEOMETRY_PARAMETER, wktStr );
-                    } else {
-                        // issue within the geocoder, it had a result but nothing converted in it
-                        continue;
-                    }
-                    return;
-                }
-            }
-        }
-
     }
 
     /**
@@ -190,7 +155,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         Response response;
         QueryResponse queryResponse = null;
         try {
-            String localSourceId = platformConfig.getSiteName();
+            String localSourceId = SystemInfo.getSiteName();
             MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
             addHeaderParameters( servletRequest, queryParameters );
 
@@ -210,8 +175,8 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
             queryResponse = executeQuery( localSourceId, queryParameters, query );
 
             // Move the specific links into Atom Transformer if possible
-            Map<String, Serializable> transformProperties = SearchUtils.getTransformLinkProperties( uriInfo, query, queryResponse, platformConfig.getSchemeFromProtocol(),
-                    platformConfig.getHostname(), platformConfig.getPort() );
+            Map<String, Serializable> transformProperties = SearchUtils.getTransformLinkProperties( uriInfo, query, queryResponse, getURLScheme(),
+                    SystemBaseUrl.getHost(), Integer.parseInt( SystemBaseUrl.getPort() ) );
             transformProperties.put( SearchConstants.FEED_TITLE, "Atom Search Results from '" + localSourceId + "' for Query: " + query.getHumanReadableQuery().trim() );
             transformProperties.put( SearchConstants.FORMAT_PARAMETER, query.getResponseFormat() );
             transformProperties.put( SearchConstants.STATUS_PARAMETER, isIncludeStatus( queryParameters ) );
@@ -261,14 +226,14 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
     @Produces( "application/opensearchdescription+xml" )
     public Response getOSD() {
         OpenSearchDescription osd = new OpenSearchDescription();
-        osd.setShortName( platformConfig.getSiteName() );
+        osd.setShortName( SystemInfo.getSiteName() );
         osd.setDescription( getServiceDescription() );
         osd.setTags( "ecdr opensearch cdr ddf" );
-        if ( StringUtils.isNotBlank( platformConfig.getOrganization() ) ) {
-            osd.setDeveloper( platformConfig.getOrganization() );
+        if ( StringUtils.isNotBlank( SystemInfo.getOrganization() ) ) {
+            osd.setDeveloper( SystemInfo.getOrganization() );
         }
-        if ( StringUtils.isNotBlank( platformConfig.getContactEmailAddress() ) ) {
-            osd.setContact( platformConfig.getContactEmailAddress() );
+        if ( StringUtils.isNotBlank( SystemInfo.getSiteContatct() ) ) {
+            osd.setContact( SystemInfo.getSiteContatct() );
         }
         Query query = new Query();
         query.setRole( "example" );
@@ -313,6 +278,48 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         } finally {
             IOUtils.closeQuietly( is );
         }
+    }
+    
+    protected QueryLanguage getQueryLanguage( MultivaluedMap<String, String> queryParams ) {
+        String lang = StringUtils.defaultIfBlank( queryParams.getFirst( SearchConstants.QUERYLANGUAGE_PARAMETER ), queryConfiguration.getDefaultQueryLanguage() );
+        LOGGER.debug( "Using query language that is associated with the name [{}]", lang );
+        for ( QueryLanguage queryLang : queryLanguageList ) {
+            if ( StringUtils.equalsIgnoreCase( queryLang.getName(), lang ) ) {
+                return queryLang;
+            }
+        }
+        return null;
+    }
+
+    private void translateGeoNames( MultivaluedMap<String, String> queryParameters ) {
+
+        String geoName = queryParameters.getFirst( SearchConstants.GEO_NAME_PARAMETER );
+        if ( StringUtils.isNotBlank( geoName )) {
+            for (Object curObject : geoCoderList) {
+                GeoCoder geoCoder = (GeoCoder) curObject;
+                GeoResult result = geoCoder.getLocation( geoName );
+                if (result != null) {
+                    if (result.getBbox() != null) {
+                        BoundingBox boundingBox = GeospatialUtils.pointsToBBox(result.getBbox());
+                        if (boundingBox != null) {
+                            String wktStr = GeospatialUtils.bboxToWKT(boundingBox);
+                            queryParameters.add( SearchConstants.GEOMETRY_PARAMETER, wktStr );
+                        } else {
+                            LOGGER.debug("Was not able to convert geoname result to boundingbox, checking next geocoder.");
+                            continue;
+                        }
+                    } else if (result.getPoint() != null) {
+                        String wktStr = GeospatialUtils.pointToWKT(result.getPoint());
+                        queryParameters.add( SearchConstants.GEOMETRY_PARAMETER, wktStr );
+                    } else {
+                        // issue within the geocoder, it had a result but nothing converted in it
+                        continue;
+                    }
+                    return;
+                }
+            }
+        }
+
     }
 
     protected void addSourceDescriptions( OpenSearchDescription osd ) {
@@ -372,18 +379,13 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
     }
 
     public String getParameterTemplate( String languageName ) {
-        // @formatter:off
-        return "?q={os:searchTerms?}"
-                + "&count={os:count?}"
-                + "&startIndex={os:startIndex?}"
-                + "&queryLanguage=" + languageName
-                + "&format={cdrs:responseFormat?}"
-                + "&timeout={cdrs:timeout?}"
-                + "&status={cdrb:includeStatus?}"
-                + "&oid={cdrsx:originQueryID?}"
-                + "&strictMode={cdrsx:strictMode?}"
-                + "&path={cdrb:path?}";
-        // @formatter:on
+        StringBuilder sb = new StringBuilder( "?" );
+        for( Entry<String,String> entry : BASE_QUERY_PARAMS_MAP.entrySet() ){
+            sb.append( entry.getKey() + "={" + entry.getValue() + "?}&" );
+        }
+        // Query Language isn't listed in the default set of values
+        sb.append( SearchConstants.QUERYLANGUAGE_PARAMETER + "=" + languageName );
+        return sb.toString();
     }
 
     public abstract QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query ) throws SourceUnavailableException,
@@ -428,10 +430,10 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
 
     protected String generateTemplateUrl( QueryLanguage lang ) {
         StringBuilder urlBuilder = new StringBuilder();
-        urlBuilder.append( platformConfig.getProtocol() );
-        urlBuilder.append( platformConfig.getHostname() );
+        urlBuilder.append( SystemBaseUrl.getProtocol() );
+        urlBuilder.append( SystemBaseUrl.getHost() );
         urlBuilder.append( ":" );
-        urlBuilder.append( platformConfig.getPort() );
+        urlBuilder.append( SystemBaseUrl.getPort() );
         urlBuilder.append( getServiceRelativeUrl() );
         urlBuilder.append( getParameterTemplate( lang.getName() ) );
         urlBuilder.append( lang.getUrlTemplateParameters() );
@@ -495,6 +497,10 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
             queryParameters.putSingle( SearchConstants.PATH_PARAMETER, catalogFramework.getId() );
         }
         return isUniqueQuery;
+    }
+    
+    protected String getURLScheme(){
+        return StringUtils.substringBefore( SystemBaseUrl.getProtocol(), ":" );
     }
 
 }

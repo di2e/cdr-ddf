@@ -31,20 +31,18 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.codice.ddf</groupId>
-            <artifactId>platform-configuration-impl</artifactId>
+            <groupId>ddf.platform.util</groupId>
+            <artifactId>platform-util</artifactId>
         </dependency>
 
         <dependency>
             <groupId>ddf.catalog.core</groupId>
             <artifactId>catalog-core-commons</artifactId>
-            <version>${ddf.catalog.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ddf.catalog.core</groupId>
             <artifactId>catalog-core-api-impl</artifactId>
-            <version>${ddf.catalog.version}</version>
         </dependency>
 
         <dependency>
@@ -56,19 +54,25 @@
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>4.10.2</version>
+            <version>${lucene.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers-common</artifactId>
-            <version>4.10.2</version>
+            <version>${lucene.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-queryparser</artifactId>
-            <version>4.10.2</version>
+            <version>${lucene.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queries</artifactId>
+            <version>${lucene.version}</version>
         </dependency>
 
         <dependency>
@@ -95,7 +99,14 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Embed-Dependency>catalog-core-api-impl, lucene-core, lucene-analyzers-common, lucene-queryparser, lucene-queries</Embed-Dependency>
+                        <Embed-Dependency>
+                          catalog-core-api-impl, 
+                          platform-util,
+                          lucene-core, 
+                          lucene-analyzers-common, 
+                          lucene-queryparser, 
+                          lucene-queries
+                        </Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Import-Package>
                             org.apache.lucene.sandbox.queries;resolution:=optional,

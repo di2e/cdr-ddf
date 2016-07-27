@@ -56,6 +56,7 @@ import ddf.catalog.data.Metacard;
 import ddf.catalog.data.Result;
 import ddf.catalog.data.impl.MetacardImpl;
 import ddf.catalog.federation.FederationException;
+import ddf.catalog.federation.base.AbstractFederationStrategy;
 import ddf.catalog.impl.CatalogFrameworkImpl;
 import ddf.catalog.impl.MockDelayProvider;
 import ddf.catalog.operation.CreateResponse;
@@ -118,9 +119,9 @@ public class FederationStrategyTest {
         NormalizingSortedFederationStrategy fedStrategy = new NormalizingSortedFederationStrategy( EXECUTOR, new ArrayList<PreFederatedQueryPlugin>(), new ArrayList<PostFederatedQueryPlugin>(), null );
         fedStrategy.setNormalizeResults( false );
 
-        CatalogFrameworkImpl framework = new CatalogFrameworkImpl( Collections.singletonList( (CatalogProvider) provider ), null, new ArrayList<PreIngestPlugin>(), new ArrayList<PostIngestPlugin>(),
-                new ArrayList<PreQueryPlugin>(), new ArrayList<PostQueryPlugin>(), new ArrayList<PreResourcePlugin>(), new ArrayList<PostResourcePlugin>(), new ArrayList<ConnectedSource>(),
-                new ArrayList<FederatedSource>(), new ArrayList<ResourceReader>(), fedStrategy, null, poller );
+        CatalogFrameworkImpl framework = null;//new CatalogFrameworkImpl( Collections.singletonList( (CatalogProvider) provider ), null, new ArrayList<PreIngestPlugin>(), new ArrayList<PostIngestPlugin>(),
+                //new ArrayList<PreQueryPlugin>(), new ArrayList<PostQueryPlugin>(), new ArrayList<PreResourcePlugin>(), new ArrayList<PostResourcePlugin>(), new ArrayList<ConnectedSource>(),
+                //new ArrayList<FederatedSource>(), new ArrayList<ResourceReader>(), fedStrategy, null, poller );
         framework.bind( provider );
 
         List<Metacard> metacards = new ArrayList<Metacard>();
@@ -188,9 +189,6 @@ public class FederationStrategyTest {
         QueryResponse fedResponse = sortedStrategy.federate( sources, fedQueryRequest );
         assertEquals( 1, fedResponse.getResults().size() );
 
-        FifoFederationStrategy fifoStrategy = new FifoFederationStrategy( EXECUTOR, new ArrayList<PreFederatedQueryPlugin>(), new ArrayList<PostFederatedQueryPlugin>() );
-        fedResponse = fifoStrategy.federate( sources, fedQueryRequest );
-        assertEquals( 1, fedResponse.getResults().size() );
     }
 
     /**

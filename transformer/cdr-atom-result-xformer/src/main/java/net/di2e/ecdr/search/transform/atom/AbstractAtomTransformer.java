@@ -54,7 +54,7 @@ import org.apache.abdera.model.Link;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
+import org.codice.ddf.configuration.SystemInfo;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
@@ -89,7 +89,6 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
     private ActionProvider resourceActionProvider = null;
     private ActionProvider thumbnailActionProvider = null;
     private ActionProvider metadataActionProvider = null;
-    private ConfigurationWatcherImpl configWatcher = null;
     private List<SecurityConfiguration> securityConfigurations = null;
     private MimeType thumbnailMimeType = null;
     private MimeType viewMimeType = null;
@@ -101,12 +100,11 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
 
     List<SecurityMarkingHandler> securityHandlers = null;
 
-    public AbstractAtomTransformer( ConfigurationWatcherImpl config, ActionProvider viewMetacard, ActionProvider metadataProvider, ActionProvider resourceProvider,
+    public AbstractAtomTransformer( ActionProvider viewMetacard, ActionProvider metadataProvider, ActionProvider resourceProvider,
             ActionProvider thumbnailProvider, MimeType thumbnailMime, MimeType viewMime, List<SecurityConfiguration> securityConfigs ) {
         if ( viewMime == null || thumbnailMime == null ) {
             throw new IllegalArgumentException( "MimeType parameters to constructor cannot be null" );
         }
-        this.configWatcher = config;
         this.viewMetacardActionProvider = viewMetacard;
         this.metadataActionProvider = metadataProvider;
         this.resourceActionProvider = resourceProvider;
@@ -169,8 +167,8 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
         feed.addExtension( OpenSearchConstants.START_INDEX ).setText( String.valueOf( queryRequest.getQuery().getStartIndex() ) );
         feed.addExtension( OpenSearchConstants.TOTAL_RESULTS ).setText( String.valueOf( response.getHits() ) );
 
-        feed.setGenerator( null, configWatcher.getVersion(), configWatcher.getSiteName() );
-        feed.addAuthor( configWatcher.getOrganization(), configWatcher.getContactEmailAddress(), null );
+        feed.setGenerator( null, SystemInfo.getVersion(), SystemInfo.getSiteName() );
+        feed.addAuthor( SystemInfo.getOrganization(), SystemInfo.getSiteContatct(), null );
 
         addLinksToFeed( feed, properties );
 
@@ -391,10 +389,6 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
         return resourceActionProvider;
     }
 
-    protected ConfigurationWatcherImpl getConfigurationWatcherImpl() {
-        return configWatcher;
-    }
-
     protected MimeType getThumbnailMimeType() {
         return thumbnailMimeType;
     }
@@ -571,7 +565,7 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
         if ( property != null && property instanceof String ) {
             feed.setTitle( String.valueOf( property ) );
         } else {
-            feed.setTitle( "Atom Search Results Feed from source:" + configWatcher.getSiteName() );
+            feed.setTitle( "Atom Search Results Feed from source:" + SystemInfo.getSiteName() );
         }
 
     }

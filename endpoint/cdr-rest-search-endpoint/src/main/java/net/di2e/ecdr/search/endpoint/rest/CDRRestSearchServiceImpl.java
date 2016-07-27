@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+ * Copyright (C) 2016 Pink Summit, LLC (info@pinksummit.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,15 +38,14 @@ import net.di2e.ecdr.commons.endpoint.rest.AbstractRestSearchEndpoint;
 import net.di2e.ecdr.commons.query.CDRQueryImpl;
 import net.di2e.ecdr.commons.xml.fs.SourceDescription;
 import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
-import net.di2e.ecdr.federation.FifoFederationStrategy;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ddf.catalog.CatalogFramework;
 import ddf.catalog.federation.FederationException;
+import ddf.catalog.federation.FederationStrategy;
 import ddf.catalog.operation.QueryRequest;
 import ddf.catalog.operation.QueryResponse;
 import ddf.catalog.operation.impl.QueryRequestImpl;
@@ -66,8 +65,6 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
     private static final String RELATIVE_URL = "/services/cdr/search/rest";
     private static final String SERVICE_TYPE = "CDR REST Search Service";
 
-    private FifoFederationStrategy fifoFederationStratgey = null;
-
     private static final Map<String, String> REGISTRABLE_PROPERTIES = new HashMap<String, String>();
     static {
         REGISTRABLE_PROPERTIES.put( "receiveTimeoutSeconds", "0" );
@@ -83,8 +80,6 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
      *
      * @param framework
      *            Catalog Framework which will be used for search
-     * @param config
-     *            ConfigurationWatcherImpl used to get the platform configuration values
      * @param builder
      *            FilterBuilder implementation
      * @param parser
@@ -94,10 +89,9 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
      *            The transformation mapper for handling mapping the external CDR transform name to the internal DDF
      *            transform name
      */
-    public CDRRestSearchServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, QueryRequestCache queryCache, FifoFederationStrategy fedStrategy, List<Object> geoCoderList ) {
-        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache, geoCoderList );
-        fifoFederationStratgey = fedStrategy;
+    public CDRRestSearchServiceImpl( CatalogFramework framework, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
+            QueryConfiguration queryConfig, QueryRequestCache queryCache, List<Object> geoCoderList ) {
+        super( framework, queryLangs, mapper, auditorList, queryConfig, queryCache, geoCoderList );
     }
 
     @HEAD
@@ -148,7 +142,7 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
     public QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query ) throws SourceUnavailableException, UnsupportedQueryException,
             FederationException {
         QueryRequest queryRequest = new QueryRequestImpl( query, false, Arrays.asList( localSourceId ), getQueryProperties( queryParameters, localSourceId ) );
-        QueryResponse queryResponse = getCatalogFramework().query( queryRequest, fifoFederationStratgey );
+        QueryResponse queryResponse = getCatalogFramework().query( queryRequest );
         return queryResponse;
     }
 

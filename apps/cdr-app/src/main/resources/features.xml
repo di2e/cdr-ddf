@@ -71,8 +71,8 @@
     
     <feature name="ddf-compression" install="manual" version="${project.version}"
              description="Installs DDF compression services that can be used for CXF-based endpoints.">
-        <bundle start-level="70">mvn:ddf.compression/compression-exi/${ddf.compression.version}</bundle>
-        <bundle start-level="70">mvn:ddf.compression/compression-gzip/${ddf.compression.version}</bundle>
+        <bundle start-level="70">mvn:ddf.compression/compression-exi/${ddf.version}</bundle>
+        <bundle start-level="70">mvn:ddf.compression/compression-gzip/${ddf.version}</bundle>
     </feature>
 
     <feature name="cdr-ddf-registry-core" install="manual" version="${project.version}" description="Core DDF registry bundles.">

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+ * Copyright (C) 2016 Pink Summit, LLC (info@pinksummit.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,10 @@ public class GeospatialCriteria {
     private boolean isBBox = false;
     private boolean isPointRadius = false;
 
-    public GeospatialCriteria( double lat, double lon, double rad ) {
-        // if ( rad == null || lon == null || lat == null ) {
-        // throw new IllegalArgumentException( "Null is not valid for lat [" + lat + "], lon [" + lon +
-        // "], and/or radius [" + rad + "]" );
-        // }
+    public GeospatialCriteria( double lat, double lon, double rad ) throws IllegalArgumentException{
+        if ( rad < 0 || ( lon < -180 || lon > 180 ) || ( lat < -90 || lat > 90 ) ) {
+            throw new IllegalArgumentException( "Invalid value for one of lat [" + lat + "], lon [" + lon + "], and/or radius [" + rad + "]" );
+        }
         this.radius = rad;
         this.longitude = lon;
         this.latitude = lat;

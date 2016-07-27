@@ -38,8 +38,9 @@
             <artifactId>registry-core-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codice.ddf</groupId>
-            <artifactId>platform-configuration-impl</artifactId>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.1</version>
         </dependency>
     </dependencies>
 

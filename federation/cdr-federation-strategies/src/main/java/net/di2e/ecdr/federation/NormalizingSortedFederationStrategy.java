@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import net.di2e.ecdr.api.federation.NormalizingFederationStrategy;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.libs.result.relevance.RelevanceNormalizer;
 
@@ -39,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ddf.catalog.data.Result;
+import ddf.catalog.federation.base.AbstractFederationStrategy;
 import ddf.catalog.operation.ProcessingDetails;
 import ddf.catalog.operation.Query;
 import ddf.catalog.operation.SourceResponse;
@@ -62,7 +64,7 @@ import ddf.catalog.util.impl.TemporalResultComparator;
  * @see Query
  * @see SortBy
  */
-public class NormalizingSortedFederationStrategy extends AbstractFederationStrategy {
+public class NormalizingSortedFederationStrategy extends AbstractFederationStrategy implements NormalizingFederationStrategy{
 
     /**
      * The default comparator for sorting by {@link Result.RELEVANCE}, {@link SortOrder.DESCENDING}

@@ -29,7 +29,6 @@ import net.di2e.ecdr.search.transform.atom.constants.AtomResponseConstants;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Link;
 import org.apache.commons.lang.StringUtils;
-import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,9 +39,9 @@ public class AtomOGCTransformer extends AtomTransformer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AtomTransformerWithContent.class );
 
-    public AtomOGCTransformer( ConfigurationWatcherImpl configWatcher, ActionProvider viewMetacardProvider, ActionProvider metadataProvider, ActionProvider resourceProvider,
+    public AtomOGCTransformer( ActionProvider viewMetacardProvider, ActionProvider metadataProvider, ActionProvider resourceProvider,
             ActionProvider thumbnailProvider, MimeType thumbnailMime, MimeType viewMime, List<SecurityConfiguration> securityConfig ) {
-        super( configWatcher, viewMetacardProvider, metadataProvider, resourceProvider, thumbnailProvider, thumbnailMime, viewMime, securityConfig );
+        super( viewMetacardProvider, metadataProvider, resourceProvider, thumbnailProvider, thumbnailMime, viewMime, securityConfig );
         LOGGER.debug( "Created new AtomOGCTransformer for returning metadata with atom entry content element populated" );
     }
 
