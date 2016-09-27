@@ -36,12 +36,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import net.di2e.ecdr.api.cache.CacheManager;
-import net.di2e.ecdr.api.queryresponse.SearchResponseTransformer;
-import net.di2e.ecdr.commons.constants.SearchConstants;
-import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
-import net.di2e.ecdr.search.transform.atom.response.AtomResponseTransformer;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -49,7 +43,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
-import org.apache.cxf.transport.http.HTTPConduit;
 import org.codice.ddf.security.common.jaxrs.RestSecurity;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -81,8 +74,13 @@ import ddf.catalog.source.SourceMonitor;
 import ddf.catalog.source.UnsupportedQueryException;
 import ddf.security.SecurityConstants;
 import ddf.security.Subject;
+import net.di2e.ecdr.api.cache.CacheManager;
+import net.di2e.ecdr.api.queryresponse.SearchResponseTransformer;
+import net.di2e.ecdr.commons.constants.SearchConstants;
+import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
+import net.di2e.ecdr.search.transform.atom.response.AtomResponseTransformer;
 
-public class CDROpenSearchSource extends CDRSourceConfiguration implements FederatedSource, ConnectedSource, ConfiguredService{
+public class CDROpenSearchSource extends CDRSourceConfiguration implements FederatedSource, ConnectedSource, ConfiguredService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CDROpenSearchSource.class );
     private static final String HEADER_ACCEPT_RANGES = "Accept-Ranges";
@@ -93,7 +91,6 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
     private static final String BYTES = "bytes";
     private static final String BYTES_EQUAL = "bytes=";
 
-    //private Set<SourceMonitor> sourceMonitors = null;
     private SourceMonitor sourceMonitor = null;
     private FilterAdapter filterAdapter = null;
 
@@ -239,10 +236,6 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
     @Override
     public boolean isAvailable( SourceMonitor callback ) {
-        if ( callback != null ){
-            //sourceMonitors.add( callback );
-            
-        }
         sourceMonitor = callback;
         return isAvailable();
     }
@@ -288,7 +281,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         if ( uri != null ) {
             LOGGER.debug( "Retrieving the remote resource using the uri [{}]", uri );
             WebClient retrieveWebClient = WebClient.create( uri );
-            HTTPConduit conduit = WebClient.getConfig( retrieveWebClient ).getHttpConduit();
+            WebClient.getConfig( retrieveWebClient ).getHttpConduit();
             TLSUtil.setTLSOptions( retrieveWebClient, getDisableCNCheck() );
             resourceResponse = doRetrieval( retrieveWebClient, requestProperties );
         }

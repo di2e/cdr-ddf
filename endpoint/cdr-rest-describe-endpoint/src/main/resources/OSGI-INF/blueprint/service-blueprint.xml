@@ -48,5 +48,18 @@
     </bean>
 
     <service ref="cdrRestDescribeService" auto-export="interfaces" />
+    
+    <bean id="generatorConfiguration" class="net.di2e.ecdr.describe.generator.GeneratorConfiguration">
+        <cm:managed-properties persistent-id="cdr-describe-generator" update-strategy="container-managed"/>
+    </bean>
+    <reference id="catalogFramework" availability="mandatory" interface="ddf.catalog.CatalogFramework" />
+    <reference id="filterBuilder" availability="mandatory" interface="ddf.catalog.filter.FilterBuilder"/>
+    
+    <bean id="contentGenerator" class="net.di2e.ecdr.describe.generator.DescribeGeneratorImpl">
+        <argument ref="catalogFramework" />
+        <argument ref="filterBuilder" />
+        <argument ref="generatorConfiguration" />
+    </bean>
 
+  <service ref="contentGenerator" auto-export="interfaces" />
 </blueprint>

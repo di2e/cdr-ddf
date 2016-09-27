@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.di2e.ecdr</groupId>
+    <artifactId>libs</artifactId>
+    <version>1.1.5-SNAPSHOT</version>
+  </parent>
+  <groupId>net.di2e.ecdr.libs</groupId>
+  <artifactId>cdr-libs-jaxb-describe</artifactId>
+  <name>Enterprise CDR :: Libs :: Describe Schema Bindings</name>
+  <packaging>bundle</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.sun.xml.bind</groupId>
+      <artifactId>jaxb-impl</artifactId>
+      <version>2.2.11</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jvnet.jaxb2_commons</groupId>
+      <artifactId>jaxb2-basics-runtime</artifactId>
+      <version>0.11.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jvnet.ogc</groupId>
+      <artifactId>gml-v_3_2_1</artifactId>
+      <version>2.6.1</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.hisrc.w3c</groupId>
+      <artifactId>xlink-v_1_0</artifactId>
+      <version>1.4.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+      <version>1.1.0.Final</version>
+    </dependency>
+
+
+
+
+  </dependencies>
+  
+  <build>
+  <pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <configuration>
+          <excludes>**/*</excludes>
+        </configuration>
+      </plugin>
+    </plugins>
+  </pluginManagement>
+    <plugins>
+     <!-- 
+      <plugin>
+        <groupId>org.jvnet.jaxb2.maven2</groupId>
+        <artifactId>maven-jaxb2-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <schemaIncludes>
+                <value>describe/di2e-describe-wrapper.xsd</value>
+              </schemaIncludes>
+              <episodes>
+                <episode>
+                  <groupId>org.jvnet.ogc</groupId>
+                  <artifactId>gml-v_3_2_1</artifactId>
+                </episode>
+                <episode>
+                  <groupId>org.hisrc.w3c</groupId>
+                  <artifactId>xlink-v_1_0</artifactId>
+                </episode>
+
+              </episodes>
+              <strict>false</strict>
+              <extension>true</extension>
+              <args>
+                <arg>-XtoString</arg>
+                <arg>-Xequals</arg>
+                <arg>-XhashCode</arg>
+                <arg>-Xcopyable</arg>
+                <arg>-Xmergeable</arg>
+                <arg>-Xsetters</arg>
+                <arg>-Xwildcard</arg>
+                <arg>-Xinject-code</arg>
+                <arg>-Xinheritance</arg>
+                <arg>-Xannotate</arg>
+                <arg>-enableIntrospection</arg>
+                <arg>-extension</arg>
+                <arg>-XJsr303Annotations</arg>
+                <arg>-XJsr303Annotations:notNullAnnotationsCustomMessages=ClassName</arg>
+              </args>
+              <plugins>
+                <plugin>
+                  <groupId>org.jvnet.jaxb2_commons</groupId>
+                  <artifactId>jaxb2-basics</artifactId>
+                  <version>0.11.1</version>
+                </plugin>
+                <plugin>
+                  <groupId>org.jvnet.jaxb2_commons</groupId>
+                  <artifactId>jaxb2-basics-annotate</artifactId>
+                  <version>1.0.2</version>
+                </plugin>
+                <plugin>
+                  <groupId>com.github.krasa</groupId>
+                  <artifactId>krasa-jaxb-tools</artifactId>
+                  <version>1.5</version>
+                </plugin>
+              </plugins>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+       -->
+
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Embed-Dependency>
+            </Embed-Dependency>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Bundle-Name>${project.name}</Bundle-Name>
+            <Export-Package>
+            </Export-Package>
+            <Import-Package>
+              *
+            </Import-Package>
+            <Private-Package>
+              net.opengis.gml.v_3_2_1.*,
+              org.jvnet.jaxb2_commons.*,
+              org.hisrc.w3c.*,
+              net.di2e.jaxb.*,
+              mil.ces.*,
+              net.opengis.gml.*,
+              org.isotc211.*,
+              us.*,
+            </Private-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+
+    </plugins>
+  </build>
+
+
+</project>

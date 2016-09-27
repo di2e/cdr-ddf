@@ -28,6 +28,19 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.opengis.filter.sort.SortBy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ddf.catalog.CatalogFramework;
+import ddf.catalog.federation.FederationException;
+import ddf.catalog.operation.QueryRequest;
+import ddf.catalog.operation.QueryResponse;
+import ddf.catalog.operation.impl.QueryRequestImpl;
+import ddf.catalog.source.SourceUnavailableException;
+import ddf.catalog.source.UnsupportedQueryException;
 import net.di2e.ecdr.api.auditor.SearchAuditor;
 import net.di2e.ecdr.api.cache.QueryRequestCache;
 import net.di2e.ecdr.api.federation.NormalizingFederationStrategy;
@@ -37,21 +50,6 @@ import net.di2e.ecdr.api.transform.TransformIdMapper;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.commons.endpoint.rest.AbstractRestSearchEndpoint;
 import net.di2e.ecdr.commons.query.CDRQueryImpl;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.opengis.filter.sort.SortBy;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ddf.catalog.CatalogFramework;
-import ddf.catalog.federation.FederationException;
-import ddf.catalog.federation.FederationStrategy;
-import ddf.catalog.operation.QueryRequest;
-import ddf.catalog.operation.QueryResponse;
-import ddf.catalog.operation.impl.QueryRequestImpl;
-import ddf.catalog.source.SourceUnavailableException;
-import ddf.catalog.source.UnsupportedQueryException;
 
 /**
  * JAX-RS Web Service which implements the CDR REST Brokered Search Specification which is based on the CDR Search Spec

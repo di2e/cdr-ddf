@@ -57,6 +57,12 @@
             <version>${ddf.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>ddf.catalog.core</groupId>
+            <artifactId>catalog-core-defaultvalues</artifactId>
+            <version>${ddf.version}</version>
+            <scope>test</scope>
+        </dependency>
 
 
         <dependency>

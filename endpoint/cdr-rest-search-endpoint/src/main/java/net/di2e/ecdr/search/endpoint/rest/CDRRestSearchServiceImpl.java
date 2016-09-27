@@ -29,6 +29,17 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ddf.catalog.CatalogFramework;
+import ddf.catalog.federation.FederationException;
+import ddf.catalog.operation.QueryRequest;
+import ddf.catalog.operation.QueryResponse;
+import ddf.catalog.operation.impl.QueryRequestImpl;
+import ddf.catalog.source.SourceUnavailableException;
+import ddf.catalog.source.UnsupportedQueryException;
 import net.di2e.ecdr.api.auditor.SearchAuditor;
 import net.di2e.ecdr.api.cache.QueryRequestCache;
 import net.di2e.ecdr.api.query.QueryConfiguration;
@@ -39,25 +50,12 @@ import net.di2e.ecdr.commons.query.CDRQueryImpl;
 import net.di2e.ecdr.commons.xml.fs.SourceDescription;
 import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
 
-import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import ddf.catalog.CatalogFramework;
-import ddf.catalog.federation.FederationException;
-import ddf.catalog.federation.FederationStrategy;
-import ddf.catalog.operation.QueryRequest;
-import ddf.catalog.operation.QueryResponse;
-import ddf.catalog.operation.impl.QueryRequestImpl;
-import ddf.catalog.source.SourceUnavailableException;
-import ddf.catalog.source.UnsupportedQueryException;
-
 /**
  * JAX-RS Web Service which implements the CDR REST Search Specification which is based on Open Search
  *
  * @author Jeff Vettraino
  */
-@Path( "/" )
+@Path("/")
 public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CDRRestSearchServiceImpl.class );
@@ -95,14 +93,14 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
     }
 
     @HEAD
-    public Response ping( @Context UriInfo uriInfo, @HeaderParam( "Accept-Encoding" ) String encoding, @HeaderParam( "Authorization" ) String auth ) {
+    public Response ping( @Context UriInfo uriInfo, @HeaderParam("Accept-Encoding") String encoding, @HeaderParam("Authorization") String auth ) {
         Response response = executePing( uriInfo, encoding, auth );
         LOGGER.debug( "Ping (HTTP HEAD) was called to check if the CDR Search Endpoint is available, result is [{}]", response.getStatus() );
         return response;
     }
 
     @GET
-    public Response search( @Context MessageContext context, @HeaderParam( "Accept-Encoding" ) String encoding, @HeaderParam( "Authorization" ) String auth ) {
+    public Response search( @Context MessageContext context, @HeaderParam("Accept-Encoding") String encoding, @HeaderParam("Authorization") String auth ) {
         UriInfo uriInfo = context.getUriInfo();
         LOGGER.debug( "Query received on CDR Search Endpoint: {}", uriInfo.getRequestUri() );
         return executeSearch( context.getHttpServletRequest(), uriInfo, encoding, auth );
@@ -139,8 +137,8 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
     }
 
     @Override
-    public QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query ) throws SourceUnavailableException, UnsupportedQueryException,
-            FederationException {
+    public QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query )
+            throws SourceUnavailableException, UnsupportedQueryException, FederationException {
         QueryRequest queryRequest = new QueryRequestImpl( query, false, Arrays.asList( localSourceId ), getQueryProperties( queryParameters, localSourceId ) );
         QueryResponse queryResponse = getCatalogFramework().query( queryRequest );
         return queryResponse;

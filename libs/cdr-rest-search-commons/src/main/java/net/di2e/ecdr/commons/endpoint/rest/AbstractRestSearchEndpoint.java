@@ -40,22 +40,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import net.di2e.ecdr.api.auditor.SearchAuditor;
-import net.di2e.ecdr.api.cache.QueryRequestCache;
-import net.di2e.ecdr.api.query.QueryConfiguration;
-import net.di2e.ecdr.api.query.QueryCriteria;
-import net.di2e.ecdr.api.query.QueryLanguage;
-import net.di2e.ecdr.api.transform.TransformIdMapper;
-import net.di2e.ecdr.commons.constants.SearchConstants;
-import net.di2e.ecdr.commons.query.CDRQueryImpl;
-import net.di2e.ecdr.commons.util.GeospatialUtils;
-import net.di2e.ecdr.commons.util.SearchUtils;
-import net.di2e.ecdr.commons.xml.fs.SourceDescription;
-import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
-import net.di2e.ecdr.commons.xml.osd.Query;
-import net.di2e.ecdr.commons.xml.osd.SyndicationRight;
-import net.di2e.ecdr.commons.xml.osd.Url;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.ArrayUtils;
@@ -77,23 +61,38 @@ import ddf.catalog.source.SourceUnavailableException;
 import ddf.catalog.source.UnsupportedQueryException;
 import ddf.catalog.transform.CatalogTransformerException;
 import ddf.registry.api.RegistrableService;
+import net.di2e.ecdr.api.auditor.SearchAuditor;
+import net.di2e.ecdr.api.cache.QueryRequestCache;
+import net.di2e.ecdr.api.query.QueryConfiguration;
+import net.di2e.ecdr.api.query.QueryCriteria;
+import net.di2e.ecdr.api.query.QueryLanguage;
+import net.di2e.ecdr.api.transform.TransformIdMapper;
+import net.di2e.ecdr.commons.constants.SearchConstants;
+import net.di2e.ecdr.commons.query.CDRQueryImpl;
+import net.di2e.ecdr.commons.util.GeospatialUtils;
+import net.di2e.ecdr.commons.util.SearchUtils;
+import net.di2e.ecdr.commons.xml.fs.SourceDescription;
+import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
+import net.di2e.ecdr.commons.xml.osd.Query;
+import net.di2e.ecdr.commons.xml.osd.SyndicationRight;
+import net.di2e.ecdr.commons.xml.osd.Url;
 
 public abstract class AbstractRestSearchEndpoint implements RegistrableService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( AbstractRestSearchEndpoint.class );
     
-    public static Map<String,String> BASE_QUERY_PARAMS_MAP = null;
-    static{
-        BASE_QUERY_PARAMS_MAP = new HashMap<String,String>();
-        BASE_QUERY_PARAMS_MAP.put( SearchConstants.KEYWORD_PARAMETER, "os:searchTerms" );
-        BASE_QUERY_PARAMS_MAP.put( SearchConstants.COUNT_PARAMETER, "os:count" );
-        BASE_QUERY_PARAMS_MAP.put( SearchConstants.STARTINDEX_PARAMETER, "os:startIndex" );
-        BASE_QUERY_PARAMS_MAP.put( SearchConstants.FORMAT_PARAMETER, "cdrs:responseFormat" );
-        BASE_QUERY_PARAMS_MAP.put( SearchConstants.TIMEOUT_PARAMETER, "cdrs:timeout" );
-        BASE_QUERY_PARAMS_MAP.put( SearchConstants.STATUS_PARAMETER, "cdrb:includeStatus" );
-        BASE_QUERY_PARAMS_MAP.put( SearchConstants.OID_PARAMETER, "cdrsx:originQueryID" );
-        BASE_QUERY_PARAMS_MAP.put( SearchConstants.STRICTMODE_PARAMETER, "cdrsx:strictMode" );
-        BASE_QUERY_PARAMS_MAP.put( SearchConstants.PATH_PARAMETER, "cdrb:path" );
+    private static Map<String, String> baseQueryParamsMap = null;
+    static {
+        baseQueryParamsMap = new HashMap<String, String>();
+        baseQueryParamsMap.put( SearchConstants.KEYWORD_PARAMETER, "os:searchTerms" );
+        baseQueryParamsMap.put( SearchConstants.COUNT_PARAMETER, "os:count" );
+        baseQueryParamsMap.put( SearchConstants.STARTINDEX_PARAMETER, "os:startIndex" );
+        baseQueryParamsMap.put( SearchConstants.FORMAT_PARAMETER, "cdrs:responseFormat" );
+        baseQueryParamsMap.put( SearchConstants.TIMEOUT_PARAMETER, "cdrs:timeout" );
+        baseQueryParamsMap.put( SearchConstants.STATUS_PARAMETER, "cdrb:includeStatus" );
+        baseQueryParamsMap.put( SearchConstants.OID_PARAMETER, "cdrsx:originQueryID" );
+        baseQueryParamsMap.put( SearchConstants.STRICTMODE_PARAMETER, "cdrsx:strictMode" );
+        baseQueryParamsMap.put( SearchConstants.PATH_PARAMETER, "cdrb:path" );
     }
 
     private QueryRequestCache queryRequestCache = null;
@@ -380,7 +379,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
 
     public String getParameterTemplate( String languageName ) {
         StringBuilder sb = new StringBuilder( "?" );
-        for( Entry<String,String> entry : BASE_QUERY_PARAMS_MAP.entrySet() ){
+        for ( Entry<String, String> entry : baseQueryParamsMap.entrySet() ) {
             sb.append( entry.getKey() + "={" + entry.getValue() + "?}&" );
         }
         // Query Language isn't listed in the default set of values
@@ -499,7 +498,7 @@ public abstract class AbstractRestSearchEndpoint implements RegistrableService {
         return isUniqueQuery;
     }
     
-    protected String getURLScheme(){
+    protected String getURLScheme() {
         return StringUtils.substringBefore( SystemBaseUrl.getProtocol(), ":" );
     }
 

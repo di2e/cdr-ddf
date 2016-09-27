@@ -64,7 +64,7 @@ import ddf.catalog.util.impl.TemporalResultComparator;
  * @see Query
  * @see SortBy
  */
-public class NormalizingSortedFederationStrategy extends AbstractFederationStrategy implements NormalizingFederationStrategy{
+public class NormalizingSortedFederationStrategy extends AbstractFederationStrategy implements NormalizingFederationStrategy {
 
     /**
      * The default comparator for sorting by {@link Result.RELEVANCE}, {@link SortOrder.DESCENDING}
@@ -109,7 +109,7 @@ public class NormalizingSortedFederationStrategy extends AbstractFederationStrat
 
         private Query query;
 
-        public SortedQueryMonitor( ExecutorService pool, Map<Source, Future<SourceResponse>> futuress, QueryResponseImpl returnResults, Query query ) {
+        SortedQueryMonitor( ExecutorService pool, Map<Source, Future<SourceResponse>> futuress, QueryResponseImpl returnResults, Query query ) {
 
             this.returnResults = returnResults;
             this.query = query;
@@ -120,7 +120,7 @@ public class NormalizingSortedFederationStrategy extends AbstractFederationStrat
         @Override
         public void run() {
             String methodName = "run";
-            LOGGER.trace("ENTRY:{}", methodName );
+            LOGGER.trace( "ENTRY:{}", methodName );
 
             SortBy sortBy = query.getSortBy();
             // Prepare the Comparators that we will use

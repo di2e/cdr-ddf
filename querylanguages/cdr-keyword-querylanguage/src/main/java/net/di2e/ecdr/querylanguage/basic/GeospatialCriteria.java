@@ -16,7 +16,7 @@
 package net.di2e.ecdr.querylanguage.basic;
 
 public class GeospatialCriteria {
-    
+
     public enum SpatialOperator {
         Contains, Overlaps, Disjoint, Within
     }
@@ -31,8 +31,8 @@ public class GeospatialCriteria {
     private boolean isBBox = false;
     private boolean isPointRadius = false;
 
-    public GeospatialCriteria( double lat, double lon, double rad ) throws IllegalArgumentException{
-        if ( rad < 0 || ( lon < -180 || lon > 180 ) || ( lat < -90 || lat > 90 ) ) {
+    public GeospatialCriteria( double lat, double lon, double rad ) {
+        if ( rad < 0 || (lon < -180 || lon > 180) || (lat < -90 || lat > 90) ) {
             throw new IllegalArgumentException( "Invalid value for one of lat [" + lat + "], lon [" + lon + "], and/or radius [" + rad + "]" );
         }
         this.radius = rad;
@@ -56,7 +56,7 @@ public class GeospatialCriteria {
         wktBuilder.append( "))" );
         geometryWKT = wktBuilder.toString();
         isBBox = true;
-        
+
     }
 
     public GeospatialCriteria( double minX, double minY, double maxX, double maxY ) {

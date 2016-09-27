@@ -28,6 +28,7 @@
     <name>Enterprise CDR Libs</name>
 
     <modules>
+        <module>cdr-libs-jaxb-describe</module>
         <module>cdr-libs-cache</module>
         <module>cdr-libs-result-relevance-normalizer</module>
         <module>cdr-rest-search-commons</module>

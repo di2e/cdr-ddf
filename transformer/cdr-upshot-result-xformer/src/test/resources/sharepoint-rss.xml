@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<?xml-stylesheet type="text/xsl" href="http://sharepoint/_layouts/RssXslt.aspx" version="1.0"?>
+<!--
+
+    Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+            http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<rss version="2.0" xmlns:search="http://schemas.microsoft.com/SharePoint/Search/RSS">
+    <channel>
+        <title>Search Results: sharepoint</title>
+        <link/>
+        <description>Search RSS feed for Microsoft SharePoint Server 2013</description>
+        <language>en-US</language>
+        <lastBuildDate>Thu, 18 Jun 2015 20:05:37 GMT</lastBuildDate>
+        <generator>Microsoft SharePoint Server 2013 RSS Generator</generator>
+        <ttl>60</ttl>
+        <image>
+            <title>Search Results: sharepoint</title>
+            <url>http://sharepoint/_layouts/images/homepage.gif</url>
+            <link/>
+        </image>
+        <item>
+            <title>SharePoint</title>
+            <link>http://jp.johnpaul.cloudappsportal.com</link>
+            <description><![CDATA[<div style="margin-top:5px"><link rel="stylesheet" type="text/css" href="http://sharepoint/_layouts/1033/styles/search.css" /><span class="srch-Icon"><a href="http://jp.johnpaul.cloudappsportal.com" title="SharePoint"><img src="http://sharepoint/_layouts/images/siteicon_16x16.png" alt="SharePoint Site Collection" border="0" /></a></span><span class="psrch-Description">Title
+
+Background Image Location
+
+Description
+Link Location
+
+Launch Behavior
+
+Order
+
+Background Image Cluster
+    …
+   tools to build apps for Office and <b>SharePoint</b>
+/_layouts/DeveloperTools.aspx $Resources:core,PL_InPageNavigation;
+0
+0
+151
+    …
+   </span><p class="srch-Metadata"><span class="srch-URL"><a href="http://jp.johnpaul.cloudappsportal.com" title="SharePoint">http://jp.johnpaul.cloudappsportal.com</a>
+        -
+        112KB
+          </span></p></div>]]></description>
+            <author>John Paul Swamy</author>
+            <pubDate>Fri, 12 Jun 2015 16:27:52 GMT</pubDate>
+            <search:dotfileextension>.ASPX</search:dotfileextension>
+            <search:size>114405</search:size>
+            <search:hithighlightedsummary>Title
+
+                Background Image Location
+
+                Description
+                Link Location
+
+                Launch Behavior
+
+                Order
+
+                Background Image Cluster tools to build apps for Office and SharePoint
+                /_layouts/DeveloperTools.aspx $Resources:core,PL_InPageNavigation;
+                0
+                0
+                151
+            </search:hithighlightedsummary>
+        </item>
+        <item>
+            <title>SharePoint</title>
+            <link>http://sp.svsp.cloudappsportal.com</link>
+            <description><![CDATA[<div style="margin-top:5px"><link rel="stylesheet" type="text/css" href="http://sharepoint/_layouts/1033/styles/search.css" /><span class="srch-Icon"><a href="http://sp.svsp.cloudappsportal.com" title="SharePoint"><img src="http://sharepoint/_layouts/images/siteicon_16x16.png" alt="SharePoint Site Collection" border="0" /></a></span><span class="psrch-Description">This is where I'll be sharing my thoughts on topics that matter to me. Who knows
+    …
+   I might even share pictures, videos and links to other interesting stuff
+    …
+   If I catch your interest, let me hear from you
+    …
+   No, this isn't actually my picture
+    …
+   I just haven't gotten around to
+    …
+   </span><p class="srch-Metadata"><span class="srch-URL"><a href="http://sp.svsp.cloudappsportal.com" title="SharePoint">http://sp.svsp.cloudappsportal.com</a>
+        -
+        51KB
+          </span></p></div>]]></description>
+            <author>Admin</author>
+            <search:size>52137</search:size>
+            <search:hithighlightedsummary>This is where I'll be sharing my thoughts on topics that matter to me. Who knows I might even share pictures, videos and links to other interesting stuff If
+                I catch your interest, let me hear from you No, this isn't actually my picture I just haven't gotten around to
+            </search:hithighlightedsummary>
+        </item>
+        <item>
+            <title>LAKEVIEW SOW001</title>
+            <link>http://sharepoint.lake.cloudappsportal.com</link>
+            <description><![CDATA[<div style="margin-top:5px"><link rel="stylesheet" type="text/css" href="http://sharepoint/_layouts/1033/styles/search.css" /><span class="srch-Icon"><a href="http://sharepoint.lake.cloudappsportal.com" title="LAKEVIEW SOW001"><img src="http://sharepoint/_layouts/images/siteicon_16x16.png" alt="SharePoint Site Collection" border="0" /></a></span><span class="psrch-Description">No
+Confirm current <b>SharePoint</b> / SQLServer configuration
+
+1/30/2015
+    …
+   No
+Configure Managed Metadata Service 8 min  http://bit.ly/1vIuZgR
+
+2/2/2015
+    …
+   No
+Establish Content Type Hub http://bit.ly/10mmqPQ
+
+2/3/2015
+    …
+   No
+Set Navigation by metadata 8min
+    …
+   </span><p class="srch-Metadata"><span class="srch-URL"><a href="http://sharepoint.lake.cloudappsportal.com" title="LAKEVIEW SOW001">http://sharepoint.lake.cloudappsportal.com</a>
+        -
+        109KB
+          </span></p></div>]]></description>
+            <author>Blane Land</author>
+            <pubDate>Sat, 17 Jan 2015 16:38:56 GMT</pubDate>
+            <search:dotfileextension>.ASPX</search:dotfileextension>
+            <search:size>111963</search:size>
+            <search:hithighlightedsummary>No
+                Confirm current SharePoint / SQLServer configuration
+
+                1/30/2015 No
+                Configure Managed Metadata Service 8 min http://bit.ly/1vIuZgR
+
+                2/2/2015 No
+                Establish Content Type Hub http://bit.ly/10mmqPQ
+
+                2/3/2015 No
+                Set Navigation by metadata 8min
+            </search:hithighlightedsummary>
+        </item>
+        <item>
+            <title>SharePoint Site</title>
+            <link>http://site.spthai.cloudappsportal.com</link>
+            <description><![CDATA[<div style="margin-top:5px"><link rel="stylesheet" type="text/css" href="http://sharepoint/_layouts/1033/styles/search.css" /><span class="srch-Icon"><a href="http://site.spthai.cloudappsportal.com" title=" SharePoint Site"><img src="http://sharepoint/_layouts/images/siteicon_16x16.png" alt="SharePoint Site Collection" border="0" /></a></span><span class="psrch-Description">SoCV
+
+MaCV
+
+NoiDung
+
+CoQuanBanHanh_NoiNhan
+
+DonViSoanThao
+
+NgayBanHanh_NgayNhan
+
+CapBanHanh
+
+DonViDuocNhan
+    …
+   </span><p class="srch-Metadata"><span class="srch-URL"><a href="http://site.spthai.cloudappsportal.com" title=" SharePoint Site">http://site.spthai.cloudappsportal.com</a>
+        -
+        71KB
+          </span></p></div>]]></description>
+            <author>Thai Le</author>
+            <pubDate>Thu, 27 Nov 2014 09:00:24 GMT</pubDate>
+            <search:dotfileextension>.ASPX</search:dotfileextension>
+            <search:size>72427</search:size>
+            <search:hithighlightedsummary>SoCV
+
+                MaCV
+
+                NoiDung
+
+                CoQuanBanHanh_NoiNhan
+
+                DonViSoanThao
+
+                NgayBanHanh_NgayNhan
+
+                CapBanHanh
+
+                DonViDuocNhan
+            </search:hithighlightedsummary>
+        </item>
+        <item>
+            <title>Sharepoint Site</title>
+            <link>http://sharepoint.maxloud.cloudappsportal.com</link>
+            <description><![CDATA[<div style="margin-top:5px"><link rel="stylesheet" type="text/css" href="http://sharepoint/_layouts/1033/styles/search.css" /><span class="srch-Icon"><a href="http://sharepoint.maxloud.cloudappsportal.com" title="Sharepoint Site"><img src="http://sharepoint/_layouts/images/siteicon_16x16.png" alt="SharePoint Site Collection" border="0" /></a></span><span class="psrch-Description">There are no items to show in this view of the "Documents" document library
+    …
+   To add a new item, click "New" or "Upload
+    …
+   </span><p class="srch-Metadata"><span class="srch-URL"><a href="http://sharepoint.maxloud.cloudappsportal.com" title="Sharepoint Site">http://sharepoint.maxloud.cloudappsportal.com</a>
+        -
+        90KB
+          </span></p></div>]]></description>
+            <author>admin</author>
+            <pubDate>Fri, 02 Jan 2015 15:34:16 GMT</pubDate>
+            <search:dotfileextension>.ASPX</search:dotfileextension>
+            <search:size>92339</search:size>
+            <search:hithighlightedsummary>There are no items to show in this view of the "Documents" document library To add a new item, click "New" or "Upload</search:hithighlightedsummary>
+        </item>
+        <item>
+            <title>Investhost</title>
+            <link>http://info.investhost.cloudappsportal.com</link>
+            <description><![CDATA[<div style="margin-top:5px"><link rel="stylesheet" type="text/css" href="http://sharepoint/_layouts/1033/styles/search.css" /><span class="srch-Icon"><a href="http://info.investhost.cloudappsportal.com" title="Investhost"><img src="http://sharepoint/_layouts/images/siteicon_16x16.png" alt="SharePoint Site Collection" border="0" /></a></span><span class="psrch-Description">Investhost offers <b>SharePoint</b> setup and configuration services
+    …
+   </span><p class="srch-Metadata"><span class="srch-URL"><a href="http://info.investhost.cloudappsportal.com" title="Investhost">http://info.investhost.cloudappsportal.com</a>
+        -
+        70KB
+          </span></p></div>]]></description>
+            <author>The Manager</author>
+            <pubDate>Sun, 01 Feb 2015 10:41:25 GMT</pubDate>
+            <search:dotfileextension>.ASPX</search:dotfileextension>
+            <search:size>71204</search:size>
+            <search:hithighlightedsummary>Investhost offers SharePoint setup and configuration services</search:hithighlightedsummary>
+        </item>
+        <item>
+            <title>Nileshkumar Patel</title>
+            <link>http://neel.skyjey.cloudappsportal.com</link>
+            <description><![CDATA[<div style="margin-top:5px"><link rel="stylesheet" type="text/css" href="http://sharepoint/_layouts/1033/styles/search.css" /><span class="srch-Icon"><a href="http://neel.skyjey.cloudappsportal.com" title="Nileshkumar Patel"><img src="http://sharepoint/_layouts/images/siteicon_16x16.png" alt="SharePoint Site Collection" border="0" /></a></span><span class="psrch-Description">Read my blog at neels-indites about <b>SharePoint</b> day to day devevlopment scenarios and troubleshoots
+    …
+   There are no items to show in this view of the "Apps in Testing" list
+    …
+   </span><p class="srch-Metadata"><span class="srch-URL"><a href="http://neel.skyjey.cloudappsportal.com" title="Nileshkumar Patel">http://neel.skyjey.cloudappsportal.com</a>
+        -
+        67KB
+          </span></p></div>]]></description>
+            <author>Neel P</author>
+            <pubDate>Sun, 08 Mar 2015 03:56:11 GMT</pubDate>
+            <search:dotfileextension>.ASPX</search:dotfileextension>
+            <search:size>68849</search:size>
+            <search:hithighlightedsummary>Read my blog at neels-indites about SharePoint day to day devevlopment scenarios and troubleshoots There are no items to show in this view of the "Apps in
+                Testing" list
+            </search:hithighlightedsummary>
+        </item>
+        <item>
+            <title>The Illusives SharePoint site</title>
+            <link>http://the.illusives.cloudappsportal.com</link>
+            <description><![CDATA[<div style="margin-top:5px"><link rel="stylesheet" type="text/css" href="http://sharepoint/_layouts/1033/styles/search.css" /><span class="srch-Icon"><a href="http://the.illusives.cloudappsportal.com" title="The Illusives SharePoint site"><img src="http://sharepoint/_layouts/images/siteicon_16x16.png" alt="SharePoint Site Collection" border="0" /></a></span><span class="psrch-Description">Song title
+
+Song type
+
+Recording link
+
+Lyrics link
+
+Guitar tab link
+
+Bass tab link
+
+Comments
+    …
+   Mon   Tue   Wed   Thu   Fri   Sat   Sun
+    …
+   </span><p class="srch-Metadata"><span class="srch-URL"><a href="http://the.illusives.cloudappsportal.com" title="The Illusives SharePoint site">http://the.illusives.cloudappsportal.com</a>
+        -
+        75KB
+          </span></p></div>]]></description>
+            <author>Andy Fleming;Wil</author>
+            <pubDate>Sun, 29 Mar 2015 04:14:04 GMT</pubDate>
+            <search:dotfileextension>.ASPX</search:dotfileextension>
+            <search:size>76613</search:size>
+            <search:hithighlightedsummary>Song title
+
+                Song type
+
+                Recording link
+
+                Lyrics link
+
+                Guitar tab link
+
+                Bass tab link
+
+                Comments Mon Tue Wed Thu Fri Sat Sun
+            </search:hithighlightedsummary>
+        </item>
+        <item>
+            <title>SoftScience Solutions - Self Organizing SharePoint Solutions Today</title>
+            <link>http://softscience.solutions.cloudappsportal.com</link>
+            <description><![CDATA[<div style="margin-top:5px"><link rel="stylesheet" type="text/css" href="http://sharepoint/_layouts/1033/styles/search.css" /><span class="srch-Icon"><a href="http://softscience.solutions.cloudappsportal.com" title="SoftScience Solutions - Self Organizing SharePoint Solutions Today"><img src="http://sharepoint/_layouts/images/siteicon_16x16.png" alt="SharePoint Site Collection" border="0" /></a></span><span class="psrch-Description">There are no items to show in this view of the "Documents" document library
+    …
+   </span><p class="srch-Metadata"><span class="srch-URL"><a href="http://softscience.solutions.cloudappsportal.com" title="SoftScience Solutions - Self Organizing SharePoint Solutions Today">http://softscience.solutions.cloudappsportal.com</a>
+        -
+        66KB
+          </span></p></div>]]></description>
+            <author>Blane</author>
+            <pubDate>Sat, 15 Nov 2014 23:16:13 GMT</pubDate>
+            <search:dotfileextension>.ASPX</search:dotfileextension>
+            <search:size>67168</search:size>
+            <search:hithighlightedsummary>There are no items to show in this view of the "Documents" document library</search:hithighlightedsummary>
+        </item>
+        <item>
+            <title>SharePoint</title>
+            <link>http://sharepoint.sharepoint.clintonsdomain.cloudappsportal.com</link>
+            <description><![CDATA[<div style="margin-top:5px"><link rel="stylesheet" type="text/css" href="http://sharepoint/_layouts/1033/styles/search.css" /><span class="srch-Icon"><a href="http://sharepoint.sharepoint.clintonsdomain.cloudappsportal.com" title="SharePoint"><img src="http://sharepoint/_layouts/images/siteicon_16x16.png" alt="SharePoint Site Collection" border="0" /></a></span><span class="psrch-Description">Title
+
+Background Image Location
+
+Description
+Link Location
+
+Launch Behavior
+
+Order
+
+Background Image Cluster
+    …
+   tools to build apps for Office and <b>SharePoint</b>
+/_layouts/DeveloperTools.aspx $Resources:core,PL_InPageNavigation;
+0
+0
+151
+    …
+   </span><p class="srch-Metadata"><span class="srch-URL"><a href="http://sharepoint.sharepoint.clintonsdomain.cloudappsportal.com" title="SharePoint">http://sharepoint.sharepoint.clintonsdomain.cloudappsportal.com</a>
+        -
+        87KB
+          </span></p></div>]]></description>
+            <author>Clinton Buchanan</author>
+            <pubDate>Wed, 14 Jan 2015 21:01:56 GMT</pubDate>
+            <search:dotfileextension>.ASPX</search:dotfileextension>
+            <search:size>89406</search:size>
+            <search:hithighlightedsummary>Title
+
+                Background Image Location
+
+                Description
+                Link Location
+
+                Launch Behavior
+
+                Order
+
+                Background Image Cluster tools to build apps for Office and SharePoint
+                /_layouts/DeveloperTools.aspx $Resources:core,PL_InPageNavigation;
+                0
+                0
+                151
+            </search:hithighlightedsummary>
+        </item>
+    </channel>
+</rss>
