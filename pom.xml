@@ -25,7 +25,7 @@
     <packaging>pom</packaging>
     <name>Enterprise CDR</name>
     <description>Top level pom file for CDR running on DDF</description>
-    <url>https://github.com/di2e/cdr-ddf/wiki</url>
+    <url>https://github.com/di2e/ecdr</url>
     <inceptionYear>2014</inceptionYear>
 
     <organization>
