@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+ * Copyright (C) 2016 Pink Summit, LLC (info@pinksummit.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,30 +28,28 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import net.di2e.ecdr.api.auditor.SearchAuditor;
-import net.di2e.ecdr.api.cache.QueryRequestCache;
-import net.di2e.ecdr.api.federation.NormalizingFederationStrategy;
-import net.di2e.ecdr.api.query.QueryConfiguration;
-import net.di2e.ecdr.api.query.QueryLanguage;
-import net.di2e.ecdr.api.transform.TransformIdMapper;
-import net.di2e.ecdr.commons.endpoint.rest.AbstractRestSearchEndpoint;
-import net.di2e.ecdr.commons.query.CDRQueryImpl;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
 import org.opengis.filter.sort.SortBy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ddf.catalog.CatalogFramework;
 import ddf.catalog.federation.FederationException;
-import ddf.catalog.federation.FederationStrategy;
 import ddf.catalog.operation.QueryRequest;
 import ddf.catalog.operation.QueryResponse;
 import ddf.catalog.operation.impl.QueryRequestImpl;
 import ddf.catalog.source.SourceUnavailableException;
 import ddf.catalog.source.UnsupportedQueryException;
+import net.di2e.ecdr.api.auditor.SearchAuditor;
+import net.di2e.ecdr.api.cache.QueryRequestCache;
+import net.di2e.ecdr.api.federation.NormalizingFederationStrategy;
+import net.di2e.ecdr.api.query.QueryConfiguration;
+import net.di2e.ecdr.api.query.QueryLanguage;
+import net.di2e.ecdr.api.transform.TransformIdMapper;
+import net.di2e.ecdr.commons.constants.SearchConstants;
+import net.di2e.ecdr.commons.endpoint.rest.AbstractRestSearchEndpoint;
+import net.di2e.ecdr.commons.query.CDRQueryImpl;
 
 /**
  * JAX-RS Web Service which implements the CDR REST Brokered Search Specification which is based on the CDR Search Spec
@@ -72,27 +70,22 @@ public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
 
     private NormalizingFederationStrategy sortedFedStrategy = null;
 
-    private FederationStrategy defaultFederationStrategy = null;
-
     /**
      * Constructor for JAX RS CDR Search Service. Values should ideally be passed into the constructor using a
      * dependency injection framework like blueprint
      *
      * @param framework
      *            Catalog Framework which will be used for search
-     * @param config
-     *            ConfigurationWatcherImpl used to get the platform configuration values
      * @param builder
      *            FilterBuilder implementation
      * @param parser
      *            The instance of the QueryParser to use which will determine how to parse the parameters from the query
      *            String. Query parsers are tied to different versions of a query profile
      */
-    public CDRRestBrokerServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, QueryRequestCache queryCache, NormalizingFederationStrategy sortedFedStrategy, FederationStrategy defaultFedStrategy, List<Object> geoCoderList ) {
-        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache, geoCoderList );
+    public CDRRestBrokerServiceImpl( CatalogFramework framework, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
+            QueryConfiguration queryConfig, QueryRequestCache queryCache, NormalizingFederationStrategy sortedFedStrategy, List<Object> geoCoderList ) {
+        super( framework, queryLangs, mapper, auditorList, queryConfig, queryCache, geoCoderList );
         this.sortedFedStrategy = sortedFedStrategy;
-        this.defaultFederationStrategy = defaultFedStrategy;
     }
 
     @HEAD
@@ -136,7 +129,7 @@ public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
 
     @Override
     public String getParameterTemplate( String queryLanguageName ) {
-        return super.getParameterTemplate( queryLanguageName ) + "&source={cdrb:routeTo?}";
+        return super.getParameterTemplate( queryLanguageName ) + "&" + SearchConstants.SOURCE_PARAMETER + "={cdrb:routeTo?}";
     }
 
     @Override
@@ -146,8 +139,7 @@ public class CDRRestBrokerServiceImpl extends AbstractRestSearchEndpoint {
 
         QueryRequest queryRequest = new QueryRequestImpl( query, siteNames.isEmpty(), siteNames, getQueryProperties( queryParameters, localSourceId ) );
         SortBy originalSortBy = query.getSortBy();
-        QueryResponse queryResponse = originalSortBy == null ? getCatalogFramework().query( queryRequest, defaultFederationStrategy ) : getCatalogFramework().query( queryRequest,
-                sortedFedStrategy );
+        QueryResponse queryResponse = originalSortBy == null ? getCatalogFramework().query( queryRequest ) : getCatalogFramework().query( queryRequest );
         return queryResponse;
     }
 

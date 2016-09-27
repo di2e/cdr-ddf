@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+ * Copyright (C) 2016 Pink Summit, LLC (info@pinksummit.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 package net.di2e.ecdr.querylanguage.basic;
 
 public class GeospatialCriteria {
-    
+
     public enum SpatialOperator {
         Contains, Overlaps, Disjoint, Within
     }
@@ -32,10 +32,9 @@ public class GeospatialCriteria {
     private boolean isPointRadius = false;
 
     public GeospatialCriteria( double lat, double lon, double rad ) {
-        // if ( rad == null || lon == null || lat == null ) {
-        // throw new IllegalArgumentException( "Null is not valid for lat [" + lat + "], lon [" + lon +
-        // "], and/or radius [" + rad + "]" );
-        // }
+        if ( rad < 0 || (lon < -180 || lon > 180) || (lat < -90 || lat > 90) ) {
+            throw new IllegalArgumentException( "Invalid value for one of lat [" + lat + "], lon [" + lon + "], and/or radius [" + rad + "]" );
+        }
         this.radius = rad;
         this.longitude = lon;
         this.latitude = lat;
@@ -57,7 +56,7 @@ public class GeospatialCriteria {
         wktBuilder.append( "))" );
         geometryWKT = wktBuilder.toString();
         isBBox = true;
-        
+
     }
 
     public GeospatialCriteria( double minX, double minY, double maxX, double maxY ) {

@@ -40,7 +40,6 @@ import org.apache.abdera.Abdera;
 import org.apache.abdera.model.Document;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
-import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.geotools.filter.text.cql2.CQL;
@@ -200,7 +199,6 @@ public class AtomTransformerTest extends net.di2e.ecdr.search.transform.atom.res
     }
 
     private AtomTransformer createTransformer() throws Exception {
-        ConfigurationWatcherImpl configurationWatcher = new ConfigurationWatcherImpl();
         ActionProvider viewMetacardProvider = mock(ActionProvider.class);
         ActionProvider metadataProvider = mock(ActionProvider.class);
         ActionProvider resourceProvider = mock(ActionProvider.class);
@@ -208,7 +206,7 @@ public class AtomTransformerTest extends net.di2e.ecdr.search.transform.atom.res
         List<SecurityConfiguration> securityConfig = Collections.emptyList();
         MimeType thumbnailMime = new MimeType("image/jpeg");
         MimeType viewMime = new MimeType("text/html");
-        return new AtomTransformer( configurationWatcher, viewMetacardProvider, metadataProvider, resourceProvider, thumbnailProvider, thumbnailMime, viewMime, securityConfig );
+        return new AtomTransformer( viewMetacardProvider, metadataProvider, resourceProvider, thumbnailProvider, thumbnailMime, viewMime, securityConfig );
     }
 
     private void compareXML(String expectedXML, Element atomElement) throws Exception {

@@ -36,12 +36,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import net.di2e.ecdr.api.cache.CacheManager;
-import net.di2e.ecdr.api.queryresponse.SearchResponseTransformer;
-import net.di2e.ecdr.commons.constants.SearchConstants;
-import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
-import net.di2e.ecdr.search.transform.atom.response.AtomResponseTransformer;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.io.IOUtils;
@@ -49,7 +43,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
-import org.apache.cxf.transport.http.HTTPConduit;
 import org.codice.ddf.security.common.jaxrs.RestSecurity;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -74,14 +67,20 @@ import ddf.catalog.operation.impl.SourceResponseImpl;
 import ddf.catalog.resource.ResourceNotFoundException;
 import ddf.catalog.resource.ResourceNotSupportedException;
 import ddf.catalog.resource.impl.ResourceImpl;
+import ddf.catalog.service.ConfiguredService;
 import ddf.catalog.source.ConnectedSource;
 import ddf.catalog.source.FederatedSource;
 import ddf.catalog.source.SourceMonitor;
 import ddf.catalog.source.UnsupportedQueryException;
 import ddf.security.SecurityConstants;
 import ddf.security.Subject;
+import net.di2e.ecdr.api.cache.CacheManager;
+import net.di2e.ecdr.api.queryresponse.SearchResponseTransformer;
+import net.di2e.ecdr.commons.constants.SearchConstants;
+import net.di2e.ecdr.commons.filter.StrictFilterDelegate;
+import net.di2e.ecdr.search.transform.atom.response.AtomResponseTransformer;
 
-public class CDROpenSearchSource extends CDRSourceConfiguration implements FederatedSource, ConnectedSource {
+public class CDROpenSearchSource extends CDRSourceConfiguration implements FederatedSource, ConnectedSource, ConfiguredService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CDROpenSearchSource.class );
     private static final String HEADER_ACCEPT_RANGES = "Accept-Ranges";
@@ -92,7 +91,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
     private static final String BYTES = "bytes";
     private static final String BYTES_EQUAL = "bytes=";
 
-    private SourceMonitor siteAvailabilityCallback = null;
+    private SourceMonitor sourceMonitor = null;
     private FilterAdapter filterAdapter = null;
 
     private Date lastAvailableCheckDate = null;
@@ -101,6 +100,8 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
     private WebClient cdrRestClient = null;
     private WebClient cdrAvailabilityCheckClient = null;
+    
+    private String configurationPid = null;
 
     public CDROpenSearchSource( FilterAdapter adapter, CacheManager<Metacard> manager ) {
         super( manager );
@@ -196,18 +197,24 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
             } else {
                 LOGGER.debug( "Pulling availability of CDR Rest Federated Source named [{}] from cache, isAvailable=[{}]", localId, isCurrentlyAvailable );
             }
-            if ( siteAvailabilityCallback != null ) {
-                if ( isCurrentlyAvailable ) {
-                    siteAvailabilityCallback.setAvailable();
-                } else {
-                    siteAvailabilityCallback.setUnavailable();
-                }
+            //if ( CollectionUtils.isNotEmpty( sourceMonitors ) ) {
+                if ( sourceMonitor != null ) {
+              //  for( SourceMonitor sourceMonitor : sourceMonitors ){
+                    if ( isCurrentlyAvailable ) {
+                        sourceMonitor.setAvailable();
+                    } else {
+                        sourceMonitor.setUnavailable();
+                    }
+              //  }
             }
         } else {
             LOGGER.debug( "HTTP Ping is set to false so not checking the sites availability, just setting to available" );
             isCurrentlyAvailable = true;
-            if ( siteAvailabilityCallback != null ) {
-                siteAvailabilityCallback.setAvailable();
+            //if ( CollectionUtils.isNotEmpty( sourceMonitors ) ) {
+            if ( sourceMonitor != null ) { 
+            //   for( SourceMonitor sourceMonitor : sourceMonitors ){
+                    sourceMonitor.setAvailable();
+             //   }
             }
         }
         return isCurrentlyAvailable;
@@ -229,7 +236,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
 
     @Override
     public boolean isAvailable( SourceMonitor callback ) {
-        this.siteAvailabilityCallback = callback;
+        sourceMonitor = callback;
         return isAvailable();
     }
 
@@ -274,7 +281,7 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
         if ( uri != null ) {
             LOGGER.debug( "Retrieving the remote resource using the uri [{}]", uri );
             WebClient retrieveWebClient = WebClient.create( uri );
-            HTTPConduit conduit = WebClient.getConfig( retrieveWebClient ).getHttpConduit();
+            WebClient.getConfig( retrieveWebClient ).getHttpConduit();
             TLSUtil.setTLSOptions( retrieveWebClient, getDisableCNCheck() );
             resourceResponse = doRetrieval( retrieveWebClient, requestProperties );
         }
@@ -590,6 +597,16 @@ public class CDROpenSearchSource extends CDRSourceConfiguration implements Feder
     @Override
     protected void setPingClient( WebClient webClient ) {
         cdrAvailabilityCheckClient = webClient;
+    }
+
+    @Override
+    public String getConfigurationPid() {
+        return configurationPid;
+    }
+
+    @Override
+    public void setConfigurationPid( String pid ) {
+        configurationPid = pid;
     }
 
 }

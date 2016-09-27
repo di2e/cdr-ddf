@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+    Copyright (C) 2016 Pink Summit, LLC (info@pinksummit.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -29,8 +29,8 @@
     <inceptionYear>2014</inceptionYear>
 
     <organization>
-        <name>Cohesive Integrations, LLC</name>
-        <url>http://www.cohesiveintegrations.com</url>
+        <name>Pink Summit, LLC</name>
+        <url>http://www.pinksummit.com</url>
     </organization>
 
     <licenses>
@@ -54,15 +54,11 @@
     <developers>
         <developer>
             <name>Jeff Vettraino</name>
-            <organization>Cohesive Integrations, LLC</organization>
-        </developer>
-        <developer>
-            <name>Nguessan Kouame</name>
-            <organization>Cohesive Integrations, LLC</organization>
+            <organization>Pink Summit, LLC</organization>
         </developer>
         <developer>
             <name>Matt Ramey</name>
-            <organization>Cohesive Integrations, LLC</organization>
+            <organization>Pink Summit, LLC</organization>
         </developer>
     </developers>
 
@@ -80,9 +76,9 @@
         <maven.surefire.plugin.version>2.17</maven.surefire.plugin.version>
 
         <maven.deploy.plugin.version>2.8.1</maven.deploy.plugin.version>
-        <maven.bundle.plugin.version>2.3.5</maven.bundle.plugin.version>
+        <maven.bundle.plugin.version>3.2.0</maven.bundle.plugin.version>
         <maven.clean.plugin.version>2.5</maven.clean.plugin.version>
-        <maven.checkstyle.plugin.version>2.13</maven.checkstyle.plugin.version>
+        <maven.checkstyle.plugin.version>2.17</maven.checkstyle.plugin.version>
         <maven.features.plugin.version>2.3.5</maven.features.plugin.version>
         <maven.resources.plugin.version>2.6</maven.resources.plugin.version>
         <maven.cobertura.plugin.version>2.6</maven.cobertura.plugin.version>
@@ -91,20 +87,17 @@
         <maven.project.info.reports.plugin.version>2.7</maven.project.info.reports.plugin.version>
         <maven.build.helper.plugin.version>1.8</maven.build.helper.plugin.version>
 
-        <maven.compiler.source>1.7</maven.compiler.source>
-        <maven.compiler.target>1.7</maven.compiler.target>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         
         <!--  DDF Dependency Versions -->
-        <ddf.catalog.version>2.4.1</ddf.catalog.version>
-        <ddf.action.version>2.4.0</ddf.action.version>
-        <ddf.platform.version>2.3.1</ddf.platform.version>
-        <ddf.libs.platform-config-impl.version>1.0.0</ddf.libs.platform-config-impl.version>
-        <ddf.compression.version>2.6.0</ddf.compression.version>
+        <ddf.version>2.9.1</ddf.version>
         <ddf.registry.version>0.1.0</ddf.registry.version>
-        <ddf.geocoder.version>2.8.0</ddf.geocoder.version>
         <joda.time.version>2.2</joda.time.version>
         <joda.convert.version>1.7</joda.convert.version>
+        <geotools.version>8.4</geotools.version>
+        <lucene.version>4.10.2</lucene.version>
     </properties>
 
     <scm>
@@ -261,7 +254,6 @@
                     <version>${maven.surefire.plugin.version}</version>
                     <configuration>
                         <argLine>-Djava.awt.headless=true</argLine>
-                        <argLine>-XX:-UseSplitVerifier</argLine>
                     </configuration>
 
                 </plugin>
@@ -379,15 +371,15 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
+            <!-- <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
                 <version>2.8</version>
                 <configuration>
                     <header>com/mycila/maven/plugin/license/templates/APACHE-2.txt</header>
                     <properties>
-                        <owner>Cohesive Integrations, LLC</owner>
-                        <email>info@cohesiveintegrations.com</email>
+                        <owner>Pink Summit, LLC</owner>
+                        <email>info@pinksummit.com</email>
                     </properties>
                     <excludes>
                         <exclude>**/LICENSE</exclude>
@@ -400,7 +392,7 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
             <plugin>
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
@@ -518,9 +510,29 @@
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>org.codice.ddf</groupId>
-                <artifactId>platform-configuration-impl</artifactId>
-                <version>${ddf.libs.platform-config-impl.version}</version>
+                <groupId>ddf.lib</groupId>
+                <artifactId>common-system</artifactId>
+                <version>${ddf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ddf.platform.util</groupId>
+                <artifactId>platform-util</artifactId>
+                <version>${ddf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ddf.catalog.core</groupId>
+                <artifactId>catalog-core-api</artifactId>
+                <version>${ddf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ddf.catalog.core</groupId>
+                <artifactId>catalog-core-api-impl</artifactId>
+                <version>${ddf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ddf.catalog.core</groupId>
+                <artifactId>catalog-core-commons</artifactId>
+                <version>${ddf.version}</version>
             </dependency>
             <dependency>
                 <groupId>ddf.registry.core</groupId>

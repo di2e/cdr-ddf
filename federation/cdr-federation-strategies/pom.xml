@@ -44,32 +44,23 @@
         <dependency>
             <groupId>ddf.catalog.core</groupId>
             <artifactId>catalog-core-api-impl</artifactId>
-            <version>2.4.1</version>
-        </dependency>
-        <!-- <dependency>
-            <groupId>ddf.catalog.core</groupId>
-            <artifactId>catalog-core-commons</artifactId>
-            <version>2.4.1</version>
         </dependency>
         <dependency>
-            <groupId>ddf.catalog.core</groupId>
-            <artifactId>catalog-core-metricsplugin</artifactId>
-            <version>2.4.1</version>
-        </dependency>-->
+            <groupId>ddf.platform.util</groupId>
+            <artifactId>platform-util</artifactId>
+        </dependency>
 
         <!-- JAR of the test classes in catalog-api, namely its mock objects -->
         <dependency>
             <groupId>ddf.catalog.core</groupId>
-            <artifactId>catalog-core-api-impl</artifactId>
-            <version>2.4.1</version>
-            <type>test-jar</type>
+            <artifactId>catalog-core-standardframework</artifactId>
+            <version>${ddf.version}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>ddf.catalog.core</groupId>
-            <artifactId>catalog-core-standardframework</artifactId>
-            <version>2.4.1</version>
+            <artifactId>catalog-core-defaultvalues</artifactId>
+            <version>${ddf.version}</version>
             <scope>test</scope>
         </dependency>
 
@@ -104,6 +95,7 @@
                         <Bundle-SymbolicName>${project.artifactId};blueprint.graceperiod:=true;blueprint.timeout:=604800000</Bundle-SymbolicName>
                         <Embed-Dependency>
                             catalog-core-api-impl;scope=compile|runtime,
+                            platform-util,
                         </Embed-Dependency>
                         <Embed-Transitive>true</Embed-Transitive>
                         <Import-Package>

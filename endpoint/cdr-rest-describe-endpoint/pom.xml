@@ -16,61 +16,126 @@
     limitations under the License.
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>net.di2e.ecdr</groupId>
-        <artifactId>endpoint</artifactId>
-        <version>1.1.5-SNAPSHOT</version>
-    </parent>
-    <name>Enterprise CDR :: Endpoints :: REST Describe Service</name>
-    <groupId>net.di2e.ecdr.endpoint</groupId>
-    <artifactId>cdr-rest-describe-endpoint</artifactId>
-    <packaging>bundle</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>net.di2e.ecdr</groupId>
+    <artifactId>endpoint</artifactId>
+    <version>1.1.5-SNAPSHOT</version>
+  </parent>
+  <name>Enterprise CDR :: Endpoints :: REST Describe Service</name>
+  <groupId>net.di2e.ecdr.endpoint</groupId>
+  <artifactId>cdr-rest-describe-endpoint</artifactId>
+  <packaging>bundle</packaging>
+  
+  <properties>
+    <karaf.version>4.0.5</karaf.version>
+  </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-bundle</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>ddf.registry.core</groupId>
-            <artifactId>registry-core-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.codice.ddf</groupId>
-            <artifactId>platform-configuration-impl</artifactId>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>net.di2e.ecdr.libs</groupId>
+      <artifactId>cdr-rest-search-commons</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.di2e.ecdr.libs</groupId>
+      <artifactId>cdr-libs-jaxb-describe</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>ddf.platform.util</groupId>
+      <artifactId>platform-util</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ddf.catalog.core</groupId>
+      <artifactId>catalog-core-api-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ddf.security</groupId>
+      <artifactId>ddf-security-common</artifactId>
+      <version>${ddf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jvnet.ogc</groupId>
+      <artifactId>ogc-tools-gml32-jts</artifactId>
+      <version>1.0.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-bundle</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ddf.registry.core</groupId>
+      <artifactId>registry-core-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.karaf.shell</groupId>
+      <artifactId>org.apache.karaf.shell.console</artifactId>
+      <version>${karaf.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.1</version>
+    </dependency>
+  </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <configuration>
-                    <instructions>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Embed-Transitive>true</Embed-Transitive>
-                        <Embed-Dependency>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.karaf.tooling</groupId>
+        <artifactId>karaf-services-maven-plugin</artifactId>
+        <version>${karaf.version}</version>
+        <executions>
+          <execution>
+            <id>service-metadata-generate</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>service-metadata-generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <configuration>
+          <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Embed-Transitive>true</Embed-Transitive>
+            <Embed-Dependency>
+              cdr-libs-jaxb-describe,
+              catalog-core-api-impl,
+              platform-util,
+              ddf-security-common,
+            </Embed-Dependency>
+            <Import-Package>
+              !org.hisrc.w3c.*,
+              !org.jvnet.*,
+              !org.codice.ddf.platform.util,
+              !org.codice.ddf.platform.util.http,
+              META-INF.cxf;version="[2.7.0, 4.0)";resolution:=optional,
+              META-INF.cxf.osgi;version="[2.7.0,
+              4.0)";resolution:=optional,
+              templates;resolution:=optional,
 
-                        </Embed-Dependency>
-                        <Import-Package>
-                            META-INF.cxf;version="[2.7.0, 4.0)";resolution:=optional,
-                            META-INF.cxf.osgi;version="[2.7.0, 4.0)";resolution:=optional,
-                            templates;resolution:=optional,
-                            *,
-                        </Import-Package>
-                        <Export-Package />
-                        <Private-Package>
-                            net.di2e.ecdr.describe.endpoint.rest,
-                        </Private-Package>
-                    </instructions>
-                </configuration>
-            </plugin>
+              *,
+            </Import-Package>
+            <Export-Package>
+              net.di2e.ecdr.describe.commands,
+              net.di2e.ecdr.describe.generator,
+            </Export-Package>
+            <Private-Package>
+              net.di2e.ecdr.describe.*,
+            </Private-Package>
+          </instructions>
+        </configuration>
+      </plugin>
 
-        </plugins>
-    </build>
+    </plugins>
+  </build>
 
 
 </project>

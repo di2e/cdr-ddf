@@ -25,11 +25,6 @@
             ref="atomPayloadTransformer" />
     </reference-list>
 
-
-    <service id="atomConfigWatcher" ref="configurationWatcherAtom" interface="org.codice.ddf.configuration.ConfigurationWatcher" />
-    <!-- <service id="atomConfigWatcher" ref="configurationWatcherAtom" interface="ddf.catalog.util.DdfConfigurationWatcher"/> -->
-    <bean id="configurationWatcherAtom" class="org.codice.ddf.configuration.impl.ConfigurationWatcherImpl" />
-
     <reference id="viewMetacardActionProvider" interface="ddf.action.ActionProvider" filter="(id=catalog.data.metacard.view)"
         availability="optional" />
     <reference id="metadataActionProvider" interface="ddf.action.ActionProvider" filter="(id=catalog.data.metacard.metadata)"
@@ -51,7 +46,6 @@
 
     <bean id="atomPayloadTransformer" class="net.di2e.ecdr.search.transform.atom.AtomTransformerWithPayload">
         <cm:managed-properties persistent-id="cdr-atom-result-xformer" update-strategy="container-managed" />
-        <argument ref="configurationWatcherAtom" />
         <argument ref="viewMetacardActionProvider" />
         <argument ref="metadataActionProvider" />
         <argument ref="resourceActionProvider" />
@@ -71,7 +65,6 @@
 
     <bean id="atomTransformer" class="net.di2e.ecdr.search.transform.atom.AtomTransformer">
         <cm:managed-properties persistent-id="cdr-atom-result-xformer" update-strategy="container-managed" />
-        <argument ref="configurationWatcherAtom" />
         <argument ref="viewMetacardActionProvider" />
         <argument ref="metadataActionProvider" />
         <argument ref="resourceActionProvider" />
@@ -91,7 +84,6 @@
     
     <bean id="atomContentTransformer" class="net.di2e.ecdr.search.transform.atom.AtomTransformerWithContent">
         <cm:managed-properties persistent-id="cdr-atom-result-xformer" update-strategy="container-managed" />
-        <argument ref="configurationWatcherAtom" />
         <argument ref="viewMetacardActionProvider" />
         <argument ref="metadataActionProvider" />
         <argument ref="resourceActionProvider" />
@@ -111,7 +103,6 @@
     
     <bean id="atomOGCTransformer" class="net.di2e.ecdr.search.transform.atom.AtomOGCTransformer">
         <cm:managed-properties persistent-id="cdr-atom-result-xformer" update-strategy="container-managed" />
-        <argument ref="configurationWatcherAtom" />
         <argument ref="viewMetacardActionProvider" />
         <argument ref="metadataActionProvider" />
         <argument ref="resourceActionProvider" />

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+ * Copyright (C) 2016 Pink Summit, LLC (info@pinksummit.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -199,6 +199,9 @@ public class CDRQueryImpl implements Query {
         if ( StringUtils.isNotBlank( stringCount ) ) {
             try {
                 count = Integer.parseInt( stringCount );
+                if ( count <= 0 ) {
+                    throw new UnsupportedQueryException( "The [" + SearchConstants.COUNT_PARAMETER + "] parameter cannot be less than 0 and was [" + stringCount + "]" );
+                }
             } catch ( NumberFormatException e ) {
                 String message = "Invalid Number found for 'count' [" + stringCount + "].  Resulted in exception: " + e.getMessage();
                 LOGGER.warn( message );

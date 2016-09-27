@@ -29,6 +29,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import net.di2e.ecdr.api.federation.NormalizingFederationStrategy;
 import net.di2e.ecdr.commons.constants.SearchConstants;
 import net.di2e.ecdr.libs.result.relevance.RelevanceNormalizer;
 
@@ -39,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ddf.catalog.data.Result;
+import ddf.catalog.federation.base.AbstractFederationStrategy;
 import ddf.catalog.operation.ProcessingDetails;
 import ddf.catalog.operation.Query;
 import ddf.catalog.operation.SourceResponse;
@@ -62,7 +64,7 @@ import ddf.catalog.util.impl.TemporalResultComparator;
  * @see Query
  * @see SortBy
  */
-public class NormalizingSortedFederationStrategy extends AbstractFederationStrategy {
+public class NormalizingSortedFederationStrategy extends AbstractFederationStrategy implements NormalizingFederationStrategy {
 
     /**
      * The default comparator for sorting by {@link Result.RELEVANCE}, {@link SortOrder.DESCENDING}
@@ -107,7 +109,7 @@ public class NormalizingSortedFederationStrategy extends AbstractFederationStrat
 
         private Query query;
 
-        public SortedQueryMonitor( ExecutorService pool, Map<Source, Future<SourceResponse>> futuress, QueryResponseImpl returnResults, Query query ) {
+        SortedQueryMonitor( ExecutorService pool, Map<Source, Future<SourceResponse>> futuress, QueryResponseImpl returnResults, Query query ) {
 
             this.returnResults = returnResults;
             this.query = query;
@@ -118,7 +120,7 @@ public class NormalizingSortedFederationStrategy extends AbstractFederationStrat
         @Override
         public void run() {
             String methodName = "run";
-            LOGGER.trace("ENTRY:{}", methodName );
+            LOGGER.trace( "ENTRY:{}", methodName );
 
             SortBy sortBy = query.getSortBy();
             // Prepare the Comparators that we will use

@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+ * Copyright (C) 2016 Pink Summit, LLC (info@pinksummit.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,19 +29,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import net.di2e.ecdr.api.auditor.SearchAuditor;
-import net.di2e.ecdr.api.cache.QueryRequestCache;
-import net.di2e.ecdr.api.query.QueryConfiguration;
-import net.di2e.ecdr.api.query.QueryLanguage;
-import net.di2e.ecdr.api.transform.TransformIdMapper;
-import net.di2e.ecdr.commons.endpoint.rest.AbstractRestSearchEndpoint;
-import net.di2e.ecdr.commons.query.CDRQueryImpl;
-import net.di2e.ecdr.commons.xml.fs.SourceDescription;
-import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
-import net.di2e.ecdr.federation.FifoFederationStrategy;
-
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.codice.ddf.configuration.impl.ConfigurationWatcherImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,21 +40,28 @@ import ddf.catalog.operation.QueryResponse;
 import ddf.catalog.operation.impl.QueryRequestImpl;
 import ddf.catalog.source.SourceUnavailableException;
 import ddf.catalog.source.UnsupportedQueryException;
+import net.di2e.ecdr.api.auditor.SearchAuditor;
+import net.di2e.ecdr.api.cache.QueryRequestCache;
+import net.di2e.ecdr.api.query.QueryConfiguration;
+import net.di2e.ecdr.api.query.QueryLanguage;
+import net.di2e.ecdr.api.transform.TransformIdMapper;
+import net.di2e.ecdr.commons.endpoint.rest.AbstractRestSearchEndpoint;
+import net.di2e.ecdr.commons.query.CDRQueryImpl;
+import net.di2e.ecdr.commons.xml.fs.SourceDescription;
+import net.di2e.ecdr.commons.xml.osd.OpenSearchDescription;
 
 /**
  * JAX-RS Web Service which implements the CDR REST Search Specification which is based on Open Search
  *
  * @author Jeff Vettraino
  */
-@Path( "/" )
+@Path("/")
 public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
 
     private static final Logger LOGGER = LoggerFactory.getLogger( CDRRestSearchServiceImpl.class );
 
     private static final String RELATIVE_URL = "/services/cdr/search/rest";
     private static final String SERVICE_TYPE = "CDR REST Search Service";
-
-    private FifoFederationStrategy fifoFederationStratgey = null;
 
     private static final Map<String, String> REGISTRABLE_PROPERTIES = new HashMap<String, String>();
     static {
@@ -83,8 +78,6 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
      *
      * @param framework
      *            Catalog Framework which will be used for search
-     * @param config
-     *            ConfigurationWatcherImpl used to get the platform configuration values
      * @param builder
      *            FilterBuilder implementation
      * @param parser
@@ -94,21 +87,20 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
      *            The transformation mapper for handling mapping the external CDR transform name to the internal DDF
      *            transform name
      */
-    public CDRRestSearchServiceImpl( CatalogFramework framework, ConfigurationWatcherImpl config, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
-            QueryConfiguration queryConfig, QueryRequestCache queryCache, FifoFederationStrategy fedStrategy, List<Object> geoCoderList ) {
-        super( framework, config, queryLangs, mapper, auditorList, queryConfig, queryCache, geoCoderList );
-        fifoFederationStratgey = fedStrategy;
+    public CDRRestSearchServiceImpl( CatalogFramework framework, List<QueryLanguage> queryLangs, TransformIdMapper mapper, List<SearchAuditor> auditorList,
+            QueryConfiguration queryConfig, QueryRequestCache queryCache, List<Object> geoCoderList ) {
+        super( framework, queryLangs, mapper, auditorList, queryConfig, queryCache, geoCoderList );
     }
 
     @HEAD
-    public Response ping( @Context UriInfo uriInfo, @HeaderParam( "Accept-Encoding" ) String encoding, @HeaderParam( "Authorization" ) String auth ) {
+    public Response ping( @Context UriInfo uriInfo, @HeaderParam("Accept-Encoding") String encoding, @HeaderParam("Authorization") String auth ) {
         Response response = executePing( uriInfo, encoding, auth );
         LOGGER.debug( "Ping (HTTP HEAD) was called to check if the CDR Search Endpoint is available, result is [{}]", response.getStatus() );
         return response;
     }
 
     @GET
-    public Response search( @Context MessageContext context, @HeaderParam( "Accept-Encoding" ) String encoding, @HeaderParam( "Authorization" ) String auth ) {
+    public Response search( @Context MessageContext context, @HeaderParam("Accept-Encoding") String encoding, @HeaderParam("Authorization") String auth ) {
         UriInfo uriInfo = context.getUriInfo();
         LOGGER.debug( "Query received on CDR Search Endpoint: {}", uriInfo.getRequestUri() );
         return executeSearch( context.getHttpServletRequest(), uriInfo, encoding, auth );
@@ -145,10 +137,10 @@ public class CDRRestSearchServiceImpl extends AbstractRestSearchEndpoint {
     }
 
     @Override
-    public QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query ) throws SourceUnavailableException, UnsupportedQueryException,
-            FederationException {
+    public QueryResponse executeQuery( String localSourceId, MultivaluedMap<String, String> queryParameters, CDRQueryImpl query )
+            throws SourceUnavailableException, UnsupportedQueryException, FederationException {
         QueryRequest queryRequest = new QueryRequestImpl( query, false, Arrays.asList( localSourceId ), getQueryProperties( queryParameters, localSourceId ) );
-        QueryResponse queryResponse = getCatalogFramework().query( queryRequest, fifoFederationStratgey );
+        QueryResponse queryResponse = getCatalogFramework().query( queryRequest );
         return queryResponse;
     }
 

@@ -35,17 +35,19 @@
             <artifactId>cdr-rest-search-commons</artifactId>
             <version>${project.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>ddf.platform.util</groupId>
+            <artifactId>platform-util</artifactId>
+        </dependency>
         <dependency>
             <groupId>ddf.catalog.core</groupId>
             <artifactId>catalog-core-api-impl</artifactId>
-            <version>${ddf.catalog.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.parboiled</groupId>
             <artifactId>parboiled-java</artifactId>
-            <version>1.1.6</version>
+            <version>1.1.7</version>
         </dependency>
         
         <dependency>
@@ -73,8 +75,8 @@
                         <Embed-Transitive>false</Embed-Transitive>
                         <Embed-Dependency>
                             catalog-core-api-impl,
-                            parboiled*;scope=compile|runtime,
-                            asm*;scope=compile|runtime,
+                            platform-util,
+                            
                         </Embed-Dependency>
                         <Import-Package>
                             *
@@ -82,8 +84,12 @@
                         <Export-Package>
                         </Export-Package>
                         <Private-Package>
-                            org.objectweb.*,
                             org.parboiled.*,
+                            org.objectweb.asm,
+                            org.objectweb.asm.signature,
+                            org.objectweb.asm.tree,
+                            org.objectweb.asm.tree.analysis,
+                            org.objectweb.asm.util,
                             net.di2e.ecdr.querylanguage.basic,
                             net.di2e.ecdr.querylanguage.basic.keywordparser,
                         </Private-Package>

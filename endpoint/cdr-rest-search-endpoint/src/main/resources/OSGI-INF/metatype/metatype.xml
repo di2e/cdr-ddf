@@ -2,6 +2,7 @@
 <!--
 
     Copyright (C) 2014 Cohesive Integrations, LLC (info@cohesiveintegrations.com)
+    Copyright (C) 2016 Pink Summit, LLC (info@pinksummit.com)
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -20,7 +21,7 @@
 
     <OCD name="CDR REST Search Endpoint" id="cdr-rest-search-endpoint" description="RESTful endpoint that aligns with the CDR REST Search Specificaiton">
 
-        <AD name="Default Response Format" id="defaultResponseFormat" required="true" type="String" default="atom"
+        <AD name="Default Response Format" id="defaultResponseFormat" required="true" type="String" default="cdr-atom"
             description="The default response format to return results as if no format parameter is supplied in the query">
             <Option label="Atom" value="cdr-atom" />
             <Option label="Atom with Metadata Payload (any format)" value="atom-with-payload" />
