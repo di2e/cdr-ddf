@@ -35,8 +35,8 @@ public enum CVEnumISMExemptFromValues {
     /**
      * (U) Document claims exemption from ICD-710 rules mandating the
      * 				use of Foreign Disclosure and Release markings that have been encoded in ISM.
-     * 				Currently, the requirement for FD&R is only mandatory for Disseminated Analytic
-     * 				Product; however, it is strongly encouraged otherwise.
+     * 				Currently, the requirement for FDR is only mandatory for Disseminated Analytic
+     * 				Product however, it is strongly encouraged otherwise.
      * 
      */
     IC_710_MANDATORY_FDR,

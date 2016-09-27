@@ -200,7 +200,6 @@
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <preparationGoals>clean verify install</preparationGoals>
-                        <arguments>-Pgenerate_uml_javadoc</arguments>
                         <pushChanges>false</pushChanges>
                         <mavenExecutorId>forked-path</mavenExecutorId>
                     </configuration>
@@ -296,6 +295,7 @@
                     <configuration>
                         <aggregate>true</aggregate>
                         <show>protected</show>
+                        <!-- 
                         <doclet>org.umlgraph.doclet.UmlGraphDoc</doclet>
                         <docletArtifact>
                             <groupId>org.umlgraph</groupId>
@@ -312,7 +312,7 @@
                             -postfixpackage
                             -nodefontsize 9
                             -nodefontpackagesize 7
-                        </additionalparam>
+                        </additionalparam>-->
                     </configuration>
                 </plugin>
 				

@@ -159,8 +159,8 @@ public class CompoundTypeIdentifierType implements Serializable, Cloneable, Copy
      *     {@link String }
      *     
      */
-    public void setElementValue(String v) {
-        this.elementValue = v;
+    public void setElementValue(String value) {
+        this.elementValue = value;
     }
 
     public boolean isSetElementValue() {
