@@ -200,7 +200,6 @@
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <preparationGoals>clean verify install</preparationGoals>
-                        <arguments>-Pgenerate_uml_javadoc</arguments>
                         <pushChanges>false</pushChanges>
                         <mavenExecutorId>forked-path</mavenExecutorId>
                     </configuration>
