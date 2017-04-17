@@ -46,6 +46,7 @@ import net.di2e.ecdr.search.transform.geo.formatter.CompositeGeometry;
 import org.apache.abdera.Abdera;
 import org.apache.abdera.ext.geo.Position;
 import org.apache.abdera.ext.opensearch.OpenSearchConstants;
+import org.apache.abdera.model.Content;
 import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.ExtensibleElement;
@@ -420,6 +421,10 @@ public abstract class AbstractAtomTransformer implements MetacardTransformer, Qu
         Date effective = metacard.getEffectiveDate();
         if ( effective != null ) {
             entry.setPublished( effective );
+        }
+
+        if (StringUtils.isNotEmpty( metacard.getMetadata() )) {
+            entry.setContent( metacard.getMetadata(), Content.Type.XML );
         }
 
         entry.addCategory( metacard.getContentTypeVersion(), metacard.getContentTypeName(), "Content Type" );
